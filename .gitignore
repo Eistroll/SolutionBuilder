@@ -1,3 +1,6 @@
 /obj/
 /bin/
 /.vs/
+/Service References/
+*.VC.db
+*.VC.VC.opendb

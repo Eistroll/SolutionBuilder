@@ -46,7 +46,10 @@ namespace SolutionBuilder
         }
         public static Model Load()
         {
-            FileStream stream = new FileStream("DataModel.xml", FileMode.Open);
+            FileInfo file = new FileInfo("DataModel.xml");
+            if (!file.Exists)
+                return new Model();
+            FileStream stream = new FileStream(file.Name, FileMode.Open);
             XmlDictionaryReader reader = XmlDictionaryReader.CreateTextReader(stream, new XmlDictionaryReaderQuotas());
             DataContractSerializer serializer = new DataContractSerializer(typeof(Model));
             Model model = (Model)serializer.ReadObject(reader, true);

@@ -8,6 +8,7 @@
         Title="MainWindow" Height="411.691" Width="705.53" Loaded="Window_Loaded">
     <Window.CommandBindings>
         <CommandBinding Command="Save" CanExecute="SaveCmd_CanExecute" Executed="SaveCmd_Executed"/>
+        <CommandBinding Command="self:CustomCommands.NewSolution" CanExecute="NewSolutionCmd_CanExecute" Executed="NewSolutionCmd_Executed"/>
     </Window.CommandBindings>
     <DockPanel Height="393" VerticalAlignment="Top">
         <Menu DockPanel.Dock="Top">
@@ -27,6 +28,11 @@
             <ComboBox x:Name="cbPlatform" ItemsSource="{Binding Platforms}" SelectedItem="{Binding SelectedPlatform}" HorizontalAlignment="Left" Margin="135,10,0,0" VerticalAlignment="Top" Width="120" Height="22"/>
             <Button x:Name="btBuild" Content="Build" Margin="613,10,0,0" VerticalAlignment="Top" Width="75" HorizontalAlignment="Left" Click="btBuild_Click" Height="20"/>
             <ListView Name="lvSolutions" ItemsSource="{Binding Solutions}" Margin="10,37,10,10">
+                <ListView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Command="NewSolution">New</MenuItem>
+                    </ContextMenu>
+                </ListView.ContextMenu>
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="" Width="30">

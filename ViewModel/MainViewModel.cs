@@ -53,7 +53,10 @@ namespace SolutionBuilder
         }
         public static MainViewModel Load()
         {
-            FileStream stream = new FileStream("DataViewModel.xml", FileMode.Open);
+            FileInfo file = new FileInfo("DataViewModel.xml");
+            if (!file.Exists)
+                return new MainViewModel();
+            FileStream stream = new FileStream(file.Name, FileMode.Open);
             XmlDictionaryReader reader = XmlDictionaryReader.CreateTextReader(stream, new XmlDictionaryReaderQuotas());
             DataContractSerializer serializer = new DataContractSerializer(typeof(MainViewModel));
             MainViewModel model = (MainViewModel)serializer.ReadObject(reader, true);

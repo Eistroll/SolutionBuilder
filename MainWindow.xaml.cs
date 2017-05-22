@@ -34,6 +34,13 @@ namespace SolutionBuilder
             this.DataContext = _ViewModel;
             _ViewModel.BindToModel( ref _Model);
         }
+        private void NewSolutionCmd_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+        private void NewSolutionCmd_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+        }
         private void SaveCmd_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = true;
