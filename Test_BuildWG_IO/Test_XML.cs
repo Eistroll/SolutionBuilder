@@ -16,13 +16,9 @@ namespace Test_SolutionBuilder
             Model model = new Model();
             model.SolutionObjects.Add(new SolutionObject
             {
-                BaseDir = @"C:\Users\thomas.roller\Documents\work\git\win\ext"
-                    ,
                 Name = "BCGCBPro140.sln"
                     ,
                 Options = new Dictionary<string, string> { { "Release", "/p:Configuration=\"Unicode Release\"" }, { "Debug", "/p:Configuration=\"Unicode Debug\"" } }
-                    ,
-                RelativePath = ""
             });
             Assert.AreEqual(1, model.SolutionObjects.Count);
             model.Save();
@@ -36,20 +32,12 @@ namespace Test_SolutionBuilder
             Model model = new Model();
             model.SolutionObjects.Add(new SolutionObject
             {
-                BaseDir = @"C:\Users\thomas.roller\Documents\work\git\win\ext"
-                    ,
                 Name = "BCGCBPro140.sln"
                     ,
                 Options = new Dictionary<string, string> { { "Release", "/p:Configuration=\"Unicode Release\"" }, { "Debug", "/p:Configuration=\"Unicode Debug\"" } }
-                    ,
-                RelativePath = ""
             });
             model.SolutionObjects.Add(new SolutionObject
             {
-                BaseDir = @"C:\Users\thomas.roller\Documents\work\git\win\wg"
-                    ,
-                RelativePath = @"Addons"
-                    ,
                 Name = "DemoPanel.sln"
                     ,
                 Options = new Dictionary<string, string> { { "Release", "/p:Configuration=\"Unicode Release\"" }, { "Debug", "/p:Configuration=\"Unicode Debug\"" } }

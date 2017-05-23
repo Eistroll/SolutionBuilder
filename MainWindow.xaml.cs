@@ -34,13 +34,6 @@ namespace SolutionBuilder
             this.DataContext = _ViewModel;
             _ViewModel.BindToModel( ref _Model);
         }
-        private void NewSolutionCmd_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = true;
-        }
-        private void NewSolutionCmd_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-        }
         private void SaveCmd_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = true;
@@ -50,7 +43,6 @@ namespace SolutionBuilder
             _ViewModel.Save();
             _Model.Save();
         }
-
         private void LoadCmd_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = true;
@@ -80,10 +72,8 @@ namespace SolutionBuilder
                     startInfo.UseShellExecute = false;
                     startInfo.CreateNoWindow = true;
                     startInfo.FileName = @"C:\Program Files (x86)\MSBuild\14.0\Bin\msbuild.exe";
-                    String path = solution.BaseDir;
-                    if (solution.RelativePath.Count() > 0)
-                        path = path + "\\" + solution.RelativePath;
-                    path += "\\" +  solution.Name;
+                    StringBuilder path = new StringBuilder(_ViewModel.BaseDir);
+                    path.Append("\\" + solution.Name);
                     startInfo.Arguments = solution.Options + " " + path;
                     process.StartInfo = startInfo;
                     bool Success = process.Start();

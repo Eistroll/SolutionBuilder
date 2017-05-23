@@ -10,9 +10,10 @@ namespace SolutionBuilder
 {
     public class SolutionObjectView : INotifyPropertyChanged
     {
-        public SolutionObjectView(ref SolutionObject SolutionObject)
+        public SolutionObjectView(ref SolutionObject SolutionObject, String selectedPlatform)
         {
             _SolutionObject = SolutionObject;
+            Options = _SolutionObject.Options[selectedPlatform];
         }
         public SolutionObjectView()
         {
@@ -28,16 +29,11 @@ namespace SolutionBuilder
             if (toCompareWith == null)
                 return false;
             return this.Name == toCompareWith.Name &&
-                this.BaseDir == toCompareWith.BaseDir &&
-                this.RelativePath == toCompareWith.RelativePath &&
                 this._Options == toCompareWith._Options &&
                 this.Selected == toCompareWith.Selected;
         }
         private SolutionObject _SolutionObject;
         public string Name { get { return _SolutionObject?.Name; } set{ _SolutionObject.Name = value; } }
-        public string BaseDir { get { return _SolutionObject?.BaseDir; } set { _SolutionObject.BaseDir = value; } }
-
-        public string RelativePath { get { return _SolutionObject?.RelativePath; } set { _SolutionObject.RelativePath = value; } }
 
         private string _Options;
         public string Options
@@ -52,5 +48,6 @@ namespace SolutionBuilder
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
+
     }
 }

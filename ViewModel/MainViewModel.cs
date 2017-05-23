@@ -12,6 +12,7 @@ using System.Xml.Serialization;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Xml;
+using System.Windows.Input;
 
 namespace SolutionBuilder
 {
@@ -28,7 +29,14 @@ namespace SolutionBuilder
             Platforms.Add("Debug");
             _SelectedPlatform = "Debug";
             SelectedPath = "WG1";
-
+            AllSolutions = new StringCollection();
+            BaseDir = @"C:\Users\thomas.roller\Documents\work\git\win\wg\";
+            var solutionPaths = Directory.GetFiles(BaseDir, @"*.sln", SearchOption.AllDirectories);
+            foreach ( var path in solutionPaths )
+            {
+                String newPath = path.Replace(BaseDir, "");
+                AllSolutions.Add( newPath);
+            }
         }
         public override int GetHashCode()
         {
@@ -78,7 +86,7 @@ namespace SolutionBuilder
             Solutions.Clear();
             foreach (SolutionObject solution in Model.SolutionObjects) {
                 SolutionObject tmp = solution;
-                Solutions.Add(new SolutionObjectView( ref tmp ) { Options = solution.Options[SelectedPlatform] });
+                Solutions.Add(new SolutionObjectView( ref tmp, SelectedPlatform ));
             }
         }
 
@@ -105,12 +113,25 @@ namespace SolutionBuilder
                 }
             }
         }
+        public StringCollection AllSolutions { get; set; }
         public String SelectedPath { get; set; }
+        public String BaseDir { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string name)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        private ICommand _AddSolutionCmd;
+        public ICommand AddSolutionCmd
+        {
+            get { return _AddSolutionCmd ?? (_AddSolutionCmd = new CommandHandler(() => AddSolution(), true)); }
+        }
+        public void AddSolution()
+        {
+            SolutionObject solution = new SolutionObject();
+            _Model.SolutionObjects.Add( solution );
+            Solutions.Add(new SolutionObjectView(ref solution, SelectedPlatform));
         }
     }
 }

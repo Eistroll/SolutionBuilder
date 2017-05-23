@@ -21,7 +21,6 @@ namespace SolutionBuilder
         }
         public Model()
         {
-
         }
         public override int GetHashCode()
         {

@@ -10,6 +10,8 @@ namespace SolutionBuilder
     {
         public SolutionObject()
         {
+            Options["Release"] = "/p:Configuration=Release";
+            Options["Debug"] = "/p:Configuration=Debug";
         }
         public override int GetHashCode()
         {
@@ -21,16 +23,10 @@ namespace SolutionBuilder
             if (toCompareWith == null)
                 return false;
             return this.Name == toCompareWith.Name &&
-                this.BaseDir == toCompareWith.BaseDir &&
-                this.RelativePath == toCompareWith.RelativePath &&
                 this.Options.OrderBy(kvp=>kvp.Key).SequenceEqual(toCompareWith.Options.OrderBy(kvp=>kvp.Key));
         }
         [DataMember]
-        public String BaseDir { get; set; }
-        [DataMember]
         public String Name { get; set; }
-        [DataMember]
-        public String RelativePath { get; set; }
         [DataMember]
         public Dictionary<string, string> Options = new Dictionary<string, string>();
     }
