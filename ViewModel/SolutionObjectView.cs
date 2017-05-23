@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Xml.Serialization;
 
 namespace SolutionBuilder
 {
@@ -42,6 +43,9 @@ namespace SolutionBuilder
             set { _Options = value; OnPropertyChanged("Options"); }
         }
         public bool Selected { get; set; }
+
+        [XmlIgnoreAttribute]
+        public String BuildLog { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string name)

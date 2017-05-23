@@ -79,7 +79,9 @@ namespace SolutionBuilder
                     bool Success = process.Start();
                     while (!process.StandardOutput.EndOfStream)
                     {
-                        textBox.AppendText(process.StandardOutput.ReadLine());
+                        String line = process.StandardOutput.ReadLine();
+                        solution.BuildLog += line;
+                        textBox.AppendText(line);
                     }
                     process.WaitForExit();
                     int exitCode = process.ExitCode;

@@ -113,9 +113,26 @@ namespace SolutionBuilder
                 }
             }
         }
+        [XmlIgnoreAttribute]
         public StringCollection AllSolutions { get; set; }
+        [XmlIgnoreAttribute]
+        public String CompleteLog
+        {
+            get
+            {
+                StringBuilder log = new StringBuilder();
+                foreach ( SolutionObjectView solution in Solutions )
+                {
+                    log.AppendLine(solution.BuildLog);
+                }
+                return log.ToString();
+            }
+        }
         public String SelectedPath { get; set; }
         public String BaseDir { get; set; }
+        public String BaseOptions{ get; set; }
+        [XmlIgnoreAttribute]
+        public String Log { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string name)
