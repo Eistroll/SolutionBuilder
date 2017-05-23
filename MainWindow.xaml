@@ -24,11 +24,11 @@
                 <ComboBox x:Name="cbPlatform" ItemsSource="{Binding Platforms}" SelectedItem="{Binding SelectedPlatform}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120" Height="22"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
-                <Button x:Name="btBuild" Content="Build" VerticalAlignment="Center" Width="75" HorizontalAlignment="Right" Click="btBuild_Click" Height="20"/>
-                <Button x:Name="btAdd" Content="Add" HorizontalAlignment="Right" VerticalAlignment="Center" Width="75" Command="{Binding AddSolutionCmd}"/>
+                <Button x:Name="btAdd" Content="Add" HorizontalAlignment="Right" VerticalAlignment="Center" Width="75" Command="{Binding AddSolutionCmd}" Margin="0,0,5,0"/>
+                <Button x:Name="btBuild" Content="Build" VerticalAlignment="Center" Width="75" HorizontalAlignment="Right" Click="btBuild_Click" Height="20" Margin="5,0,0,0"/>
             </StackPanel>
         </DockPanel>
-        <Grid DockPanel.Dock="Top" Margin="5,0" >
+        <Grid DockPanel.Dock="Top" Margin="5,3,5,0" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="200*"/>

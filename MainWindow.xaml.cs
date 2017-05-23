@@ -74,7 +74,7 @@ namespace SolutionBuilder
                     startInfo.FileName = @"C:\Program Files (x86)\MSBuild\14.0\Bin\msbuild.exe";
                     StringBuilder path = new StringBuilder(_ViewModel.BaseDir);
                     path.Append("\\" + solution.Name);
-                    startInfo.Arguments = solution.Options + " " + path;
+                    startInfo.Arguments = _ViewModel.BaseOptions + " " + solution.Options + " " + path;
                     process.StartInfo = startInfo;
                     bool Success = process.Start();
                     while (!process.StandardOutput.EndOfStream)

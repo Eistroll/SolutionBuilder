@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Xml.Serialization;
+using System.Runtime.Serialization;
 
 namespace SolutionBuilder
 {
@@ -34,6 +35,7 @@ namespace SolutionBuilder
                 this.Selected == toCompareWith.Selected;
         }
         private SolutionObject _SolutionObject;
+        public SolutionObject SolutionObject { get { return _SolutionObject; } }
         public string Name { get { return _SolutionObject?.Name; } set{ _SolutionObject.Name = value; } }
 
         private string _Options;
@@ -44,7 +46,7 @@ namespace SolutionBuilder
         }
         public bool Selected { get; set; }
 
-        [XmlIgnoreAttribute]
+        [IgnoreDataMemberAttribute]
         public String BuildLog { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;

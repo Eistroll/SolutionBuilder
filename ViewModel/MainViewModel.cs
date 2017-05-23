@@ -86,7 +86,9 @@ namespace SolutionBuilder
             Solutions.Clear();
             foreach (SolutionObject solution in Model.SolutionObjects) {
                 SolutionObject tmp = solution;
-                Solutions.Add(new SolutionObjectView( ref tmp, SelectedPlatform ));
+                SolutionObjectView solutionView = new SolutionObjectView(ref tmp, SelectedPlatform);
+                solutionView.PropertyChanged += new PropertyChangedEventHandler(SolutionView_PropertyChanged);
+                Solutions.Add(solutionView);
             }
         }
 
@@ -98,6 +100,18 @@ namespace SolutionBuilder
                 if (model == null)
                     return;
                 UpdateFromModel(ref model);
+            }
+        }
+        private void SolutionView_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Options") {
+                SolutionObjectView solView = (SolutionObjectView)sender;
+                if (solView == null)
+                    return;
+                if (solView.SolutionObject != null )
+                {
+                    solView.SolutionObject.Options[SelectedPlatform] = solView.Options;
+                }
             }
         }
         public ObservableCollection<SolutionObjectView> Solutions { get; set; }
@@ -113,9 +127,9 @@ namespace SolutionBuilder
                 }
             }
         }
-        [XmlIgnoreAttribute]
+        [IgnoreDataMemberAttribute]
         public StringCollection AllSolutions { get; set; }
-        [XmlIgnoreAttribute]
+        [IgnoreDataMemberAttribute]
         public String CompleteLog
         {
             get
@@ -131,7 +145,7 @@ namespace SolutionBuilder
         public String SelectedPath { get; set; }
         public String BaseDir { get; set; }
         public String BaseOptions{ get; set; }
-        [XmlIgnoreAttribute]
+        [IgnoreDataMemberAttribute]
         public String Log { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
