@@ -39,7 +39,7 @@
         <StackPanel DockPanel.Dock="Bottom" Margin="5,0">
             <TextBox x:Name="textBox" Text="{Binding Log}" TextWrapping="Wrap" Height="100" VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" HorizontalScrollBarVisibility="Visible"/>
         </StackPanel>
-        <ListView Name="lvSolutions" ItemsSource="{Binding Solutions}" Margin="5">
+        <ListView Name="lvSolutions" ItemsSource="{Binding Solutions}" Margin="5" HorizontalContentAlignment="Stretch">
             <ListView.ContextMenu>
                 <ContextMenu>
                     <MenuItem Command="{Binding NewSolutionCmd}">New</MenuItem>
@@ -58,14 +58,14 @@
                     <GridViewColumn Header="Name">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <ComboBox ItemsSource="{Binding DataContext.AllSolutions, ElementName=wndMain}" SelectedItem="{Binding Name}"  Width="200"/>
+                                <ComboBox ItemsSource="{Binding DataContext.AllSolutions, ElementName=wndMain}" SelectedItem="{Binding Name}" Height="20" Width="200" Margin="-5,0"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                     <GridViewColumn Header="Options">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBox Text="{Binding Options}" Width="300"/>
+                                <TextBox Text="{Binding Options}" Height="20" Width="300" Margin="-5,0"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
