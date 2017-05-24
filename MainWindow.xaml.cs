@@ -79,7 +79,7 @@ namespace SolutionBuilder
                     bool Success = process.Start();
                     while (!process.StandardOutput.EndOfStream)
                     {
-                        String line = process.StandardOutput.ReadLine();
+                        String line = process.StandardOutput.ReadLine() + Environment.NewLine;
                         solution.BuildLog += line;
                         textBox.AppendText(line);
                     }

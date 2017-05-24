@@ -44,6 +44,7 @@ namespace Test_SolutionBuilder
             });
             MainViewModel viewModel = new MainViewModel();
             viewModel.BindToModel(ref model);
+            viewModel.Solutions[1].Selected = true;
             Assert.AreEqual(2, model.SolutionObjects.Count);
             Assert.AreEqual(2, viewModel.Solutions.Count);
             model.Save();
@@ -51,6 +52,8 @@ namespace Test_SolutionBuilder
             CollectionAssert.AreEqual(viewModel.Paths, loadedModel.Paths);
             CollectionAssert.AreEqual(viewModel.Platforms, loadedModel.Platforms);
             Assert.AreEqual(viewModel.SelectedPath, loadedModel.SelectedPath);
+            Assert.IsFalse(viewModel.Solutions[0].Selected);
+            Assert.IsTrue(viewModel.Solutions[1].Selected);
         }
 
     }

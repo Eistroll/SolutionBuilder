@@ -42,15 +42,20 @@ namespace SolutionBuilder
         public string Options
         {
             get { return _Options; }
-            set { _Options = value; OnPropertyChanged("Options"); }
+            set { if (_Options != value) { _Options = value; NotifyPropertyChanged("Options"); } }
         }
-        public bool Selected { get; set; }
+        private bool _Selected = false;
+        public bool Selected
+        {
+            get { return _Selected; }
+            set { if (_Selected != value) { _Selected = value; NotifyPropertyChanged("Selected"); } }
+        }
 
         [IgnoreDataMemberAttribute]
         public String BuildLog { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged(string name)
+        private void NotifyPropertyChanged(string name)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }

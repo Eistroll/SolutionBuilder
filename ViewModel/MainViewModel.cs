@@ -30,6 +30,7 @@ namespace SolutionBuilder
             _SelectedPlatform = "Debug";
             SelectedPath = "WG1";
             AllSolutions = new StringCollection();
+            SelectedSolutions = new StringCollection();
             BaseDir = @"C:\Users\thomas.roller\Documents\work\git\win\wg\";
             var solutionPaths = Directory.GetFiles(BaseDir, @"*.sln", SearchOption.AllDirectories);
             foreach ( var path in solutionPaths )
@@ -37,6 +38,7 @@ namespace SolutionBuilder
                 String newPath = path.Replace(BaseDir, "");
                 AllSolutions.Add( newPath);
             }
+            SelectedSolutionIndex = -1;
         }
         public override int GetHashCode()
         {
@@ -87,6 +89,8 @@ namespace SolutionBuilder
             foreach (SolutionObject solution in Model.SolutionObjects) {
                 SolutionObject tmp = solution;
                 SolutionObjectView solutionView = new SolutionObjectView(ref tmp, SelectedPlatform);
+                if (SelectedSolutions.Contains(tmp.Name))
+                    solutionView.Selected = true;
                 solutionView.PropertyChanged += new PropertyChangedEventHandler(SolutionView_PropertyChanged);
                 Solutions.Add(solutionView);
             }
@@ -113,7 +117,18 @@ namespace SolutionBuilder
                     solView.SolutionObject.Options[SelectedPlatform] = solView.Options;
                 }
             }
+            if (e.PropertyName == "Selected") {
+                SolutionObjectView solView = (SolutionObjectView)sender;
+                if (solView == null)
+                    return;
+                if (!solView.Selected)
+                    SelectedSolutions.Remove(solView.Name);
+                else
+                    SelectedSolutions.Add(solView.Name);
+            }
         }
+        public StringCollection SelectedSolutions { get; set; }
+        [IgnoreDataMemberAttribute]
         public ObservableCollection<SolutionObjectView> Solutions { get; set; }
         public StringCollection Paths { get; set; }
         public StringCollection Platforms { get; set; }
@@ -126,6 +141,13 @@ namespace SolutionBuilder
                     Solutions[i].Options = _Model.SolutionObjects[i].Options[_SelectedPlatform];
                 }
             }
+        }
+        private int _SelectedSolutionIndex;
+        [IgnoreDataMemberAttribute]
+        public int SelectedSolutionIndex
+        {
+            get { return _SelectedSolutionIndex; }
+            set { _SelectedSolutionIndex = value; UpdateLog(); }
         }
         [IgnoreDataMemberAttribute]
         public StringCollection AllSolutions { get; set; }
@@ -145,11 +167,33 @@ namespace SolutionBuilder
         public String SelectedPath { get; set; }
         public String BaseDir { get; set; }
         public String BaseOptions{ get; set; }
+        private String _Log;
         [IgnoreDataMemberAttribute]
-        public String Log { get; set; }
+        public String Log
+        {
+            get { return _Log; }
+            set
+            {
+                if (value != _Log) 
+                {
+                    _Log = value;
+                    NotifyPropertyChanged("Log");
+                }
+            }
+        }
+        private void UpdateLog()
+        {
+            StringBuilder logBuilder= new StringBuilder();
+            if (SelectedSolutionIndex != -1) {
+                logBuilder.Append(Solutions[SelectedSolutionIndex].BuildLog);
+            }
+            else
+                logBuilder.Append(CompleteLog);
+            Log = logBuilder.ToString();
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged(string name)
+        private void NotifyPropertyChanged(string name)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SolutionBuilder"
         mc:Ignorable="d"
-        Title="MainWindow" Height="411.691" Width="705.53" Loaded="Window_Loaded" x:Name="wndMain">
+        Title="MainWindow" Height="524.691" Width="705.53" Loaded="Window_Loaded" x:Name="wndMain">
     <Window.CommandBindings>
         <CommandBinding Command="Save" CanExecute="SaveCmd_CanExecute" Executed="SaveCmd_Executed"/>
     </Window.CommandBindings>
@@ -37,12 +37,11 @@
             <TextBox x:Name="tbBaseOptions" Grid.Column="1" Text="{Binding BaseOptions}" VerticalAlignment="Center"/>
         </Grid>
         <StackPanel DockPanel.Dock="Bottom" Margin="5,0">
-            <TextBox x:Name="textBox" Text="{Binding Log}" TextWrapping="Wrap" Height="100" VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" HorizontalScrollBarVisibility="Visible"/>
+            <TextBox x:Name="textBox" Text="{Binding Log, UpdateSourceTrigger=PropertyChanged}" Height="184" VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" HorizontalScrollBarVisibility="Visible" IsReadOnly="True" AcceptsReturn="True"/>
         </StackPanel>
-        <ListView Name="lvSolutions" ItemsSource="{Binding Solutions}" Margin="5" HorizontalContentAlignment="Stretch">
+        <ListView Name="lvSolutions" ItemsSource="{Binding Solutions}" Margin="5" HorizontalContentAlignment="Stretch" SelectedIndex="{Binding SelectedSolutionIndex}">
             <ListView.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Command="{Binding NewSolutionCmd}">New</MenuItem>
                     <MenuItem Command="{Binding AddSolutionCmd}">Add</MenuItem>
                 </ContextMenu>
             </ListView.ContextMenu>
