@@ -24,22 +24,28 @@
             </Grid.RowDefinitions>
             <Menu Grid.Row="0">
                 <MenuItem Header="_File">
-                    <MenuItem Header="_Load"/>
                     <MenuItem Command="Save"/>
+                    <Separator/>
+                    <MenuItem Header="_Settings" Click="mnuSettings_Click"/>
                     <Separator/>
                     <MenuItem Header="_Exit"/>
                 </MenuItem>
             </Menu>
-            <DockPanel Grid.Row="1"  Margin="5,5,5,0" LastChildFill="False">
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                    <ComboBox x:Name="cbLocation" ItemsSource="{Binding Paths}" SelectedItem="{Binding SelectedPath}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120" Height="22"/>
+            <Grid Grid.Row="1"  Margin="5,5,5,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" Grid.Column="0">
+                    <ComboBox x:Name="cbLocation" ItemsSource="{Binding Paths}" SelectedItem="{Binding SelectedPath}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120" Height="22" IsEditable="True"/>
                     <ComboBox x:Name="cbPlatform" ItemsSource="{Binding Platforms}" SelectedItem="{Binding SelectedPlatform}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120" Height="22"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                <StackPanel Orientation="Horizontal" Grid.Column="2">
                     <Button x:Name="btAdd" Content="Add" HorizontalAlignment="Right" VerticalAlignment="Center" Width="75" Command="{Binding AddSolutionCmd}" Margin="0,0,5,0"/>
                     <Button x:Name="btBuild" Content="Build" VerticalAlignment="Center" Width="75" HorizontalAlignment="Right" Click="btBuild_Click" Height="20" Margin="5,0,0,0"/>
                 </StackPanel>
-            </DockPanel>
+            </Grid>
             <Grid Grid.Row="2" Margin="5,5,5,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100"/>

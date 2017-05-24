@@ -58,7 +58,11 @@ namespace SolutionBuilder
         {
 
         }
-
+        private void mnuSettings_Click(object sender, RoutedEventArgs e)
+        {
+            Window settings = new SolutionBuilder.Settings();
+            settings.ShowDialog();
+        }
         private void btBuild_Click(object sender, RoutedEventArgs e)
         {
             foreach ( SolutionObjectView solution in _ViewModel.Solutions )
