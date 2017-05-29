@@ -7,6 +7,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Xml.Serialization;
 using System.Runtime.Serialization;
+using System.Windows.Media.Imaging;
 
 namespace SolutionBuilder
 {
@@ -50,11 +51,11 @@ namespace SolutionBuilder
             get { return _Selected; }
             set { if (_Selected != value) { _Selected = value; NotifyPropertyChanged("Selected"); } }
         }
-        private bool _BuildSuccess = false;
-        public bool BuildSuccess
+        private BitmapImage _BuildState;
+        public BitmapImage BuildState
         {
-            get { return _BuildSuccess; }
-            set { if (_BuildSuccess != value) { _BuildSuccess = value; NotifyPropertyChanged("BuildSuccess"); } }
+            get { return _BuildState; }
+            set { if (_BuildState != value) { _BuildState = value; NotifyPropertyChanged("BuildState"); } }
         }
 
         [IgnoreDataMemberAttribute]

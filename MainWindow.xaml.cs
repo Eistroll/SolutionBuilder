@@ -25,17 +25,21 @@ namespace SolutionBuilder
         private Model _Model = new Model();
         private MainViewModel _ViewModel = new MainViewModel();
         private String MSBuild_EXE = "";
+        private BitmapImage ImageBuildSuccess;
+        private BitmapImage ImageBuildFailure;
         public MainWindow()
         {
             InitializeComponent();
+            ImageBuildFailure = new BitmapImage(new Uri(@"Images/img_delete_16.png",UriKind.Relative));
+            ImageBuildSuccess = new BitmapImage(new Uri(@"Images/img_check_16.png",UriKind.Relative));
             _Model = Model.Load();
             _ViewModel = MainViewModel.Load();
             List<String> msBuildExes= new List<String>();
             try
             {
-                msBuildExes = Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "msbuild.exe", SearchOption.AllDirectories).ToList();
+                msBuildExes = Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) + "\\MSBuild", "msbuild.exe", SearchOption.AllDirectories).ToList();
             }
-            catch(UnauthorizedAccessException){ MSBuild_EXE = @"E:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\msbuild.exe"; }
+            catch(UnauthorizedAccessException){ MSBuild_EXE = @"C:\Program Files (x86)\MSBuild\14.0\Bin\msbuild.exe"; }
             finally { }
             if (msBuildExes.Count > 0)
                 MSBuild_EXE = msBuildExes[0];
@@ -79,6 +83,8 @@ namespace SolutionBuilder
         {
             if (MSBuild_EXE.Length == 0)
                 return;
+            foreach (SolutionObjectView solution in _ViewModel.Solutions) { solution.BuildState = null; }
+            lvSolutions.InvalidateVisual();
             foreach ( SolutionObjectView solution in _ViewModel.Solutions )
             {
                 if ( solution.Selected )
@@ -104,9 +110,9 @@ namespace SolutionBuilder
                     process.WaitForExit();
                     int exitCode = process.ExitCode;
                     if (exitCode == 0)
-                        solution.BuildSuccess = true;
+                        solution.BuildState = ImageBuildSuccess;
                     else
-                        solution.BuildSuccess = false;
+                        solution.BuildState = ImageBuildFailure;
                 }
             }
         }

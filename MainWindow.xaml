@@ -55,6 +55,11 @@
                 <TextBox x:Name="tbBaseOptions" Grid.Column="1" Text="{Binding BaseOptions}" VerticalAlignment="Center"/>
             </Grid>
             <ListView Grid.Row="3" Name="lvSolutions" ItemsSource="{Binding Solutions}" Margin="5" HorizontalContentAlignment="Stretch" SelectedIndex="{Binding SelectedSolutionIndex}">
+                <ListView.Resources>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    </Style>
+                </ListView.Resources>
                 <ListView.ContextMenu>
                     <ContextMenu>
                         <MenuItem Command="{Binding AddSolutionCmd}">Add</MenuItem>
@@ -69,24 +74,24 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Name">
+                        <GridViewColumn Header="Name" Width="300">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <ComboBox ItemsSource="{Binding DataContext.AllSolutions, ElementName=wndMain}" SelectedItem="{Binding Name}" Height="20" Width="200" Margin="-5,0"/>
+                                    <ComboBox ItemsSource="{Binding DataContext.AllSolutions, ElementName=wndMain}" SelectedItem="{Binding Name}" Height="20" Margin="-5,0"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Options">
+                        <GridViewColumn Header="Options" Width="300">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBox Text="{Binding Options}" Height="20" Width="300" Margin="-5,0"/>
+                                    <TextBox Text="{Binding Options}" Height="20" Margin="-5,0"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Success">
+                        <GridViewColumn Header="State" Width="32">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBox Text="{Binding BuildSuccess}" Height="20" Width="20" Margin="-5,0"/>
+                                    <Image Source="{Binding BuildState}" Height="20" Width="20" Margin="-5,0"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>

@@ -31,7 +31,7 @@ namespace SolutionBuilder
             SelectedPath = "WG1";
             AllSolutions = new StringCollection();
             SelectedSolutions = new StringCollection();
-            BaseDir = @"C:\Users\thomas.roller\Documents\work\git\win\wg\";
+            BaseDir = @"C:\Users\thomas.roller\Documents\work\git\win\wg";
             UpdateAvailableSolutions();
 
             SelectedSolutionIndex = -1;
@@ -39,7 +39,7 @@ namespace SolutionBuilder
 
         private void UpdateAvailableSolutions()
         {
-            System.IO.FileInfo BaseDirInfo = new System.IO.FileInfo(BaseDir);
+            System.IO.DirectoryInfo BaseDirInfo = new System.IO.DirectoryInfo(BaseDir);
             if (BaseDirInfo.Exists)
             {
                 var solutionPaths = Directory.GetFiles(BaseDir, @"*.sln", SearchOption.AllDirectories);
@@ -138,6 +138,7 @@ namespace SolutionBuilder
                     SelectedSolutions.Add(solView.Name);
             }
         }
+        public String VS_Build_exe { get; set; }
         public StringCollection SelectedSolutions { get; set; }
         [IgnoreDataMemberAttribute]
         public ObservableCollection<SolutionObjectView> Solutions { get; set; }
