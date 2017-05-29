@@ -32,14 +32,25 @@ namespace SolutionBuilder
             AllSolutions = new StringCollection();
             SelectedSolutions = new StringCollection();
             BaseDir = @"C:\Users\thomas.roller\Documents\work\git\win\wg\";
-            var solutionPaths = Directory.GetFiles(BaseDir, @"*.sln", SearchOption.AllDirectories);
-            foreach ( var path in solutionPaths )
-            {
-                String newPath = path.Replace(BaseDir, "");
-                AllSolutions.Add( newPath);
-            }
+            UpdateAvailableSolutions();
+
             SelectedSolutionIndex = -1;
         }
+
+        private void UpdateAvailableSolutions()
+        {
+            System.IO.FileInfo BaseDirInfo = new System.IO.FileInfo(BaseDir);
+            if (BaseDirInfo.Exists)
+            {
+                var solutionPaths = Directory.GetFiles(BaseDir, @"*.sln", SearchOption.AllDirectories);
+                foreach (var path in solutionPaths)
+                {
+                    String newPath = path.Replace(BaseDir, "");
+                    AllSolutions.Add(newPath);
+                }
+            }
+        }
+
         public override int GetHashCode()
         {
             return base.GetHashCode();
@@ -165,7 +176,20 @@ namespace SolutionBuilder
             }
         }
         public String SelectedPath { get; set; }
-        public String BaseDir { get; set; }
+        private String _BaseDir;
+        public String BaseDir
+        {
+            get { return _BaseDir; }
+            set
+            {
+                if (value != _BaseDir)
+                {
+                    _BaseDir = value;
+                    UpdateAvailableSolutions();
+                    NotifyPropertyChanged("BaseDir");
+                }
+            }
+        }
         public String BaseOptions{ get; set; }
         private String _Log;
         [IgnoreDataMemberAttribute]

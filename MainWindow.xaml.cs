@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,12 +24,22 @@ namespace SolutionBuilder
     {
         private Model _Model = new Model();
         private MainViewModel _ViewModel = new MainViewModel();
+        private String MSBuild_EXE = "";
         public MainWindow()
         {
             InitializeComponent();
             _Model = Model.Load();
             _ViewModel = MainViewModel.Load();
-       }
+            List<String> msBuildExes= new List<String>();
+            try
+            {
+                msBuildExes = Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "msbuild.exe", SearchOption.AllDirectories).ToList();
+            }
+            catch(UnauthorizedAccessException){ MSBuild_EXE = @"E:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\msbuild.exe"; }
+            finally { }
+            if (msBuildExes.Count > 0)
+                MSBuild_EXE = msBuildExes[0];
+        }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -65,6 +77,8 @@ namespace SolutionBuilder
         }
         private void btBuild_Click(object sender, RoutedEventArgs e)
         {
+            if (MSBuild_EXE.Length == 0)
+                return;
             foreach ( SolutionObjectView solution in _ViewModel.Solutions )
             {
                 if ( solution.Selected )
@@ -75,7 +89,7 @@ namespace SolutionBuilder
                     startInfo.RedirectStandardOutput = true;
                     startInfo.UseShellExecute = false;
                     startInfo.CreateNoWindow = true;
-                    startInfo.FileName = @"C:\Program Files (x86)\MSBuild\14.0\Bin\msbuild.exe";
+                    startInfo.FileName = MSBuild_EXE;
                     StringBuilder path = new StringBuilder(_ViewModel.BaseDir);
                     path.Append("\\" + solution.Name);
                     startInfo.Arguments = _ViewModel.BaseOptions + " " + solution.Options + " " + path;
@@ -89,6 +103,10 @@ namespace SolutionBuilder
                     }
                     process.WaitForExit();
                     int exitCode = process.ExitCode;
+                    if (exitCode == 0)
+                        solution.BuildSuccess = true;
+                    else
+                        solution.BuildSuccess = false;
                 }
             }
         }

@@ -50,6 +50,12 @@ namespace SolutionBuilder
             get { return _Selected; }
             set { if (_Selected != value) { _Selected = value; NotifyPropertyChanged("Selected"); } }
         }
+        private bool _BuildSuccess = false;
+        public bool BuildSuccess
+        {
+            get { return _BuildSuccess; }
+            set { if (_BuildSuccess != value) { _BuildSuccess = value; NotifyPropertyChanged("BuildSuccess"); } }
+        }
 
         [IgnoreDataMemberAttribute]
         public String BuildLog { get; set; }
