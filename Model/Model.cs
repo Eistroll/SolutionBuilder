@@ -31,10 +31,10 @@ namespace SolutionBuilder
             var toCompareWith = obj as Model;
             if (toCompareWith == null)
                 return false;
-            return this.SolutionObjects.Count == toCompareWith.SolutionObjects.Count &&
+            return this.Scope2SolutionObjects.Count == toCompareWith.Scope2SolutionObjects.Count &&
                 this.SolutionObjects.SequenceEqual(toCompareWith.SolutionObjects);
         }
-
+        public Dictionary<string, ObservableCollection<SolutionObject>> Scope2SolutionObjects = new Dictionary<string, ObservableCollection<SolutionObject>>();
         public ObservableCollection<SolutionObject> SolutionObjects = new ObservableCollection<SolutionObject>();
         public void Save()
         {

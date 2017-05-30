@@ -15,6 +15,7 @@
             </ListView.Resources>
             <ListView.View>
                 <GridView>
+                    <GridViewColumn Header="Scope" Width="100" DisplayMemberBinding="{Binding Scope}"/>
                     <GridViewColumn Header="Key" Width="100" DisplayMemberBinding="{Binding Key}"/>
                     <GridViewColumn Header="Value" Width="Auto">
                         <GridViewColumn.CellTemplate>

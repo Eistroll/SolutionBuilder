@@ -16,10 +16,58 @@ using System.Windows.Input;
 
 namespace SolutionBuilder
 {
-    public class MainViewModel : INotifyPropertyChanged
+    [DataContract]
+    public class TabItem
     {
-        public MainViewModel()
+        [DataMember]
+        public string Header { get; set; }
+        [DataMember]
+        public String SelectedPath { get; set; }
+        [DataMember]
+        public String BaseOptions { get; set; }
+        public ObservableCollection<SolutionObjectView> Solutions { get; set; }
+        [DataMember]
+        public StringCollection SelectedSolutions { get; set; }
+        [DataMember]
+        public StringCollection Paths { get; set; }
+        [DataMember]
+        public StringCollection Platforms { get; set; }
+
+        private String _SelectedPlatform;
+        [DataMember]
+        public String SelectedPlatform
         {
+            get { return _SelectedPlatform; }
+            set
+            {
+                _SelectedPlatform = value;
+                for (int i = 0; i < Solutions.Count; ++i) {
+                    Solutions[i].Options = _Model.SolutionObjects[i].Options[_SelectedPlatform];
+                }
+            }
+        }
+        [DataMember]
+        private int _SelectedSolutionIndex;
+        [IgnoreDataMemberAttribute]
+        public int SelectedSolutionIndex
+        {
+            get { return _SelectedSolutionIndex; }
+            set
+            {
+                _SelectedSolutionIndex = value;
+                if(_SelectedSolutionIndex != -1)
+                    _ViewModel.UpdateLog(Solutions[_SelectedSolutionIndex]);
+            }
+        }
+        public StringCollection AllSolutions { get; set; }
+        private MainViewModel _ViewModel;
+        [IgnoreDataMemberAttribute]
+        private Model _Model;
+
+        public TabItem()
+        {
+            AllSolutions = new StringCollection();
+            SelectedSolutions = new StringCollection();
             Solutions = new ObservableCollection<SolutionObjectView>();
             Paths = new StringCollection();
             Platforms = new StringCollection();
@@ -29,40 +77,112 @@ namespace SolutionBuilder
             Platforms.Add("Debug");
             _SelectedPlatform = "Debug";
             SelectedPath = "WG1";
-            AllSolutions = new StringCollection();
-            SelectedSolutions = new StringCollection();
-            SettingsList = new ObservableCollection<Setting>();
-            SettingsList.Add(new Setting { Key = "BaseDir", Value = @"C:\Users\thomas.roller\Documents\work\git\win" });
-            SettingsList.Add(new Setting { Key = "BuildExe", Value = @"C:\Program Files (x86)\MSBuild\14.0\Bin\msbuild.exe" });
             SelectedSolutionIndex = -1;
-        }
-
-        public String GetSetting( String key )
-        {
-            foreach (Setting setting in SettingsList) {
-                if (setting.Key == key) {
-                    return setting.Value;
-                }
-            }
-            return "";
         }
         private void UpdateAvailableSolutions()
         {
-            String BaseDir = GetSetting("BaseDir");
+            String BaseDir = _ViewModel.GetSetting("BaseDir", Header);
             if (BaseDir.Length == 0)
                 return;
             System.IO.DirectoryInfo BaseDirInfo = new System.IO.DirectoryInfo(BaseDir);
-            if (BaseDirInfo.Exists)
-            {
+            if (BaseDirInfo.Exists) {
                 var solutionPaths = Directory.GetFiles(BaseDir, @"*.sln", SearchOption.AllDirectories);
-                foreach (var path in solutionPaths)
-                {
+                foreach (var path in solutionPaths) {
                     String newPath = path.Replace(BaseDir, "");
                     AllSolutions.Add(newPath);
                 }
             }
         }
+        public void BindToModel(ref Model Model, ref MainViewModel ViewModel)
+        {
+            _Model = Model;
+            _ViewModel = ViewModel;
+            UpdateAvailableSolutions();
 
+            UpdateFromModel(ref Model);
+        }
+        private void UpdateFromModel(ref Model Model)
+        {
+            Solutions.Clear();
+            if (!Model.Scope2SolutionObjects.ContainsKey(Header))
+                return;
+            foreach (SolutionObject solution in Model.Scope2SolutionObjects[Header]) {
+                SolutionObject tmp = solution;
+                SolutionObjectView solutionView = new SolutionObjectView(ref tmp, SelectedPlatform);
+                if (SelectedSolutions.Contains(tmp.Name))
+                    solutionView.Selected = true;
+                solutionView.PropertyChanged += new PropertyChangedEventHandler(SolutionView_PropertyChanged);
+                Solutions.Add(solutionView);
+            }
+        }
+        private void SolutionView_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Options") {
+                SolutionObjectView solView = (SolutionObjectView)sender;
+                if (solView == null)
+                    return;
+                if (solView.SolutionObject != null) {
+                    solView.SolutionObject.Options[SelectedPlatform] = solView.Options;
+                }
+            }
+            if (e.PropertyName == "Selected") {
+                SolutionObjectView solView = (SolutionObjectView)sender;
+                if (solView == null)
+                    return;
+                if (!solView.Selected)
+                    SelectedSolutions.Remove(solView.Name);
+                else
+                    SelectedSolutions.Add(solView.Name);
+            }
+        }
+        private ICommand _AddSolutionCmd;
+        public ICommand AddSolutionCmd
+        {
+            get { return _AddSolutionCmd ?? (_AddSolutionCmd = new CommandHandler(() => AddSolution(), true)); }
+        }
+        public void AddSolution()
+        {
+            SolutionObject solution = new SolutionObject();
+            if (!_Model.Scope2SolutionObjects.ContainsKey(Header))
+            {
+                _Model.Scope2SolutionObjects[Header] = new ObservableCollection<SolutionObject>();
+            }
+            _Model.Scope2SolutionObjects[Header].Add(solution);
+            Solutions.Add(new SolutionObjectView(ref solution, SelectedPlatform));
+        }
+    }
+    public class MainViewModel : INotifyPropertyChanged
+    {
+        public ObservableCollection<TabItem> Tabs { get; set; }
+        public int SelectedTabIndex { get; set; }
+        [IgnoreDataMemberAttribute]
+        public StringCollection AllSolutionsForSelectedTab
+        {
+            get
+            {
+                if (SelectedTabIndex >= 0 && SelectedTabIndex < Tabs.Count)
+                    return Tabs[SelectedTabIndex].AllSolutions;
+                else
+                    return new StringCollection();
+            }
+        }
+        public MainViewModel()
+        {
+            Tabs = new ObservableCollection<TabItem>();
+            var me = this;
+            SettingsList = new ObservableCollection<Setting>();
+            SettingsList.Add(new Setting { Scope="Base", Key = "BuildExe", Value = @"C:\Program Files (x86)\MSBuild\14.0\Bin\msbuild.exe" });
+        }
+
+        public String GetSetting( String key, String scope="Base" )
+        {
+            foreach (Setting setting in SettingsList) {
+                if (setting.Scope == scope && setting.Key == key) {
+                    return setting.Value;
+                }
+            }
+            return "";
+        }
         public override int GetHashCode()
         {
             return base.GetHashCode();
@@ -72,10 +192,7 @@ namespace SolutionBuilder
             var toCompareWith = obj as MainViewModel;
             if (toCompareWith == null)
                 return false;
-            return this.Paths == toCompareWith.Paths &&
-                this.Platforms == toCompareWith.Platforms &&
-                this._SelectedPlatform == toCompareWith._SelectedPlatform &&
-                this.SelectedPath == toCompareWith.SelectedPath;
+            return true;
         }
         public void Save()
         {
@@ -100,98 +217,33 @@ namespace SolutionBuilder
         private Model _Model;
         public void BindToModel( ref Model Model )
         {
-            //Binding binding = new Binding { Source = Model, Path = new PropertyPath("SolutionObjects") };
             Model.PropertyChanged += new PropertyChangedEventHandler(Model_PropertyChanged);
             _Model = Model;
-            UpdateAvailableSolutions();
-
-            UpdateFromModel(ref Model);
-        }
-
-        private void UpdateFromModel(ref Model Model)
-        {
-            Solutions.Clear();
-            foreach (SolutionObject solution in Model.SolutionObjects) {
-                SolutionObject tmp = solution;
-                SolutionObjectView solutionView = new SolutionObjectView(ref tmp, SelectedPlatform);
-                if (SelectedSolutions.Contains(tmp.Name))
-                    solutionView.Selected = true;
-                solutionView.PropertyChanged += new PropertyChangedEventHandler(SolutionView_PropertyChanged);
-                Solutions.Add(solutionView);
+            var me = this;
+            foreach( var tab in Tabs) 
+            {
+                tab.BindToModel(ref _Model, ref me);
             }
         }
-
         private void Model_PropertyChanged( object sender, PropertyChangedEventArgs e )
         {
-            if (e.PropertyName == "SolutionObjects")
-            {
-                Model model = (Model)sender;
-                if (model == null)
-                    return;
-                UpdateFromModel(ref model);
-            }
-        }
-        private void SolutionView_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "Options") {
-                SolutionObjectView solView = (SolutionObjectView)sender;
-                if (solView == null)
-                    return;
-                if (solView.SolutionObject != null )
-                {
-                    solView.SolutionObject.Options[SelectedPlatform] = solView.Options;
-                }
-            }
-            if (e.PropertyName == "Selected") {
-                SolutionObjectView solView = (SolutionObjectView)sender;
-                if (solView == null)
-                    return;
-                if (!solView.Selected)
-                    SelectedSolutions.Remove(solView.Name);
-                else
-                    SelectedSolutions.Add(solView.Name);
-            }
         }
         public ObservableCollection<Setting> SettingsList { get; set; }
-        public StringCollection SelectedSolutions { get; set; }
-        [IgnoreDataMemberAttribute]
-        public ObservableCollection<SolutionObjectView> Solutions { get; set; }
-        public StringCollection Paths { get; set; }
-        public StringCollection Platforms { get; set; }
-        private String _SelectedPlatform;
-        public String SelectedPlatform {
-            get { return _SelectedPlatform; }
-            set {
-                _SelectedPlatform = value;
-                for( int i=0; i<Solutions.Count; ++i ) {
-                    Solutions[i].Options = _Model.SolutionObjects[i].Options[_SelectedPlatform];
-                }
-            }
-        }
-        private int _SelectedSolutionIndex;
-        [IgnoreDataMemberAttribute]
-        public int SelectedSolutionIndex
-        {
-            get { return _SelectedSolutionIndex; }
-            set { _SelectedSolutionIndex = value; UpdateLog(); }
-        }
-        [IgnoreDataMemberAttribute]
-        public StringCollection AllSolutions { get; set; }
-        [IgnoreDataMemberAttribute]
         public String CompleteLog
         {
             get
             {
                 StringBuilder log = new StringBuilder();
-                foreach ( SolutionObjectView solution in Solutions )
+                foreach ( var tab in Tabs)
                 {
-                    log.AppendLine(solution.BuildLog);
+                    foreach ( SolutionObjectView solution in tab.Solutions )
+                    {
+                        log.AppendLine(solution.BuildLog);
+                    }
                 }
                 return log.ToString();
             }
         }
-        public String SelectedPath { get; set; }
-        public String BaseOptions{ get; set; }
         private String _Log;
         [IgnoreDataMemberAttribute]
         public String Log
@@ -206,14 +258,10 @@ namespace SolutionBuilder
                 }
             }
         }
-        private void UpdateLog()
+        public void UpdateLog( SolutionObjectView solution )
         {
             StringBuilder logBuilder= new StringBuilder();
-            if (SelectedSolutionIndex != -1) {
-                logBuilder.Append(Solutions[SelectedSolutionIndex].BuildLog);
-            }
-            else
-                logBuilder.Append(CompleteLog);
+            logBuilder.Append(solution.BuildLog);
             Log = logBuilder.ToString();
         }
 
@@ -221,17 +269,6 @@ namespace SolutionBuilder
         private void NotifyPropertyChanged(string name)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
-        private ICommand _AddSolutionCmd;
-        public ICommand AddSolutionCmd
-        {
-            get { return _AddSolutionCmd ?? (_AddSolutionCmd = new CommandHandler(() => AddSolution(), true)); }
-        }
-        public void AddSolution()
-        {
-            SolutionObject solution = new SolutionObject();
-            _Model.SolutionObjects.Add( solution );
-            Solutions.Add(new SolutionObjectView(ref solution, SelectedPlatform));
         }
     }
 }

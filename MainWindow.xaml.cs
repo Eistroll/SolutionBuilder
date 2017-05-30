@@ -43,11 +43,12 @@ namespace SolutionBuilder
         }
         private void RemoveSolution_OnClick(object sender, RoutedEventArgs e)
         {
-            int index = lvSolutions.SelectedIndex;
-            if (index >= 0 && index < _Model.SolutionObjects.Count && index < _ViewModel.Solutions.Count) 
-            {
-                _Model.SolutionObjects.RemoveAt(index);
-                _ViewModel.Solutions.RemoveAt(index);
+            TabItem tab = (TabItem)tabs.SelectedContent;
+            int index = tab.SelectedSolutionIndex;
+            if (index >= 0 && index < tab.Solutions.Count) {
+                var solutions = _Model.Scope2SolutionObjects[tab.Header];
+                solutions.RemoveAt(index);
+                tab.Solutions.RemoveAt(index);
             }
         }
         private void SaveCmd_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -80,41 +81,48 @@ namespace SolutionBuilder
             settings.DataContext = _ViewModel;
             settings.ShowDialog();
         }
+        private void mnuNewTab_Click(object sender, RoutedEventArgs e)
+        {
+            String tabName = "New";
+            _ViewModel.SettingsList.Add(new Setting() { Scope = tabName, Key = "BaseDir", Value = "" });
+            TabItem tab = new TabItem() { Header = tabName };
+            tab.BindToModel(ref _Model, ref _ViewModel);
+            _ViewModel.Tabs.Add( tab );
+
+        }
         private void btBuild_Click(object sender, RoutedEventArgs e)
         {
             FileInfo buildExe = new FileInfo(_ViewModel.GetSetting("BuildExe"));
             if (!buildExe.Exists)
                 return;
-            foreach (SolutionObjectView solution in _ViewModel.Solutions) { solution.BuildState = null; }
-            lvSolutions.InvalidateVisual();
-            foreach ( SolutionObjectView solution in _ViewModel.Solutions )
+            foreach ( var tab in _ViewModel.Tabs)
             {
-                if ( solution.Selected )
-                {
-                    System.Diagnostics.Process process = new System.Diagnostics.Process();
-                    System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-                    startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                    startInfo.RedirectStandardOutput = true;
-                    startInfo.UseShellExecute = false;
-                    startInfo.CreateNoWindow = true;
-                    startInfo.FileName = buildExe.ToString();
-                    StringBuilder path = new StringBuilder(_ViewModel.GetSetting("BaseDir"));
-                    path.Append("\\" + solution.Name);
-                    startInfo.Arguments = _ViewModel.BaseOptions + " " + solution.Options + " " + path;
-                    process.StartInfo = startInfo;
-                    bool Success = process.Start();
-                    while (!process.StandardOutput.EndOfStream)
-                    {
-                        String line = process.StandardOutput.ReadLine() + Environment.NewLine;
-                        solution.BuildLog += line;
-                        textBox.AppendText(line);
+                foreach (SolutionObjectView solution in tab.Solutions) {
+                    if (solution.Selected) {
+                        System.Diagnostics.Process process = new System.Diagnostics.Process();
+                        System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+                        startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+                        startInfo.RedirectStandardOutput = true;
+                        startInfo.UseShellExecute = false;
+                        startInfo.CreateNoWindow = true;
+                        startInfo.FileName = buildExe.ToString();
+                        StringBuilder path = new StringBuilder(_ViewModel.GetSetting("BaseDir"));
+                        path.Append("\\" + solution.Name);
+                        startInfo.Arguments = tab.BaseOptions + " " + solution.Options + " " + path;
+                        process.StartInfo = startInfo;
+                        bool Success = process.Start();
+                        while (!process.StandardOutput.EndOfStream) {
+                            String line = process.StandardOutput.ReadLine() + Environment.NewLine;
+                            solution.BuildLog += line;
+                            textBox.AppendText(line);
+                        }
+                        process.WaitForExit();
+                        int exitCode = process.ExitCode;
+                        if (exitCode == 0)
+                            solution.BuildState = ImageBuildSuccess;
+                        else
+                            solution.BuildState = ImageBuildFailure;
                     }
-                    process.WaitForExit();
-                    int exitCode = process.ExitCode;
-                    if (exitCode == 0)
-                        solution.BuildState = ImageBuildSuccess;
-                    else
-                        solution.BuildState = ImageBuildFailure;
                 }
             }
         }
