@@ -31,14 +31,26 @@ namespace SolutionBuilder
             SelectedPath = "WG1";
             AllSolutions = new StringCollection();
             SelectedSolutions = new StringCollection();
-            BaseDir = @"C:\Users\thomas.roller\Documents\work\git\win\wg";
-            UpdateAvailableSolutions();
-
+            SettingsList = new ObservableCollection<Setting>();
+            SettingsList.Add(new Setting { Key = "BaseDir", Value = @"C:\Users\thomas.roller\Documents\work\git\win" });
+            SettingsList.Add(new Setting { Key = "BuildExe", Value = @"C:\Program Files (x86)\MSBuild\14.0\Bin\msbuild.exe" });
             SelectedSolutionIndex = -1;
         }
 
+        public String GetSetting( String key )
+        {
+            foreach (Setting setting in SettingsList) {
+                if (setting.Key == key) {
+                    return setting.Value;
+                }
+            }
+            return "";
+        }
         private void UpdateAvailableSolutions()
         {
+            String BaseDir = GetSetting("BaseDir");
+            if (BaseDir.Length == 0)
+                return;
             System.IO.DirectoryInfo BaseDirInfo = new System.IO.DirectoryInfo(BaseDir);
             if (BaseDirInfo.Exists)
             {
@@ -91,6 +103,8 @@ namespace SolutionBuilder
             //Binding binding = new Binding { Source = Model, Path = new PropertyPath("SolutionObjects") };
             Model.PropertyChanged += new PropertyChangedEventHandler(Model_PropertyChanged);
             _Model = Model;
+            UpdateAvailableSolutions();
+
             UpdateFromModel(ref Model);
         }
 
@@ -138,7 +152,7 @@ namespace SolutionBuilder
                     SelectedSolutions.Add(solView.Name);
             }
         }
-        public String VS_Build_exe { get; set; }
+        public ObservableCollection<Setting> SettingsList { get; set; }
         public StringCollection SelectedSolutions { get; set; }
         [IgnoreDataMemberAttribute]
         public ObservableCollection<SolutionObjectView> Solutions { get; set; }
@@ -177,20 +191,6 @@ namespace SolutionBuilder
             }
         }
         public String SelectedPath { get; set; }
-        private String _BaseDir;
-        public String BaseDir
-        {
-            get { return _BaseDir; }
-            set
-            {
-                if (value != _BaseDir)
-                {
-                    _BaseDir = value;
-                    UpdateAvailableSolutions();
-                    NotifyPropertyChanged("BaseDir");
-                }
-            }
-        }
         public String BaseOptions{ get; set; }
         private String _Log;
         [IgnoreDataMemberAttribute]

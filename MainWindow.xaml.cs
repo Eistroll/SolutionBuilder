@@ -24,7 +24,6 @@ namespace SolutionBuilder
     {
         private Model _Model = new Model();
         private MainViewModel _ViewModel = new MainViewModel();
-        private String MSBuild_EXE = "";
         private BitmapImage ImageBuildSuccess;
         private BitmapImage ImageBuildFailure;
         public MainWindow()
@@ -32,17 +31,9 @@ namespace SolutionBuilder
             InitializeComponent();
             ImageBuildFailure = new BitmapImage(new Uri(@"Images/img_delete_16.png",UriKind.Relative));
             ImageBuildSuccess = new BitmapImage(new Uri(@"Images/img_check_16.png",UriKind.Relative));
+            
             _Model = Model.Load();
             _ViewModel = MainViewModel.Load();
-            List<String> msBuildExes= new List<String>();
-            try
-            {
-                msBuildExes = Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) + "\\MSBuild", "msbuild.exe", SearchOption.AllDirectories).ToList();
-            }
-            catch(UnauthorizedAccessException){ MSBuild_EXE = @"C:\Program Files (x86)\MSBuild\14.0\Bin\msbuild.exe"; }
-            finally { }
-            if (msBuildExes.Count > 0)
-                MSBuild_EXE = msBuildExes[0];
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -77,11 +68,13 @@ namespace SolutionBuilder
         private void mnuSettings_Click(object sender, RoutedEventArgs e)
         {
             Window settings = new SolutionBuilder.Settings();
+            settings.DataContext = _ViewModel;
             settings.ShowDialog();
         }
         private void btBuild_Click(object sender, RoutedEventArgs e)
         {
-            if (MSBuild_EXE.Length == 0)
+            FileInfo buildExe = new FileInfo(_ViewModel.GetSetting("BuildExe"));
+            if (!buildExe.Exists)
                 return;
             foreach (SolutionObjectView solution in _ViewModel.Solutions) { solution.BuildState = null; }
             lvSolutions.InvalidateVisual();
@@ -95,8 +88,8 @@ namespace SolutionBuilder
                     startInfo.RedirectStandardOutput = true;
                     startInfo.UseShellExecute = false;
                     startInfo.CreateNoWindow = true;
-                    startInfo.FileName = MSBuild_EXE;
-                    StringBuilder path = new StringBuilder(_ViewModel.BaseDir);
+                    startInfo.FileName = buildExe.ToString();
+                    StringBuilder path = new StringBuilder(_ViewModel.GetSetting("BaseDir"));
                     path.Append("\\" + solution.Name);
                     startInfo.Arguments = _ViewModel.BaseOptions + " " + solution.Options + " " + path;
                     process.StartInfo = startInfo;

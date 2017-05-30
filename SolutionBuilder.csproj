@@ -68,6 +68,7 @@
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModel\CustomCommands.cs" />
+    <Compile Include="ViewModel\Setting.cs" />
     <Compile Include="ViewModel\SolutionObjectView.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="Model\Model.cs" />
