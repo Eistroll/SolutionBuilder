@@ -41,6 +41,15 @@ namespace SolutionBuilder
             this.DataContext = _ViewModel;
             _ViewModel.BindToModel( ref _Model);
         }
+        private void RemoveSolution_OnClick(object sender, RoutedEventArgs e)
+        {
+            int index = lvSolutions.SelectedIndex;
+            if (index >= 0 && index < _Model.SolutionObjects.Count && index < _ViewModel.Solutions.Count) 
+            {
+                _Model.SolutionObjects.RemoveAt(index);
+                _ViewModel.Solutions.RemoveAt(index);
+            }
+        }
         private void SaveCmd_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = true;
