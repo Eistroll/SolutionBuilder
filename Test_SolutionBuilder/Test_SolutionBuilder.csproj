@@ -6,8 +6,8 @@
     <ProjectGuid>{CA2C2486-325D-466B-8F28-F1E6C9F3C42C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Test_BuildWG_IO</RootNamespace>
-    <AssemblyName>Test_BuildWG_IO</AssemblyName>
+    <RootNamespace>Test_SolutionBuilder</RootNamespace>
+    <AssemblyName>Test_SolutionBuilder</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>

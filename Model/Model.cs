@@ -31,11 +31,9 @@ namespace SolutionBuilder
             var toCompareWith = obj as Model;
             if (toCompareWith == null)
                 return false;
-            return this.Scope2SolutionObjects.Count == toCompareWith.Scope2SolutionObjects.Count &&
-                this.SolutionObjects.SequenceEqual(toCompareWith.SolutionObjects);
+            return this.Scope2SolutionObjects.Count == toCompareWith.Scope2SolutionObjects.Count;
         }
         public Dictionary<string, ObservableCollection<SolutionObject>> Scope2SolutionObjects = new Dictionary<string, ObservableCollection<SolutionObject>>();
-        public ObservableCollection<SolutionObject> SolutionObjects = new ObservableCollection<SolutionObject>();
         public void Save()
         {
             DataContractSerializer serializer = new DataContractSerializer(typeof(Model));

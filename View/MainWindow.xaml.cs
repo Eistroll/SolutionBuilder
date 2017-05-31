@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -15,7 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace SolutionBuilder
+namespace SolutionBuilder.View
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -24,14 +25,19 @@ namespace SolutionBuilder
     {
         private Model _Model = new Model();
         private MainViewModel _ViewModel = new MainViewModel();
-        private BitmapImage ImageBuildSuccess;
-        private BitmapImage ImageBuildFailure;
+        private ImageSource ImageBuildSuccess;
+        private ImageSource ImageBuildFailure;
+        static internal ImageSource GetImageSourceFromResource(string imageName)
+        {
+            Uri oUri = new Uri("pack://application:,,,/" + Assembly.GetExecutingAssembly().GetName().Name + ";component/" + imageName, UriKind.RelativeOrAbsolute);
+            return BitmapFrame.Create(oUri);
+        }
         public MainWindow()
         {
             InitializeComponent();
-            ImageBuildFailure = new BitmapImage(new Uri(@"Images/img_delete_16.png",UriKind.Relative));
-            ImageBuildSuccess = new BitmapImage(new Uri(@"Images/img_check_16.png",UriKind.Relative));
-            
+            ImageBuildFailure = GetImageSourceFromResource("Images/img_delete_16.png");
+            ImageBuildSuccess = GetImageSourceFromResource("Images/img_check_16.png");
+
             _Model = Model.Load();
             _ViewModel = MainViewModel.Load();
         }
@@ -77,18 +83,21 @@ namespace SolutionBuilder
         }
         private void mnuSettings_Click(object sender, RoutedEventArgs e)
         {
-            Window settings = new SolutionBuilder.Settings();
+            Window settings = new Settings();
             settings.DataContext = _ViewModel;
             settings.ShowDialog();
         }
         private void mnuNewTab_Click(object sender, RoutedEventArgs e)
         {
-            String tabName = "New";
-            _ViewModel.SettingsList.Add(new Setting() { Scope = tabName, Key = "BaseDir", Value = "" });
-            TabItem tab = new TabItem() { Header = tabName };
-            tab.BindToModel(ref _Model, ref _ViewModel);
-            _ViewModel.Tabs.Add( tab );
-
+            var dialog = new StringQueryDialog("Enter Tab name:");
+            if ( dialog.ShowDialog() == true )
+            {
+                String tabName = dialog.QueryString;
+                _ViewModel.SettingsList.Add(new Setting() { Scope = tabName, Key = "BaseDir", Value = "" });
+                TabItem tab = new TabItem() { Header = tabName };
+                tab.BindToModel(ref _Model, ref _ViewModel);
+                _ViewModel.Tabs.Add(tab);
+            }
         }
         private void btBuild_Click(object sender, RoutedEventArgs e)
         {
@@ -106,7 +115,7 @@ namespace SolutionBuilder
                         startInfo.UseShellExecute = false;
                         startInfo.CreateNoWindow = true;
                         startInfo.FileName = buildExe.ToString();
-                        StringBuilder path = new StringBuilder(_ViewModel.GetSetting("BaseDir"));
+                        StringBuilder path = new StringBuilder(_ViewModel.GetSetting("BaseDir", tab.Header));
                         path.Append("\\" + solution.Name);
                         startInfo.Arguments = tab.BaseOptions + " " + solution.Options + " " + path;
                         process.StartInfo = startInfo;
@@ -122,6 +131,7 @@ namespace SolutionBuilder
                             solution.BuildState = ImageBuildSuccess;
                         else
                             solution.BuildState = ImageBuildFailure;
+                        solution.SuccessFlag = exitCode == 0 ? true : false;
                     }
                 }
             }

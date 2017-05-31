@@ -14,46 +14,53 @@ namespace Test_SolutionBuilder
         public void ModelSave()
         {
             Model model = new Model();
-            model.SolutionObjects.Add(new SolutionObject
+            model.Scope2SolutionObjects["test"] = new System.Collections.ObjectModel.ObservableCollection<SolutionObject>();
+            model.Scope2SolutionObjects["test"].Add(new SolutionObject
             {
                 Name = "BCGCBPro140.sln"
                     ,
                 Options = new Dictionary<string, string> { { "Release", "/p:Configuration=\"Unicode Release\"" }, { "Debug", "/p:Configuration=\"Unicode Debug\"" } }
             });
-            Assert.AreEqual(1, model.SolutionObjects.Count);
             model.Save();
             Model loadedModel = Model.Load();
-            CollectionAssert.AreEqual(model.SolutionObjects, loadedModel.SolutionObjects);
+            Assert.AreEqual(loadedModel.Scope2SolutionObjects.Count, model.Scope2SolutionObjects.Count);
+            Assert.AreEqual(1, loadedModel.Scope2SolutionObjects.Count);
+            CollectionAssert.AreEqual(model.Scope2SolutionObjects["test"], loadedModel.Scope2SolutionObjects["test"]);
         }
 
         [TestMethod]
         public void ViewModelSave()
         {
             Model model = new Model();
-            model.SolutionObjects.Add(new SolutionObject
+            model.Scope2SolutionObjects["test"] = new System.Collections.ObjectModel.ObservableCollection<SolutionObject>();
+            model.Scope2SolutionObjects["test"].Add(new SolutionObject
             {
                 Name = "BCGCBPro140.sln"
                     ,
                 Options = new Dictionary<string, string> { { "Release", "/p:Configuration=\"Unicode Release\"" }, { "Debug", "/p:Configuration=\"Unicode Debug\"" } }
             });
-            model.SolutionObjects.Add(new SolutionObject
+            model.Scope2SolutionObjects["test"].Add(new SolutionObject
             {
                 Name = "DemoPanel.sln"
                     ,
                 Options = new Dictionary<string, string> { { "Release", "/p:Configuration=\"Unicode Release\"" }, { "Debug", "/p:Configuration=\"Unicode Debug\"" } }
             });
             MainViewModel viewModel = new MainViewModel();
+            viewModel.Tabs.Add(new TabItem() { Header = "test" });
             viewModel.BindToModel(ref model);
-            viewModel.Solutions[1].Selected = true;
-            Assert.AreEqual(2, model.SolutionObjects.Count);
-            Assert.AreEqual(2, viewModel.Solutions.Count);
+            var tab = viewModel.Tabs[0];
+            tab.Solutions[1].Selected = true;
+            Assert.AreEqual(2, model.Scope2SolutionObjects["test"].Count);
+            Assert.AreEqual(2, tab.Solutions.Count);
             model.Save();
             MainViewModel loadedModel = MainViewModel.Load();
-            CollectionAssert.AreEqual(viewModel.Paths, loadedModel.Paths);
-            CollectionAssert.AreEqual(viewModel.Platforms, loadedModel.Platforms);
-            Assert.AreEqual(viewModel.SelectedPath, loadedModel.SelectedPath);
-            Assert.IsFalse(viewModel.Solutions[0].Selected);
-            Assert.IsTrue(viewModel.Solutions[1].Selected);
+            Assert.AreEqual(1, loadedModel.Tabs.Count);
+            var loadedTab = loadedModel.Tabs[0];
+            CollectionAssert.AreEqual(tab.Paths, loadedTab.Paths);
+            CollectionAssert.AreEqual(tab.Platforms, loadedTab.Platforms);
+            Assert.AreEqual(tab.SelectedPath, loadedTab.SelectedPath);
+            Assert.IsFalse(tab.Solutions[0].Selected);
+            Assert.IsTrue(tab.Solutions[1].Selected);
         }
 
     }

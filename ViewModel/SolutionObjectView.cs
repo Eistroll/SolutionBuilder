@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Xml.Serialization;
 using System.Runtime.Serialization;
 using System.Windows.Media.Imaging;
+using System.Windows.Media;
 
 namespace SolutionBuilder
 {
@@ -17,10 +18,6 @@ namespace SolutionBuilder
         {
             _SolutionObject = SolutionObject;
             Options = _SolutionObject.Options[selectedPlatform];
-        }
-        public SolutionObjectView()
-        {
-            _SolutionObject = new SolutionObject();
         }
         public override int GetHashCode()
         {
@@ -51,11 +48,17 @@ namespace SolutionBuilder
             get { return _Selected; }
             set { if (_Selected != value) { _Selected = value; NotifyPropertyChanged("Selected"); } }
         }
-        private BitmapImage _BuildState;
-        public BitmapImage BuildState
+        private ImageSource _BuildState;
+        public ImageSource BuildState
         {
             get { return _BuildState; }
             set { if (_BuildState != value) { _BuildState = value; NotifyPropertyChanged("BuildState"); } }
+        }
+        private bool _SuccessFlag;
+        public bool SuccessFlag
+        {
+            get { return _SuccessFlag; }
+            set { if (_SuccessFlag != value) { _SuccessFlag = value; NotifyPropertyChanged("SuccessFlag"); } }
         }
 
         [IgnoreDataMemberAttribute]

@@ -15,7 +15,7 @@ namespace SolutionBuilder
     {
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            MainWindow wnd = new MainWindow();
+            View.MainWindow wnd = new View.MainWindow();
             wnd.Show();
         }
     }
