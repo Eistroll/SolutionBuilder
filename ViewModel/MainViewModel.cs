@@ -1,23 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Collections.ObjectModel;
-using System.Windows;
-using System.Windows.Data;
-using System.Xml.Serialization;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Xml;
-using System.Windows.Input;
 
 namespace SolutionBuilder
 {
     public class MainViewModel : INotifyPropertyChanged
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private Model _Model;
         public ObservableCollection<Setting> SettingsList { get; set; }
         public ObservableCollection<TabItem> Tabs { get; set; }
@@ -46,6 +42,21 @@ namespace SolutionBuilder
                 }
             }
         }
+        public String CompleteLog
+        {
+            get
+            {
+                StringBuilder log = new StringBuilder();
+                foreach (var tab in Tabs) {
+                    foreach (SolutionObjectView solution in tab.Solutions) {
+                        log.AppendLine(solution.BuildLog);
+                    }
+                }
+                return log.ToString();
+            }
+        }
+
+        // Constructor
         public MainViewModel()
         {
             Tabs = new ObservableCollection<TabItem>();
@@ -53,6 +64,17 @@ namespace SolutionBuilder
             SettingsList = new ObservableCollection<Setting>();
             SettingsList.Add(new Setting { Scope="Base", Key = "BuildExe", Value = @"C:\Program Files (x86)\MSBuild\14.0\Bin\msbuild.exe" });
             Init();
+        }
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+        public override bool Equals(object obj)
+        {
+            var toCompareWith = obj as MainViewModel;
+            if (toCompareWith == null)
+                return false;
+            return true;
         }
         public void Init()
         {
@@ -68,17 +90,6 @@ namespace SolutionBuilder
                 }
             }
             return "";
-        }
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
-        public override bool Equals(object obj)
-        {
-            var toCompareWith = obj as MainViewModel;
-            if (toCompareWith == null)
-                return false;
-            return true;
         }
         public void Save()
         {
@@ -113,21 +124,6 @@ namespace SolutionBuilder
         }
         private void Model_PropertyChanged( object sender, PropertyChangedEventArgs e )
         {
-        }
-        public String CompleteLog
-        {
-            get
-            {
-                StringBuilder log = new StringBuilder();
-                foreach ( var tab in Tabs)
-                {
-                    foreach ( SolutionObjectView solution in tab.Solutions )
-                    {
-                        log.AppendLine(solution.BuildLog);
-                    }
-                }
-                return log.ToString();
-            }
         }
         public void UpdateLog( SolutionObjectView solution )
         {

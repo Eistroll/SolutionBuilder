@@ -1,24 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
-using System.Xml.Serialization;
 
 namespace SolutionBuilder
 {
     public class Model : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged(string name)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
+        // Properties
+        public Dictionary<string, ObservableCollection<SolutionObject>> Scope2SolutionObjects = new Dictionary<string, ObservableCollection<SolutionObject>>();
+        
+        //Constructor
         public Model()
         {
         }
@@ -33,7 +27,13 @@ namespace SolutionBuilder
                 return false;
             return this.Scope2SolutionObjects.Count == toCompareWith.Scope2SolutionObjects.Count;
         }
-        public Dictionary<string, ObservableCollection<SolutionObject>> Scope2SolutionObjects = new Dictionary<string, ObservableCollection<SolutionObject>>();
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged(string name)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        // IO
         public void Save()
         {
             DataContractSerializer serializer = new DataContractSerializer(typeof(Model));
