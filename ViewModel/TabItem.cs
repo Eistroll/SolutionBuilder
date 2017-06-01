@@ -9,11 +9,12 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace SolutionBuilder
 {
     [DataContract]
-    public class TabItem
+    public class TabItem : INotifyPropertyChanged
     {
         [DataMember]
         public string Header { get; set; }
@@ -27,7 +28,6 @@ namespace SolutionBuilder
         public StringCollection Paths { get; set; }
         [DataMember]
         public StringCollection Platforms { get; set; }
-
         [DataMember]
         private String _SelectedPlatform;
         public String SelectedPlatform
@@ -43,7 +43,8 @@ namespace SolutionBuilder
         }
         [DataMember]
         private int _SelectedSolutionIndex;
-
+        [DataMember]
+        public bool DoBuild { get; set; }
         //////////////////////////////////////////////////////////////////////////
         //Not serialized Data members
         //////////////////////////////////////////////////////////////////////////
@@ -69,6 +70,12 @@ namespace SolutionBuilder
             get { return _AllSolutions ?? (_AllSolutions = new StringCollection()); }
             set { _AllSolutions = value; }
         }
+        private ImageSource _BuildState;
+        public ImageSource BuildState
+        {
+            get { return _BuildState; }
+            set { if (_BuildState != value) { _BuildState = value; NotifyPropertyChanged("BuildState"); } }
+        }
         private MainViewModel _ViewModel;
         private Model _Model;
 
@@ -78,9 +85,7 @@ namespace SolutionBuilder
             SelectedSolutions = new StringCollection();
             Solutions = new ObservableCollection<SolutionObjectView>();
             Paths = new StringCollection();
-            Platforms = new StringCollection();
-            Platforms.Add("Release");
-            Platforms.Add("Debug");
+            Platforms = new StringCollection() { "Release", "Debug" };
             _SelectedPlatform = "Debug";
             SelectedSolutionIndex = -1;
         }
@@ -140,6 +145,11 @@ namespace SolutionBuilder
                 else
                     SelectedSolutions.Add(solView.Name);
             }
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged(string name)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
         private ICommand _AddSolutionCmd;
         public ICommand AddSolutionCmd

@@ -61,8 +61,10 @@ namespace SolutionBuilder
         {
             Tabs = new ObservableCollection<TabItem>();
             var me = this;
-            SettingsList = new ObservableCollection<Setting>();
-            SettingsList.Add(new Setting { Scope="Base", Key = "BuildExe", Value = @"C:\Program Files (x86)\MSBuild\14.0\Bin\msbuild.exe" });
+            SettingsList = new ObservableCollection<Setting>
+            {
+                new Setting { Scope = "Base", Key = "BuildExe", Value = @"C:\Program Files (x86)\MSBuild\14.0\Bin\msbuild.exe" }
+            };
             Init();
         }
         public override int GetHashCode()
