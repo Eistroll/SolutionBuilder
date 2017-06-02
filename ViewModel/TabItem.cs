@@ -25,7 +25,7 @@ namespace SolutionBuilder
         [DataMember]
         public StringCollection SelectedSolutions { get; set; }
         [DataMember]
-        public StringCollection Paths { get; set; }
+        public ObservableCollection<string> Paths { get; set; }
         [DataMember]
         public StringCollection Platforms { get; set; }
         [DataMember]
@@ -54,6 +54,7 @@ namespace SolutionBuilder
             set
             {
                 _SelectedSolutionIndex = value;
+                _RemoveSolutionCmd.RaiseCanExecuteChanged();
                 if (_SelectedSolutionIndex != -1)
                     _ViewModel.UpdateLog(Solutions[_SelectedSolutionIndex]);
             }
@@ -76,6 +77,12 @@ namespace SolutionBuilder
             get { return _BuildState; }
             set { if (_BuildState != value) { _BuildState = value; NotifyPropertyChanged("BuildState"); } }
         }
+        private string _PathEnteredItem;
+        public string PathEnteredItem
+        {
+            get { return _PathEnteredItem; }
+            set { if (value != _PathEnteredItem && !Paths.Contains(value)) { _PathEnteredItem = value; Paths.Add(_PathEnteredItem); } }
+        }
         private MainViewModel _ViewModel;
         private Model _Model;
 
@@ -84,7 +91,7 @@ namespace SolutionBuilder
             AllSolutions = new StringCollection();
             SelectedSolutions = new StringCollection();
             Solutions = new ObservableCollection<SolutionObjectView>();
-            Paths = new StringCollection();
+            Paths = new ObservableCollection<string>();
             Platforms = new StringCollection() { "Release", "Debug" };
             _SelectedPlatform = "Debug";
             SelectedSolutionIndex = -1;
@@ -154,9 +161,29 @@ namespace SolutionBuilder
         private ICommand _AddSolutionCmd;
         public ICommand AddSolutionCmd
         {
-            get { return _AddSolutionCmd ?? (_AddSolutionCmd = new CommandHandler(() => AddSolution(), true)); }
+            get { return _AddSolutionCmd ?? (_AddSolutionCmd = new CommandHandler(param => AddSolution())); }
         }
         public void AddSolution()
+        {
+            SolutionObject solution = new SolutionObject();
+            if (!_Model.Scope2SolutionObjects.ContainsKey(Header)) {
+                _Model.Scope2SolutionObjects[Header] = new ObservableCollection<SolutionObject>();
+            }
+            _Model.Scope2SolutionObjects[Header].Add(solution);
+            SolutionObjectView solutionView = new SolutionObjectView(ref solution, SelectedPlatform);
+            solutionView.PropertyChanged += new PropertyChangedEventHandler(SolutionView_PropertyChanged);
+            Solutions.Add(solutionView);
+        }
+        private CommandHandler _RemoveSolutionCmd;
+        public CommandHandler RemoveSolutionCmd
+        {
+            get { return _RemoveSolutionCmd ?? (_RemoveSolutionCmd = new CommandHandler(param => RemoveSolution(param),param => RemoveSolution_CanExecute(param) )); }
+        }
+        public bool RemoveSolution_CanExecute(object parameter)
+        {
+            return SelectedSolutionIndex != -1;
+        }
+        public void RemoveSolution(object parameter)
         {
             SolutionObject solution = new SolutionObject();
             if (!_Model.Scope2SolutionObjects.ContainsKey(Header)) {

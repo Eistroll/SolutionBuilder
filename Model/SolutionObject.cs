@@ -6,7 +6,7 @@ using System.Runtime.Serialization;
 namespace SolutionBuilder
 {
     [DataContract]
-    public class SolutionObject
+    public class SolutionObject : ICloneable
     {
         [DataMember]
         public String Name { get; set; }
@@ -30,6 +30,11 @@ namespace SolutionBuilder
                 return false;
             return this.Name == toCompareWith.Name &&
                 this.Options.OrderBy(kvp=>kvp.Key).SequenceEqual(toCompareWith.Options.OrderBy(kvp=>kvp.Key));
+        }
+
+        public object Clone()
+        {
+            return MemberwiseClone();
         }
     }
 }

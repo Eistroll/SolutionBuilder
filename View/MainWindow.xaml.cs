@@ -108,6 +108,30 @@ namespace SolutionBuilder.View
                 _ViewModel.Tabs.Add(tab);
             }
         }
+        private void MnuCopyTab_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new StringQueryDialog("Enter Tab name:");
+            if (dialog.ShowDialog() == true) {
+                String tabName = dialog.QueryString;
+                TabItem originalTab = tabs.SelectedItem as TabItem;
+                String originalBaseDir = _ViewModel.GetSetting("BaseDir", originalTab.Header);
+                String newBaseDir = originalBaseDir.Replace(originalTab.Header, tabName);
+                _ViewModel.SettingsList.Add(new Setting() { Scope = tabName, Key = "BaseDir", Value = newBaseDir });
+                TabItem tab = new TabItem() { Header = tabName };
+                var clonedList = _Model.Scope2SolutionObjects[originalTab.Header].Select(obj => (SolutionObject) obj.Clone()).ToList();
+                _Model.Scope2SolutionObjects[tabName] = new System.Collections.ObjectModel.ObservableCollection<SolutionObject>(clonedList);
+                tab.BindToModel(ref _Model, ref _ViewModel);
+                _ViewModel.Tabs.Add(tab);
+            }
+        }
+        private void MnuRemoveTab_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("Are you sure?", "Delete Tab Confirmation", System.Windows.MessageBoxButton.YesNo);
+            if (messageBoxResult == MessageBoxResult.Yes) { 
+                TabItem selectedTab = tabs.SelectedItem as TabItem;
+                _ViewModel.Tabs.Remove(selectedTab);
+            }
+        }
         private void BuildAll_Click(object sender, RoutedEventArgs e)
         {
             FileInfo buildExe = new FileInfo(_ViewModel.GetSetting("BuildExe"));

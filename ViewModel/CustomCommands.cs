@@ -16,24 +16,32 @@ namespace SolutionBuilder
 
     public class CommandHandler : ICommand
     {
-        private Action _action;
-        private bool _canExecute;
-        public CommandHandler(Action action, bool canExecute)
+        private Action<object> _execute;
+        private Predicate<object> _canExecute;
+        public CommandHandler(Action<object> execute)
+            : this(execute, null)
         {
-            _action = action;
+        }
+        public CommandHandler(Action<object> execute, Predicate<object> canExecute)
+        {
+            _execute = execute;
             _canExecute = canExecute;
         }
 
         public bool CanExecute(object parameter)
         {
-            return _canExecute;
+            return _canExecute==null? true:_canExecute(parameter);
         }
 
         public event EventHandler CanExecuteChanged;
-
         public void Execute(object parameter)
         {
-            _action();
+            _execute(parameter);
+        }
+        public void RaiseCanExecuteChanged()
+        {
+            if (CanExecuteChanged != null)
+                CanExecuteChanged(this, EventArgs.Empty);
         }
     }
 }

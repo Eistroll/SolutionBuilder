@@ -26,6 +26,8 @@
             </MenuItem>
             <MenuItem Header="_Tabs">
                 <MenuItem Header="_New" Click="MnuNewTab_Click"/>
+                <MenuItem Header="_Copy" Click="MnuCopyTab_Click"/>
+                <MenuItem Header="_Remove" Click="MnuRemoveTab_Click"/>
             </MenuItem>
         </Menu>
         <TabControl Grid.Row="1" Name="tabs" ItemsSource="{Binding Tabs}" SelectedIndex="{Binding SelectedTabIndex}">
@@ -53,7 +55,7 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <StackPanel Orientation="Horizontal" Grid.Column="0">
-                                <ComboBox x:Name="cbLocation" ItemsSource="{Binding Paths}" SelectedItem="{Binding SelectedPath}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120" Height="22" IsEditable="True"/>
+                                <ComboBox x:Name="cbLocation" ItemsSource="{Binding Paths}" SelectedItem="{Binding SelectedPath}" Text="{Binding PathEnteredItem, UpdateSourceTrigger=LostFocus}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120" Height="22" IsEditable="True"/>
                                 <ComboBox x:Name="cbPlatform" ItemsSource="{Binding Platforms}" SelectedItem="{Binding SelectedPlatform}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120" Height="22"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Grid.Column="2">
@@ -77,8 +79,8 @@
                             </ListView.Resources>
                             <ListView.ContextMenu>
                                 <ContextMenu>
-                                    <MenuItem Header="Remove" Click="RemoveSolution_OnClick"/>
                                     <MenuItem Header="Add" Command="{Binding AddSolutionCmd}"/>
+                                    <MenuItem Header="Remove" Command="{Binding RemoveSolutionCmd}"/>
                                 </ContextMenu>
                             </ListView.ContextMenu>
                             <ListView.View>

@@ -12,29 +12,11 @@ using System.Windows.Media;
 
 namespace SolutionBuilder
 {
-    public class SolutionObjectView : INotifyPropertyChanged
+    public class SolutionObjectView : INotifyPropertyChanged, ICloneable
     {
-        public SolutionObjectView(ref SolutionObject SolutionObject, String selectedPlatform)
-        {
-            _SolutionObject = SolutionObject;
-            Options = _SolutionObject.Options[selectedPlatform];
-        }
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
-        public override bool Equals(object obj)
-        {
-            var toCompareWith = obj as SolutionObjectView;
-            if (toCompareWith == null)
-                return false;
-            return this.Name == toCompareWith.Name &&
-                this._Options == toCompareWith._Options &&
-                this.Selected == toCompareWith.Selected;
-        }
         private SolutionObject _SolutionObject;
         public SolutionObject SolutionObject { get { return _SolutionObject; } }
-        public string Name { get { return _SolutionObject?.Name; } set{ _SolutionObject.Name = value; } }
+        public string Name { get { return _SolutionObject?.Name; } set { _SolutionObject.Name = value; } }
 
         private string _Options;
         public string Options
@@ -63,6 +45,24 @@ namespace SolutionBuilder
 
         [IgnoreDataMemberAttribute]
         public String BuildLog { get; set; }
+        public SolutionObjectView(ref SolutionObject SolutionObject, String selectedPlatform)
+        {
+            _SolutionObject = SolutionObject;
+            Options = _SolutionObject.Options[selectedPlatform];
+        }
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+        public override bool Equals(object obj)
+        {
+            var toCompareWith = obj as SolutionObjectView;
+            if (toCompareWith == null)
+                return false;
+            return this.Name == toCompareWith.Name &&
+                this._Options == toCompareWith._Options &&
+                this.Selected == toCompareWith.Selected;
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged(string name)
@@ -70,5 +70,9 @@ namespace SolutionBuilder
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
+        public object Clone()
+        {
+            return MemberwiseClone();
+        }
     }
 }
