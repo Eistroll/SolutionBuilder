@@ -16,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Diagnostics;
 
 namespace SolutionBuilder.View
 {
@@ -132,6 +133,10 @@ namespace SolutionBuilder.View
                 _ViewModel.Tabs.Remove(selectedTab);
             }
         }
+        private void BuildOutputHandler(object sender, DataReceivedEventArgs e)
+        {
+            this.Dispatcher.Invoke(new Action<TextBox>(textBox => textBox.Text += Environment.NewLine + e.Data ?? string.Empty),this.textBox);
+        }
         private void BuildAll_Click(object sender, RoutedEventArgs e)
         {
             FileInfo buildExe = new FileInfo(_ViewModel.GetSetting("BuildExe"));
@@ -152,13 +157,10 @@ namespace SolutionBuilder.View
                         path.Append("\\" + solution.Name);
                         startInfo.Arguments = tab.BaseOptions + " " + solution.Options + " " + path;
                         process.StartInfo = startInfo;
+                        // Set event handler
+                        process.OutputDataReceived += new DataReceivedEventHandler(BuildOutputHandler);
                         bool Success = process.Start();
-                        while (!process.StandardOutput.EndOfStream)
-                        {
-                            String line = process.StandardOutput.ReadLine() + Environment.NewLine;
-                            solution.BuildLog += line;
-                            textBox.AppendText(line);
-                        }
+                        process.BeginOutputReadLine();
                         process.WaitForExit();
                         int exitCode = process.ExitCode;
                         if (exitCode == 0)
