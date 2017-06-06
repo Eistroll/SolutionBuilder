@@ -54,7 +54,7 @@ namespace SolutionBuilder
             set
             {
                 _SelectedSolutionIndex = value;
-                _RemoveSolutionCmd.RaiseCanExecuteChanged();
+                RemoveSolutionCmd.RaiseCanExecuteChanged();
                 if (_SelectedSolutionIndex != -1)
                     _ViewModel.UpdateLog(Solutions[_SelectedSolutionIndex]);
             }

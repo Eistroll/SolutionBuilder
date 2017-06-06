@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define TRACE
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -133,9 +134,23 @@ namespace SolutionBuilder.View
                 _ViewModel.Tabs.Remove(selectedTab);
             }
         }
-        private void BuildOutputHandler(object sender, DataReceivedEventArgs e)
+        private void AddToLog( string text )
         {
-            this.Dispatcher.Invoke(new Action<TextBox>(textBox => textBox.Text += Environment.NewLine + e.Data ?? string.Empty),this.textBox);
+            if (!this.textBox.CheckAccess())
+            {
+                this.textBox.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action<string>(AddToLog), text);
+            }
+            else 
+            {
+                textBox.Text += text;
+                textBox.ScrollToEnd();
+            }
+        }
+        private void BuildOutputHandler(object sender, DataReceivedEventArgs e, SolutionObjectView solution)
+        {
+            string line = e.Data + Environment.NewLine;
+            solution.BuildLog += line;
+            AddToLog(line);
         }
         private void BuildAll_Click(object sender, RoutedEventArgs e)
         {
@@ -146,34 +161,40 @@ namespace SolutionBuilder.View
             {
                 if (!tab.DoBuild)
                     continue;
-                bool buildFailure = false;
+                tab.BuildState = null;
                 foreach (SolutionObjectView solution in tab.Solutions) {
-                    if (solution.Selected) {
-                        System.Diagnostics.Process process = new System.Diagnostics.Process();
-                        System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo()
-                        { WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden, RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true };
-                        startInfo.FileName = buildExe.ToString();
-                        StringBuilder path = new StringBuilder(_ViewModel.GetSetting("BaseDir", tab.Header));
-                        path.Append("\\" + solution.Name);
-                        startInfo.Arguments = tab.BaseOptions + " " + solution.Options + " " + path;
-                        process.StartInfo = startInfo;
-                        // Set event handler
-                        process.OutputDataReceived += new DataReceivedEventHandler(BuildOutputHandler);
-                        bool Success = process.Start();
-                        process.BeginOutputReadLine();
-                        process.WaitForExit();
-                        int exitCode = process.ExitCode;
-                        if (exitCode == 0)
-                            solution.BuildState = ImageBuildSuccess;
-                        else
-                        {
-                            buildFailure = true; solution.BuildState = ImageBuildFailure;
-                        }
-                            
-                        solution.SuccessFlag = exitCode == 0 ? true : false;
-                    }
+                    solution.BuildState = null;
                 }
-                tab.BuildState = buildFailure ? ImageBuildFailure : ImageBuildSuccess;
+                    Task.Factory.StartNew(() =>
+                {
+                    bool buildFailure = false;
+                    foreach (SolutionObjectView solution in tab.Solutions) {
+                        if (solution.Selected) {
+                            System.Diagnostics.Process process = new System.Diagnostics.Process();
+                            System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo()
+                            { WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden, RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true };
+                            startInfo.FileName = buildExe.ToString();
+                            StringBuilder path = new StringBuilder(_ViewModel.GetSetting("BaseDir", tab.Header));
+                            path.Append("\\" + solution.Name);
+                            startInfo.Arguments = tab.BaseOptions + " " + solution.Options + " " + path;
+                            process.StartInfo = startInfo;
+                            // Set event handler
+                            process.OutputDataReceived += (s, eventargs) => BuildOutputHandler(s, eventargs, solution);
+                            bool Success = process.Start();
+                            process.BeginOutputReadLine();
+                            process.WaitForExit();
+                            int exitCode = process.ExitCode;
+                            if (exitCode == 0)
+                                solution.BuildState = ImageBuildSuccess;
+                            else {
+                                buildFailure = true; solution.BuildState = ImageBuildFailure;
+                            }
+
+                            solution.SuccessFlag = exitCode == 0 ? true : false;
+                        }
+                    }
+                    tab.BuildState = buildFailure ? ImageBuildFailure : ImageBuildSuccess;
+                });
             }
         }
     }
