@@ -55,7 +55,6 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <StackPanel Orientation="Horizontal" Grid.Column="0">
-                                <ComboBox x:Name="cbLocation" ItemsSource="{Binding Paths}" SelectedItem="{Binding SelectedPath}" Text="{Binding PathEnteredItem, UpdateSourceTrigger=LostFocus}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120" Height="22" IsEditable="True"/>
                                 <ComboBox x:Name="cbPlatform" ItemsSource="{Binding Platforms}" SelectedItem="{Binding SelectedPlatform}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120" Height="22"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Grid.Column="2">
@@ -97,7 +96,7 @@
                                     <GridViewColumn Header="Name" Width="300">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
-                                                <ComboBox ItemsSource="{Binding DataContext.AllSolutionsForSelectedTab, ElementName=wndMain }" SelectedItem="{Binding Name}" Height="20" Margin="-5,0"/>
+                                                <ComboBox ItemsSource="{Binding DataContext.AllSolutionsForSelectedTab, ElementName=wndMain }" SelectedItem="{Binding Name}" Height="20" Margin="-5,0" IsEditable="True"/>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>

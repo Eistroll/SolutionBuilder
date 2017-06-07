@@ -26,8 +26,6 @@ namespace SolutionBuilder
         [DataMember]
         public StringCollection SelectedSolutions { get; set; }
         [DataMember]
-        public ObservableCollection<string> Paths { get; set; }
-        [DataMember]
         public StringCollection Platforms { get; set; }
         [DataMember]
         private String _SelectedPlatform;
@@ -78,12 +76,6 @@ namespace SolutionBuilder
             get { return _BuildState; }
             set { if (_BuildState != value) { _BuildState = value; NotifyPropertyChanged("BuildState"); } }
         }
-        private string _PathEnteredItem;
-        public string PathEnteredItem
-        {
-            get { return _PathEnteredItem; }
-            set { if (value != _PathEnteredItem && !Paths.Contains(value)) { _PathEnteredItem = value; Paths.Add(_PathEnteredItem); } }
-        }
         private MainViewModel _ViewModel;
         private Model _Model;
 
@@ -92,7 +84,6 @@ namespace SolutionBuilder
             AllSolutions = new StringCollection();
             SelectedSolutions = new StringCollection();
             Solutions = new ObservableCollection<SolutionObjectView>();
-            Paths = new ObservableCollection<string>();
             Platforms = new StringCollection() { "Release", "Debug" };
             _SelectedPlatform = "Debug";
             SelectedSolutionIndex = -1;
