@@ -38,6 +38,8 @@ namespace SolutionBuilder
         {
             DataContractSerializer serializer = new DataContractSerializer(typeof(Model));
             FileStream writer = new FileStream("DataModel.xml", FileMode.Create);
+            if (!writer.CanWrite)
+                return;
             serializer.WriteObject(writer, this);
             writer.Close();
         }

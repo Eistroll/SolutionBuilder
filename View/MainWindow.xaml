@@ -81,6 +81,8 @@
                                 <ContextMenu>
                                     <MenuItem Header="Add" Command="{Binding AddSolutionCmd}"/>
                                     <MenuItem Header="Remove" Command="{Binding RemoveSolutionCmd}"/>
+                                    <MenuItem Header="Build" Command="{Binding BuildSolutionCmd}"/>
+                                    <MenuItem Header="Open" Command="{Binding OpenSolutionCmd}"/>
                                 </ContextMenu>
                             </ListView.ContextMenu>
                             <ListView.View>
@@ -122,6 +124,6 @@
             </TabControl.ContentTemplate>
         </TabControl>
         <GridSplitter Grid.Row="2" Height="5" HorizontalAlignment="Stretch"/>
-        <TextBox Grid.Row="3" x:Name="textBox" Text="{Binding Log, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Stretch" ScrollViewer.CanContentScroll="True" HorizontalScrollBarVisibility="Visible" IsReadOnly="True" AcceptsReturn="True" Margin="5" VerticalScrollBarVisibility="Auto"/>
+        <TextBox Grid.Row="3" x:Name="textBoxBuildLog" Text="{Binding Log, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Stretch" ScrollViewer.CanContentScroll="True" HorizontalScrollBarVisibility="Visible" IsReadOnly="True" AcceptsReturn="True" Margin="5" VerticalScrollBarVisibility="Auto"/>
     </Grid>
 </Window>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -185,14 +186,41 @@ namespace SolutionBuilder
         }
         public void RemoveSolution(object parameter)
         {
-            SolutionObject solution = new SolutionObject();
-            if (!_Model.Scope2SolutionObjects.ContainsKey(Header)) {
-                _Model.Scope2SolutionObjects[Header] = new ObservableCollection<SolutionObject>();
+            Solutions.RemoveAt(SelectedSolutionIndex);
+        }
+        private CommandHandler _BuildSolutionCmd;
+        public CommandHandler BuildSolutionCmd
+        {
+            get { return _BuildSolutionCmd ?? (_BuildSolutionCmd = new CommandHandler(param => BuildSolution(param), param => RemoveSolution_CanExecute(param))); }
+        }
+        public bool BuildSolution_CanExecute(object parameter)
+        {
+            return SelectedSolutionIndex != -1;
+        }
+        public void BuildSolution(object parameter)
+        {
+            SolutionObjectView solution = Solutions[SelectedSolutionIndex];
+            View.MainWindow mainWindow = (View.MainWindow)System.Windows.Application.Current.MainWindow;
+            if (mainWindow != null) {
+                mainWindow.textBoxBuildLog.Clear();
+                mainWindow.BuildSolutions(this, new FileInfo(_ViewModel.GetSetting("BuildExe")), new ObservableCollection<SolutionObjectView>() { solution });
             }
-            _Model.Scope2SolutionObjects[Header].Add(solution);
-            SolutionObjectView solutionView = new SolutionObjectView(ref solution, SelectedPlatform);
-            solutionView.PropertyChanged += new PropertyChangedEventHandler(SolutionView_PropertyChanged);
-            Solutions.Add(solutionView);
+        }
+        private CommandHandler _OpenSolutionCmd;
+        public CommandHandler OpenSolutionCmd
+        {
+            get { return _OpenSolutionCmd ?? (_OpenSolutionCmd = new CommandHandler(param => OpenSolution(param), param => RemoveSolution_CanExecute(param))); }
+        }
+        public bool OpenSolution_CanExecute(object parameter)
+        {
+            return SelectedSolutionIndex != -1;
+        }
+        public void OpenSolution(object parameter)
+        {
+            SolutionObjectView solution = Solutions[SelectedSolutionIndex];
+            StringBuilder path = new StringBuilder(_ViewModel.GetSetting("BaseDir", Header));
+            path.Append("\\" + solution.Name);
+            Process.Start(path.ToString());
         }
     }
 }

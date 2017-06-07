@@ -95,8 +95,11 @@ namespace SolutionBuilder
         }
         public void Save()
         {
+            FileInfo file = new FileInfo("DataViewModel.xml");
             DataContractSerializer serializer = new DataContractSerializer(typeof(MainViewModel));
-            FileStream writer = new FileStream("DataViewModel.xml", FileMode.Create);
+            FileStream writer = new FileStream(file.Name, FileMode.Create);
+            if (!writer.CanWrite)
+                return;
             serializer.WriteObject(writer, this);
             writer.Close();
         }
