@@ -193,7 +193,7 @@ namespace SolutionBuilder
             SolutionObjectView solution = Solutions[SelectedSolutionIndex];
             View.MainWindow mainWindow = (View.MainWindow)System.Windows.Application.Current.MainWindow;
             if (mainWindow != null) {
-                mainWindow.textBoxBuildLog.Clear();
+                mainWindow.textBoxLog.Clear();
                 mainWindow.BuildSolutions(this, new FileInfo(_ViewModel.GetSetting("BuildExe")), new ObservableCollection<SolutionObjectView>() { solution });
             }
         }

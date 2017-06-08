@@ -125,7 +125,7 @@
                     </TabControl.ContentTemplate>
                 </TabControl>
                 <GridSplitter Grid.Row="2" Height="5" HorizontalAlignment="Stretch"/>
-                <TextBox Grid.Row="3" x:Name="textBoxBuildLog" Text="{Binding Log, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Stretch" ScrollViewer.CanContentScroll="True" HorizontalScrollBarVisibility="Visible" IsReadOnly="True" AcceptsReturn="True" Margin="5" VerticalScrollBarVisibility="Auto"/>
+                <TextBox Grid.Row="3" x:Name="textBoxLog" Text="{Binding Log, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Stretch" ScrollViewer.CanContentScroll="True" HorizontalScrollBarVisibility="Visible" IsReadOnly="True" AcceptsReturn="True" Margin="5" VerticalScrollBarVisibility="Auto"/>
             </Grid>
         </TabItem>
         <TabItem Header="Distributor">

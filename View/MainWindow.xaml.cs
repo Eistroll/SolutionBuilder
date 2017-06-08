@@ -19,6 +19,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
+using SolutionBuilder.ViewModel;
 
 namespace SolutionBuilder.View
 {
@@ -137,14 +138,14 @@ namespace SolutionBuilder.View
         }
         private void AddToLog( string text )
         {
-            if (!this.textBoxBuildLog.CheckAccess())
+            if (!this.textBoxLog.CheckAccess())
             {
-                this.textBoxBuildLog.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action<string>(AddToLog), text);
+                this.textBoxLog.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action<string>(AddToLog), text);
             }
             else 
             {
-                textBoxBuildLog.Text += text;
-                textBoxBuildLog.ScrollToEnd();
+                textBoxLog.Text += text;
+                textBoxLog.ScrollToEnd();
             }
         }
         private void BuildOutputHandler(object sender, DataReceivedEventArgs e, SolutionObjectView solution)
@@ -198,13 +199,14 @@ namespace SolutionBuilder.View
             FileInfo buildExe = new FileInfo(_ViewModel.GetSetting("BuildExe"));
             if (!buildExe.Exists)
                 return;
-            this.textBoxBuildLog.Clear();
-            foreach ( var tab in _ViewModel.Tabs)
+            this.textBoxLog.Clear();
+            foreach (var tab in _ViewModel.Tabs)
             {
                 if (!tab.DoBuild)
                     continue;
                 tab.BuildState = null;
-                foreach (SolutionObjectView solution in tab.Solutions) {
+                foreach (SolutionObjectView solution in tab.Solutions)
+                {
                     solution.BuildState = null;
                 }
                 Task.Factory.StartNew(() =>
@@ -213,6 +215,28 @@ namespace SolutionBuilder.View
                     tab.BuildState = buildFailure ? ImageBuildFailure : ImageBuildSuccess;
                 });
             }
+        }
+        private void ExecuteAll_Click(object sender, RoutedEventArgs e)
+        {
+            FileInfo copyExe = new FileInfo(_ViewModel.GetSetting("CopyExe"));
+            if (!copyExe.Exists)
+                return;
+            this.textBoxLog.Clear();
+            foreach (var distribution in _ViewModel.DistributionList)
+            {
+                if (!distribution.Selected)
+                    continue;
+                if(distribution.Copy)
+                {
+                    Copy(copyExe.Name, distribution);
+                }
+                if(distribution.Start)
+                { }
+            }
+        }
+
+        private void Copy(string copyExe, DistributionItem distribution)
+        {
         }
     }
 }
