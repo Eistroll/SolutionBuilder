@@ -6,11 +6,15 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Xml;
+using SolutionBuilder.ViewModel;
 
 namespace SolutionBuilder
 {
     public class MainViewModel : INotifyPropertyChanged
     {
+        public ObservableCollection<DistributionItem> DistributionList { get; set; }
+        public StringCollection Folders { get; set; }
+        public StringCollection Platforms { get; set; }
         /// <summary>
         /// 
         /// </summary>
@@ -59,6 +63,13 @@ namespace SolutionBuilder
         // Constructor
         public MainViewModel()
         {
+            DistributionList = new ObservableCollection<DistributionItem>();
+            Platforms = new StringCollection() { "Release", "Debug" };
+            Folders = new StringCollection() { "SR01", "SR02", "LS01", "LS02" };
+            DistributionList.Add(new DistributionItem() { Folder = "SR01", Platform = "Debug", Copy = true, Execute = true });
+            DistributionList.Add(new DistributionItem() { Folder = "SR02", Platform = "Debug", Copy = true, Execute = true });
+            DistributionList.Add(new DistributionItem() { Folder = "LS01", Platform = "Debug", Copy = true, Execute = true });
+            DistributionList.Add(new DistributionItem() { Folder = "LS02", Platform = "Debug", Copy = true, Execute = true });
             Tabs = new ObservableCollection<TabItem>();
             var me = this;
             SettingsList = new ObservableCollection<Setting>

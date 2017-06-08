@@ -48,7 +48,7 @@ namespace SolutionBuilder.View
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            this.DataContext = _ViewModel;
+            DataContext = _ViewModel;
             _ViewModel.BindToModel( ref _Model);
         }
         private void Window_Closing(object sender, CancelEventArgs e)
