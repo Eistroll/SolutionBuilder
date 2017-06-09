@@ -147,6 +147,13 @@
                             <ComboBoxItem>WG3</ComboBoxItem>
                         </ComboBox>
                         <ComboBox ItemsSource="{Binding Platforms}" Margin="5" Width="100"/>
+                        <Expander>
+                            <StackPanel Orientation="Horizontal">
+                                <Button>Add</Button>
+                                <ComboBox></ComboBox>
+                                <TextBox></TextBox>
+                            </StackPanel>
+                        </Expander>
                     </StackPanel>
                     <StackPanel Grid.Column="2" Orientation="Horizontal">
                         <Button Margin="5" Click="ExecuteAll_Click">Execute all</Button>
@@ -195,8 +202,8 @@
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
-                                            <Button Click="ExecuteDistribution_Click">Execute</Button>
-                                            <Button Click="KillDistribution_Click">Kill</Button>
+                                            <Button Click="ExecuteDistribution_Click" Margin="2,0">Execute</Button>
+                                            <Button Click="KillDistribution_Click" Margin="2,0">Kill</Button>
                                         </StackPanel>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
