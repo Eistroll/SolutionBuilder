@@ -149,8 +149,8 @@
                         <ComboBox ItemsSource="{Binding Platforms}" Margin="5" Width="100"/>
                     </StackPanel>
                     <StackPanel Grid.Column="2" Orientation="Horizontal">
-                        <Button Margin="5">Execute all</Button>
-                        <Button Margin="5">Kill all</Button>
+                        <Button Margin="5" Click="ExecuteAll_Click">Execute all</Button>
+                        <Button Margin="5" Click="KillAll_Click">Kill all</Button>
                     </StackPanel>
                 </Grid>
                 <ListView Grid.Row="1" Name="lvDistribution" ItemsSource="{Binding DistributionList}" Margin="5" HorizontalContentAlignment="Stretch">
@@ -188,6 +188,16 @@
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <CheckBox IsChecked="{Binding Start}"></CheckBox>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Actions" Width="Auto">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Click="ExecuteDistribution_Click">Execute</Button>
+                                            <Button Click="KillDistribution_Click">Kill</Button>
+                                        </StackPanel>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>

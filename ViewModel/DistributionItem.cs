@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,5 +14,7 @@ namespace SolutionBuilder.ViewModel
         public string Platform { get; set; }
         public bool Copy { get; set; }
         public bool Start { get; set; }
+        [IgnoreDataMemberAttribute]
+        public int PID { get; set; }
     }
 }

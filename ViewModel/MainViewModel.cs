@@ -66,15 +66,16 @@ namespace SolutionBuilder
             DistributionList = new ObservableCollection<DistributionItem>();
             Platforms = new StringCollection() { "Release", "Debug" };
             Folders = new StringCollection() { "SR01", "SR02", "LS01", "LS02" };
-            DistributionList.Add(new DistributionItem() { Folder = "SR01", Platform = "Debug", Copy = true, Execute = true });
-            DistributionList.Add(new DistributionItem() { Folder = "SR02", Platform = "Debug", Copy = true, Execute = true });
-            DistributionList.Add(new DistributionItem() { Folder = "LS01", Platform = "Debug", Copy = true, Execute = true });
-            DistributionList.Add(new DistributionItem() { Folder = "LS02", Platform = "Debug", Copy = true, Execute = true });
+            DistributionList.Add(new DistributionItem() { Folder = "SR01", Platform = "Debug", Copy = true, Start = true });
+            DistributionList.Add(new DistributionItem() { Folder = "SR02", Platform = "Debug", Copy = true, Start = true });
+            DistributionList.Add(new DistributionItem() { Folder = "LS01", Platform = "Debug", Copy = true, Start = true });
+            DistributionList.Add(new DistributionItem() { Folder = "LS02", Platform = "Debug", Copy = true, Start = true });
             Tabs = new ObservableCollection<TabItem>();
             var me = this;
             SettingsList = new ObservableCollection<Setting>
             {
-                new Setting { Scope = "Base", Key = "BuildExe", Value = @"C:\Program Files (x86)\MSBuild\14.0\Bin\msbuild.exe" }
+                new Setting { Scope = "Base", Key = "BuildExe", Value = @"C:\Program Files (x86)\MSBuild\14.0\Bin\msbuild.exe" },
+                new Setting { Scope = "Base", Key = "CopyExe", Value= @"robocopy.exe" }
             };
             Init();
         }

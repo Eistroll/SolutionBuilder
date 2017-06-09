@@ -219,8 +219,8 @@ namespace SolutionBuilder.View
         private void ExecuteAll_Click(object sender, RoutedEventArgs e)
         {
             FileInfo copyExe = new FileInfo(_ViewModel.GetSetting("CopyExe"));
-            if (!copyExe.Exists)
-                return;
+            //if (!copyExe.Exists)
+            //    return;
             this.textBoxLog.Clear();
             foreach (var distribution in _ViewModel.DistributionList)
             {
@@ -234,9 +234,26 @@ namespace SolutionBuilder.View
                 { }
             }
         }
+        private void KillAll_Click(object sender, RoutedEventArgs e)
+        {
+        }
+        private void ExecuteDistribution_Click(object sender, RoutedEventArgs e)
+        {
+        }
+        private void KillDistribution_Click(object sender, RoutedEventArgs e)
+        {
+        }
 
         private void Copy(string copyExe, DistributionItem distribution)
         {
+            System.Diagnostics.Process process = new System.Diagnostics.Process();
+            System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo()
+            { WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden, RedirectStandardOutput = false, UseShellExecute = false, CreateNoWindow = true };
+            startInfo.FileName = copyExe;
+            string source = distribution.Folder;
+            string target = "";
+            string options = "";
+            startInfo.Arguments = source + " " + target + " " + options;
         }
     }
 }
