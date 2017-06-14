@@ -229,7 +229,12 @@ namespace SolutionBuilder.View
                     continue;
                 if(distribution.Copy)
                 {
-                    Copy(copyExe.ToString(), distribution);
+                    string source = cbDistributionSource.SelectedValue as string;
+                    string target = _ViewModel.GetSetting(distribution.Folder, MainViewModel.DISTRIBUTION_TARGET);
+                    Task.Factory.StartNew(() =>
+                    {
+                        Copy(copyExe.ToString(), source, target, distribution);
+                    });
                 }
                 if(distribution.Start)
                 { }
@@ -245,7 +250,7 @@ namespace SolutionBuilder.View
         {
         }
 
-        private void Copy(string copyExe, DistributionItem distribution)
+        private void Copy(string copyExe, string source, string target, DistributionItem distribution)
         {
             try
             {
@@ -253,10 +258,8 @@ namespace SolutionBuilder.View
                 System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo()
                 { WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden, RedirectStandardOutput = false, UseShellExecute = false, CreateNoWindow = true };
                 startInfo.FileName = @copyExe;
-                string source = cbDistributionSource.SelectedValue as string;
-                string targetSetting = _ViewModel.GetSetting(distribution.Folder, MainViewModel.DISTRIBUTION_TARGET);
-                string Platform = cbDistributionPlatforms.SelectedValue as string;
-                string target = targetSetting.Replace(@"{Platform}",Platform);
+                string Platform = distribution.Platform;
+                target = target.Replace(@"{Platform}",Platform);
                 target = target.Replace(@"{Name}", distribution.Folder);
                 source = source.Replace(@"{Platform}", Platform);
                 string options = "/MIR";

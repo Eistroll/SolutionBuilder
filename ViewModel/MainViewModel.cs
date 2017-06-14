@@ -17,8 +17,8 @@ namespace SolutionBuilder
     {
         public const string DISTRIBUTION_TARGET = "DistributionTarget";
         public const string DISTRIBUTION_SOURCE = "DistributionSource";
+        public const string SCOPE_BASE = "Base";
         public ObservableCollection<DistributionItem> DistributionList { get; set; }
-        public StringCollection Folders { get; set; }
         public StringCollection Platforms { get; set; }
         [IgnoreDataMemberAttribute]
         public Dictionary<string, string> DistributionSourceMap { get; set; }
@@ -28,6 +28,16 @@ namespace SolutionBuilder
         /// 
         /// </summary>
         private Model _Model;
+        private int _SelectedSettingIndex = -1;
+        public int SelectedSettingIndex
+        {
+            get { return _SelectedSettingIndex; }
+            set
+            {
+                _SelectedSettingIndex = value;
+                RemoveSettingCmd.RaiseCanExecuteChanged();
+            }
+        }
         public ObservableCollection<Setting> SettingsList { get; set; }
         public ObservableCollection<TabItem> Tabs { get; set; }
         public int SelectedTabIndex { get; set; }
@@ -80,9 +90,10 @@ namespace SolutionBuilder
             var me = this;
             SettingsList = new ObservableCollection<Setting>
             {
-                new Setting { Scope = "Base", Key = "BuildExe", Value = @"C:\Program Files (x86)\MSBuild\14.0\Bin\msbuild.exe" },
-                new Setting { Scope = "Base", Key = "CopyExe", Value= @"robocopy.exe" },
+                new Setting { Scope = SCOPE_BASE, Key = "BuildExe", Value = @"C:\Program Files (x86)\MSBuild\14.0\Bin\msbuild.exe" },
+                new Setting { Scope = SCOPE_BASE, Key = "CopyExe", Value= @"robocopy.exe" },
             };
+            SelectedSettingIndex = -1;
             Init();
         }
         public override int GetHashCode()
@@ -104,7 +115,7 @@ namespace SolutionBuilder
             UpdateDistributionSourceMap();
             UpdateDistributionTargetMap();
         }
-        public String GetSetting( String key, String scope="Base" )
+        public String GetSetting( String key, String scope=SCOPE_BASE )
         {
             foreach (Setting setting in SettingsList) {
                 if (setting.Scope == scope && setting.Key == key) {
@@ -233,7 +244,13 @@ namespace SolutionBuilder
         }
         public void AddSetting()
         {
-            var dialog = new SettingCreationDialog();
+            StringCollection scopes = new StringCollection();
+            scopes.Add(SCOPE_BASE);
+            scopes.Add(DISTRIBUTION_SOURCE);
+            scopes.Add(DISTRIBUTION_TARGET);
+            foreach( var tab in Tabs ) 
+                scopes.Add(tab.Header);
+            var dialog = new SettingCreationDialog() { Scopes = scopes };
             if (dialog.ShowDialog() == true) {
                 View.MainWindow mainWindow = (View.MainWindow)System.Windows.Application.Current.MainWindow;
                 if (mainWindow != null)
@@ -247,10 +264,11 @@ namespace SolutionBuilder
         }
         public bool RemoveSetting_CanExecute(object parameter)
         {
-            return true;
+            return SelectedSettingIndex != -1;
         }
         public void RemoveSetting(object parameter)
         {
+            SettingsList.RemoveAt(SelectedSettingIndex);
         }
     }
 }

@@ -18,7 +18,7 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Label Grid.Row="0" Grid.Column="0">Scope:</Label>
-        <TextBox x:Name="ScopeTextBox" Text="{Binding Scope}" Grid.Row="0" Grid.Column="1" Margin="2"></TextBox>
+        <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding Scopes}" SelectedValue="{Binding Scope}"  Height="20"/>
         <Label Grid.Row="1" Grid.Column="0">Key:</Label>
         <TextBox x:Name="KeyTextBox" Text="{Binding Key}" Grid.Row="1" Grid.Column="1" Margin="2"></TextBox>
         <Label Grid.Row="2" Grid.Column="0">Value:</Label>
