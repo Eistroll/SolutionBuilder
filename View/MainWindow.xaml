@@ -3,36 +3,37 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
         xmlns:local="clr-namespace:SolutionBuilder.View"
         mc:Ignorable="d"
         Title="MainWindow" Height="550" Width="750" Loaded="Window_Loaded" Closing="Window_Closing" x:Name="wndMain">
     <Window.CommandBindings>
         <CommandBinding Command="Save" CanExecute="SaveCmd_CanExecute" Executed="SaveCmd_Executed"/>
     </Window.CommandBindings>
-    <TabControl>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*" MinHeight="100"/>
+        </Grid.RowDefinitions>
+    <Menu Grid.Row="0">
+        <MenuItem Header="_File">
+            <MenuItem Command="Save"/>
+            <Separator/>
+            <MenuItem Header="_Settings" Click="MnuSettings_Click"/>
+            <Separator/>
+            <MenuItem Header="_Exit" Click="MnuExit_Click"/>
+        </MenuItem>
+        <MenuItem Header="_Tabs">
+            <MenuItem Header="_New" Click="MnuNewTab_Click"/>
+            <MenuItem Header="_Copy" Click="MnuCopyTab_Click"/>
+            <MenuItem Header="_Remove" Click="MnuRemoveTab_Click"/>
+        </MenuItem>
+    </Menu>
+    <TabControl Grid.Row="1">
         <TabItem Header="Builder">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*" MinHeight="200"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*" MinHeight="100"/>
-                </Grid.RowDefinitions>
-                <Menu Grid.Row="0">
-                    <MenuItem Header="_File">
-                        <MenuItem Command="Save"/>
-                        <Separator/>
-                        <MenuItem Header="_Settings" Click="MnuSettings_Click"/>
-                        <Separator/>
-                        <MenuItem Header="_Exit" Click="MnuExit_Click"/>
-                    </MenuItem>
-                    <MenuItem Header="_Tabs">
-                        <MenuItem Header="_New" Click="MnuNewTab_Click"/>
-                        <MenuItem Header="_Copy" Click="MnuCopyTab_Click"/>
-                        <MenuItem Header="_Remove" Click="MnuRemoveTab_Click"/>
-                    </MenuItem>
-                </Menu>
-                <TabControl Grid.Row="1" Name="tabs" ItemsSource="{Binding Tabs}" SelectedIndex="{Binding SelectedTabIndex}">
+                <TabControl Name="tabs" ItemsSource="{Binding Tabs}" SelectedIndex="{Binding SelectedTabIndex}">
                     <TabControl.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
@@ -124,9 +125,6 @@
                         </DataTemplate>
                     </TabControl.ContentTemplate>
                 </TabControl>
-                <GridSplitter Grid.Row="2" Height="5" HorizontalAlignment="Stretch"/>
-                <TextBox Grid.Row="3" x:Name="textBoxLog" Text="{Binding Log, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Stretch" ScrollViewer.CanContentScroll="True" HorizontalScrollBarVisibility="Visible" IsReadOnly="True" AcceptsReturn="True" Margin="5" VerticalScrollBarVisibility="Auto"/>
-            </Grid>
         </TabItem>
         <TabItem Header="Distributor">
             <Grid>
@@ -141,19 +139,9 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0" Orientation="Horizontal">
-                        <ComboBox Margin="5" Width="100">
-                            <ComboBoxItem>WG</ComboBoxItem>
-                            <ComboBoxItem>WG2</ComboBoxItem>
-                            <ComboBoxItem>WG3</ComboBoxItem>
+                        <ComboBox x:Name="cbDistributionSource" ItemsSource="{Binding DistributionSourceMap}" DisplayMemberPath="Key" SelectedValuePath="Value" SelectedIndex="0" Margin="5" Width="100">
                         </ComboBox>
-                        <ComboBox ItemsSource="{Binding Platforms}" Margin="5" Width="100"/>
-                        <Expander>
-                            <StackPanel Orientation="Horizontal">
-                                <Button>Add</Button>
-                                <ComboBox></ComboBox>
-                                <TextBox></TextBox>
-                            </StackPanel>
-                        </Expander>
+                        <ComboBox x:Name="cbDistributionPlatforms" ItemsSource="{Binding Platforms}" SelectedIndex="0" Margin="5" Width="100"/>
                     </StackPanel>
                     <StackPanel Grid.Column="2" Orientation="Horizontal">
                         <Button Margin="5" Click="ExecuteAll_Click">Execute all</Button>
@@ -161,7 +149,12 @@
                     </StackPanel>
                 </Grid>
                 <ListView Grid.Row="1" Name="lvDistribution" ItemsSource="{Binding DistributionList}" Margin="5" HorizontalContentAlignment="Stretch">
-                    <ListView.View>
+                        <ListView.Resources>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            </Style>
+                        </ListView.Resources>
+                        <ListView.View>
                         <GridView>
                             <GridViewColumn Header="" Width="30">
                                 <GridViewColumn.CellTemplate>
@@ -170,17 +163,17 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="Folder" Width="150">
+                            <GridViewColumn Header="Folder" Width="200">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <ComboBox ItemsSource="{Binding DataContext.Folders, ElementName=wndMain }" SelectedItem="{Binding Folder}" Height="20" Margin="-5,0" IsEditable="True"/>
+                                        <ComboBox ItemsSource="{Binding DataContext.DistributionTargetMap, ElementName=wndMain }" DisplayMemberPath="Key" SelectedValuePath="Key" SelectedValue="{Binding Folder}" Height="20" Margin="-5,0"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="Platform" Width="300">
+                            <GridViewColumn Header="Platform" Width="200">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <ComboBox ItemsSource="{Binding DataContext.Platforms, ElementName=wndMain}" SelectedItem="{Binding Platform}" Height="20" Margin="-5,0" IsEditable="True"/>
+                                        <ComboBox ItemsSource="{Binding DataContext.Platforms, ElementName=wndMain}" SelectedItem="{Binding Platform}" Height="20" Margin="-5,0"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
@@ -198,7 +191,7 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="Actions" Width="Auto">
+                            <GridViewColumn Header="Actions" Width="150">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
@@ -214,4 +207,7 @@
             </Grid>
         </TabItem>
     </TabControl>
+    <GridSplitter Grid.Row="2" Height="5" HorizontalAlignment="Stretch"/>
+    <TextBox Grid.Row="3" x:Name="textBoxLog" Text="{Binding Log, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Stretch" ScrollViewer.CanContentScroll="True" HorizontalScrollBarVisibility="Visible" IsReadOnly="True" AcceptsReturn="True" Margin="5" VerticalScrollBarVisibility="Auto"/>
+    </Grid>
 </Window>

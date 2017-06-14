@@ -79,6 +79,9 @@
     </ApplicationDefinition>
     <Compile Include="ViewModel\DistributionItem.cs" />
     <Compile Include="ViewModel\TabItem.cs" />
+    <Compile Include="View\SettingCreationDialog.xaml.cs">
+      <DependentUpon>SettingCreationDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\StringQueryDialog.xaml.cs">
       <DependentUpon>StringQueryDialog.xaml</DependentUpon>
     </Compile>
@@ -103,6 +106,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="View\SettingCreationDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\Settings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

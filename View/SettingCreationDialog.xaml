@@ -1,0 +1,28 @@
+﻿<Window x:Class="SolutionBuilder.View.SettingCreationDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SolutionBuilder.View"
+        mc:Ignorable="d"
+        Title="SettingCreationDialog" Height="159.151" Width="463.13">
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="60"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Label Grid.Row="0" Grid.Column="0">Scope:</Label>
+        <TextBox x:Name="ScopeTextBox" Text="{Binding Scope}" Grid.Row="0" Grid.Column="1" Margin="2"></TextBox>
+        <Label Grid.Row="1" Grid.Column="0">Key:</Label>
+        <TextBox x:Name="KeyTextBox" Text="{Binding Key}" Grid.Row="1" Grid.Column="1" Margin="2"></TextBox>
+        <Label Grid.Row="2" Grid.Column="0">Value:</Label>
+        <TextBox x:Name="ValueTextBox" Text="{Binding Value}" Grid.Row="2" Grid.Column="1" Margin="2"></TextBox>
+        <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"  Content="Ok" Click="OkButton_Click" Width="50" Margin="5"/>
+    </Grid>
+</Window>

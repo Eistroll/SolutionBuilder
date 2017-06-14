@@ -6,13 +6,23 @@
         xmlns:local="clr-namespace:SolutionBuilder.View"
         mc:Ignorable="d"
         Title="Settings" Height="300" Width="600">
-    <Grid>
-        <ListView x:Name="lvSettings" ItemsSource="{Binding SettingsList}" >
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <ListView Grid.Row="0" x:Name="lvSettings" ItemsSource="{Binding SettingsList}" HorizontalContentAlignment="Stretch">
             <ListView.Resources>
                 <Style TargetType="{x:Type ListViewItem}">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                 </Style>
             </ListView.Resources>
+            <ListView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Add" Command="{Binding AddSettingCmd}"/>
+                    <MenuItem Header="Remove" Command="{Binding RemoveSettingCmd}"/>
+                </ContextMenu>
+            </ListView.ContextMenu>
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Scope" Width="100" DisplayMemberBinding="{Binding Scope}"/>
@@ -27,5 +37,37 @@
                 </GridView>
             </ListView.View>
         </ListView>
+        <!--<Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Label Grid.Row="0">Distribution</Label>
+            <Grid Grid.Row="1" Margin="0,2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0" Margin="2,0" Width="60">Sources</Label>
+                <ComboBox Grid.Column="1" x:Name="cbSource" ItemsSource="{Binding DistributionSourceMap}" DisplayMemberPath="Key" SelectedValuePath="Value" SelectedIndex="0" Margin="2,0" Width="100"/>
+                <TextBox Grid.Column="2" Text="{Binding ElementName=cbSource, Path=SelectedValue}" Margin="2,0"></TextBox>
+                <Button Grid.Column="3" Margin="2,0" Click="NewDistributionSource_Click">New</Button>
+            </Grid>
+            <Grid Grid.Row="2" Margin="0,2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0" Margin="2,0" Width="60">Targets</Label>
+                <ComboBox Grid.Column="1" x:Name="cbTarget"  ItemsSource="{Binding DistributionTargetMap}" SelectedValuePath="Value" DisplayMemberPath="Key" SelectedIndex="0" Margin="2,0" Width="100"/>
+                <TextBox Grid.Column="2" Text="{Binding ElementName=cbTarget, Path=SelectedValue}" Margin="2,0"></TextBox>
+                <Button Grid.Column="3" Margin="2,0" Click="NewDistributionTarget_Click">New</Button>
+            </Grid>
+        </Grid>-->
     </Grid>
 </Window>

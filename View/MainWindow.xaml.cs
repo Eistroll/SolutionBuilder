@@ -30,6 +30,7 @@ namespace SolutionBuilder.View
     {
         private Model _Model = new Model();
         private MainViewModel _ViewModel = new MainViewModel();
+        public MainViewModel ViewModel { get { return _ViewModel; } set { _ViewModel = value; } }
         private ImageSource ImageBuildSuccess;
         private ImageSource ImageBuildFailure;
         static internal ImageSource GetImageSourceFromResource(string imageName)
@@ -138,9 +139,9 @@ namespace SolutionBuilder.View
         }
         private void AddToLog( string text )
         {
-            if (!this.textBoxLog.CheckAccess())
+            if (!textBoxLog.CheckAccess())
             {
-                this.textBoxLog.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action<string>(AddToLog), text);
+                textBoxLog.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action<string>(AddToLog), text);
             }
             else 
             {
@@ -228,7 +229,7 @@ namespace SolutionBuilder.View
                     continue;
                 if(distribution.Copy)
                 {
-                    Copy(copyExe.Name, distribution);
+                    Copy(copyExe.ToString(), distribution);
                 }
                 if(distribution.Start)
                 { }
@@ -246,14 +247,51 @@ namespace SolutionBuilder.View
 
         private void Copy(string copyExe, DistributionItem distribution)
         {
-            System.Diagnostics.Process process = new System.Diagnostics.Process();
-            System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo()
-            { WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden, RedirectStandardOutput = false, UseShellExecute = false, CreateNoWindow = true };
-            startInfo.FileName = copyExe;
-            string source = distribution.Folder;
-            string target = "";
-            string options = "";
-            startInfo.Arguments = source + " " + target + " " + options;
+            try
+            {
+                System.Diagnostics.Process process = new System.Diagnostics.Process();
+                System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo()
+                { WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden, RedirectStandardOutput = false, UseShellExecute = false, CreateNoWindow = true };
+                startInfo.FileName = @copyExe;
+                string source = cbDistributionSource.SelectedValue as string;
+                string targetSetting = _ViewModel.GetSetting(distribution.Folder, MainViewModel.DISTRIBUTION_TARGET);
+                string Platform = cbDistributionPlatforms.SelectedValue as string;
+                string target = targetSetting.Replace(@"{Platform}",Platform);
+                target = target.Replace(@"{Name}", distribution.Folder);
+                source = source.Replace(@"{Platform}", Platform);
+                string options = "/MIR";
+                startInfo.Arguments = $"{source} {target} {options}";
+                process.StartInfo = startInfo;
+                //process.OutputDataReceived += (s, eventargs) => BuildOutputHandler(s, eventargs, solution);
+                AddToLog($"Start: Copy {source} to {target}" + Environment.NewLine);
+                bool started = process.Start();
+                //process.BeginOutputReadLine();
+                process.WaitForExit();
+                int exitCode = process.ExitCode;
+                switch(exitCode) {
+                    case 0: 
+                    case 1:
+                    case 2:
+                    case 3: AddToLog($"Finished with code {exitCode} (Success): Copy {source} to {target}" + Environment.NewLine); break;
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7: AddToLog($"Finished with code {exitCode} (Warning): Copy {source} to {target}" + Environment.NewLine); break;
+                    case 8:
+                    case 9:
+                    case 10:
+                    case 11:
+                    case 12:
+                    case 13:
+                    case 14:
+                    case 15: AddToLog($"Finished with code {exitCode} (Error): Copy {source} to {target}" + Environment.NewLine); break;
+                    case 16: AddToLog($"Finished with code {exitCode}: did not run" + Environment.NewLine); break;
+                }
+            }
+            catch (System.Exception ex)
+            {
+                AddToLog(ex.Message + Environment.NewLine);
+            }
         }
     }
 }

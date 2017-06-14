@@ -26,5 +26,25 @@ namespace SolutionBuilder.View
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
         }
+        private void NewDistributionSource_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new StringQueryDialog("Enter Source name:");
+            if (dialog.ShowDialog() == true) {
+                String name = dialog.QueryString;
+                View.MainWindow mainWindow = (View.MainWindow)System.Windows.Application.Current.MainWindow;
+                if (mainWindow != null)
+                    mainWindow.ViewModel.DistributionSourceMap.Add(name, "");
+            }
+        }
+        private void NewDistributionTarget_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new StringQueryDialog("Enter Target name:");
+            if (dialog.ShowDialog() == true) {
+                String name = dialog.QueryString;
+                View.MainWindow mainWindow = (View.MainWindow)System.Windows.Application.Current.MainWindow;
+                if (mainWindow != null)
+                    mainWindow.ViewModel.DistributionTargetMap.Add(name, "");
+            }
+        }
     }
 }

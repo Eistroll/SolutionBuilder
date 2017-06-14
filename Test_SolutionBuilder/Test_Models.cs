@@ -37,10 +37,22 @@ namespace Test_SolutionBuilder
             MainViewModel ViewModel = new MainViewModel();
             Model Model = new Model();
             ViewModel.BindToModel(ref Model);
-            Assert.AreEqual(1, ViewModel.SettingsList.Count);
+            Assert.AreEqual(2, ViewModel.SettingsList.Count);
             ViewModel.SettingsList[0].Value = "x";
             ViewModel.SettingsList.Add(new Setting() { Scope = "scope", Key = "key", Value = "value" });
             ViewModel.SettingsList[1].Value = "valueX";
+        }
+        [TestMethod]
+        public void ParamerReplacement()
+        {
+            string Platform = "Debug";
+            string Name = "XXX";
+            string text = $"C:\\{Platform}\\{Name}";
+            Assert.AreEqual(@"C:\Debug\XXX", text);
+
+            string x = "C:\\{Platform}\\{Name}";
+            string replaced = x.Replace(@"{Platform}", "Debug");
+            Assert.AreEqual("C:\\Debug\\{Name}", replaced);
         }
     }
 }
