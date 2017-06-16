@@ -77,6 +77,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\StateToImageSourceConverter.cs" />
+    <Compile Include="Model\Builder.cs" />
     <Compile Include="ViewModel\DistributionItem.cs" />
     <Compile Include="ViewModel\TabItem.cs" />
     <Compile Include="View\SettingCreationDialog.xaml.cs">

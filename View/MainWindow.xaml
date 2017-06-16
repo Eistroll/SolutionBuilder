@@ -3,10 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:converters="clr-namespace:SolutionBuilder.Converters"
         xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
         xmlns:local="clr-namespace:SolutionBuilder.View"
         mc:Ignorable="d"
         Title="MainWindow" Height="550" Width="750" Loaded="Window_Loaded" Closing="Window_Closing" x:Name="wndMain">
+    <Window.Resources>
+        <converters:StateToImageSourceConverter x:Key="StateConverter"/>
+    </Window.Resources>
     <Window.CommandBindings>
         <CommandBinding Command="Save" CanExecute="SaveCmd_CanExecute" Executed="SaveCmd_Executed"/>
     </Window.CommandBindings>
@@ -39,7 +43,7 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="{Binding Header}" Margin="0,0,2,0" />
                                 <CheckBox IsChecked="{Binding DoBuild}" Margin="0,0,2,0"/>
-                                <Image Source="{Binding BuildState}" Margin="2"/>
+                                <Image Source="{Binding BuildState, Converter={StaticResource StateConverter}}" Margin="2"/>
                             </StackPanel>
                         </DataTemplate>
                     </TabControl.ItemTemplate>
@@ -113,7 +117,7 @@
                                             <GridViewColumn Header="State" Width="32">
                                                 <GridViewColumn.CellTemplate>
                                                     <DataTemplate>
-                                                        <Image Source="{Binding BuildState}" Height="20" Width="20" Margin="-5,0"/>
+                                                        <Image Source="{Binding BuildState, Converter={StaticResource StateConverter}}" Height="20" Width="20" Margin="-5,0"/>
                                                     </DataTemplate>
                                                 </GridViewColumn.CellTemplate>
                                             </GridViewColumn>

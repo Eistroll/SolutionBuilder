@@ -70,8 +70,8 @@ namespace SolutionBuilder
             get { return _AllSolutions ?? (_AllSolutions = new StringCollection()); }
             set { _AllSolutions = value; }
         }
-        private ImageSource _BuildState;
-        public ImageSource BuildState
+        private View.State _BuildState;
+        public View.State BuildState
         {
             get { return _BuildState; }
             set { if (_BuildState != value) { _BuildState = value; NotifyPropertyChanged("BuildState"); } }
@@ -193,8 +193,9 @@ namespace SolutionBuilder
             SolutionObjectView solution = Solutions[SelectedSolutionIndex];
             View.MainWindow mainWindow = (View.MainWindow)System.Windows.Application.Current.MainWindow;
             if (mainWindow != null) {
-                mainWindow.textBoxLog.Clear();
-                mainWindow.BuildSolutions(this, new FileInfo(_ViewModel.GetSetting("BuildExe")), new ObservableCollection<SolutionObjectView>() { solution });
+                mainWindow.ClearLog();
+                Builder builder = new Builder(_ViewModel);
+                builder.BuildSolutions(this, new FileInfo(_ViewModel.GetSetting("BuildExe")), new ObservableCollection<SolutionObjectView>() { solution }, mainWindow.AddToLog);
             }
         }
         private CommandHandler _OpenSolutionCmd;

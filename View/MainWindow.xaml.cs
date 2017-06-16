@@ -1,28 +1,23 @@
 ﻿#define TRACE
 using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Diagnostics;
-using System.Collections.ObjectModel;
 using SolutionBuilder.ViewModel;
 
 namespace SolutionBuilder.View
 {
+    public enum State
+    {
+        None = 0,
+        Success,
+        Failure
+    }
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -31,19 +26,9 @@ namespace SolutionBuilder.View
         private Model _Model = new Model();
         private MainViewModel _ViewModel = new MainViewModel();
         public MainViewModel ViewModel { get { return _ViewModel; } set { _ViewModel = value; } }
-        private ImageSource ImageBuildSuccess;
-        private ImageSource ImageBuildFailure;
-        static internal ImageSource GetImageSourceFromResource(string imageName)
-        {
-            Uri oUri = new Uri("pack://application:,,,/" + Assembly.GetExecutingAssembly().GetName().Name + ";component/" + imageName, UriKind.RelativeOrAbsolute);
-            return BitmapFrame.Create(oUri);
-        }
         public MainWindow()
         {
             InitializeComponent();
-            ImageBuildFailure = GetImageSourceFromResource("Images/img_delete_16.png");
-            ImageBuildSuccess = GetImageSourceFromResource("Images/img_check_16.png");
-
             _Model = Model.Load();
             _ViewModel = MainViewModel.Load();
         }
@@ -57,6 +42,22 @@ namespace SolutionBuilder.View
         {
             _ViewModel.Save();
             _Model.Save();
+        }
+        public void ClearLog()
+        {
+            textBoxLog.Clear();
+        }
+        public void AddToLog(string text)
+        {
+            if (!textBoxLog.CheckAccess())
+            {
+                textBoxLog.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action<string>(AddToLog), text);
+            }
+            else
+            {
+                textBoxLog.Text += text;
+                textBoxLog.ScrollToEnd();
+            }
         }
         private void RemoveSolution_OnClick(object sender, RoutedEventArgs e)
         {
@@ -137,92 +138,35 @@ namespace SolutionBuilder.View
                 _ViewModel.Tabs.Remove(selectedTab);
             }
         }
-        private void AddToLog( string text )
-        {
-            if (!textBoxLog.CheckAccess())
-            {
-                textBoxLog.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action<string>(AddToLog), text);
-            }
-            else 
-            {
-                textBoxLog.Text += text;
-                textBoxLog.ScrollToEnd();
-            }
-        }
-        private void BuildOutputHandler(object sender, DataReceivedEventArgs e, SolutionObjectView solution)
-        {
-            string line = e.Data + Environment.NewLine;
-            solution.BuildLog += line;
-        }
-
-        public bool BuildSolutions(TabItem tab, FileInfo buildExe, ObservableCollection<SolutionObjectView> solutions = null)
-        {
-            bool buildFailure = false;
-            bool ignoreSelection = true;
-            if (solutions == null) {
-                solutions = tab.Solutions;
-                ignoreSelection = false;
-            }
-            foreach (SolutionObjectView solution in solutions) {
-                if (ignoreSelection || solution.Selected) {
-                    System.Diagnostics.Process process = new System.Diagnostics.Process();
-                    System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo()
-                    { WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden, RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true };
-                    startInfo.FileName = buildExe.ToString();
-                    StringBuilder path = new StringBuilder(_ViewModel.GetSetting("BaseDir", tab.Header));
-                    path.Append("\\" + solution.Name);
-                    startInfo.Arguments = tab.BaseOptions + " " + solution.Options + " " + path;
-                    process.StartInfo = startInfo;
-                    // Set event handler
-                    process.OutputDataReceived += (s, eventargs) => BuildOutputHandler(s, eventargs, solution);
-                    bool Success = process.Start();
-                    process.BeginOutputReadLine();
-                    process.WaitForExit();
-                    int exitCode = process.ExitCode;
-                    if (exitCode == 0) {
-                        buildFailure = false;
-                        solution.BuildState = ImageBuildSuccess;
-                    }
-                    else {
-                        buildFailure = true;
-                        solution.BuildState = ImageBuildFailure;
-                    }
-
-                    AddToLog(path + (buildFailure ? " failed" : " successful") + Environment.NewLine);
-                    solution.SuccessFlag = exitCode == 0 ? true : false;
-                }
-            }
-            return buildFailure;
-        }
-
         private void BuildAll_Click(object sender, RoutedEventArgs e)
         {
             FileInfo buildExe = new FileInfo(_ViewModel.GetSetting("BuildExe"));
             if (!buildExe.Exists)
                 return;
-            this.textBoxLog.Clear();
+            ClearLog();
+            Builder builder = new Builder(_ViewModel);
             foreach (var tab in _ViewModel.Tabs)
             {
                 if (!tab.DoBuild)
                     continue;
-                tab.BuildState = null;
+                tab.BuildState = View.State.None;
                 foreach (SolutionObjectView solution in tab.Solutions)
                 {
-                    solution.BuildState = null;
+                    solution.BuildState = View.State.None;
                 }
                 Task.Factory.StartNew(() =>
                 {
-                    bool buildFailure = BuildSolutions(tab, buildExe);
-                    tab.BuildState = buildFailure ? ImageBuildFailure : ImageBuildSuccess;
+                    bool buildFailure = builder.BuildSolutions(tab, buildExe, null, AddToLog);
+                    tab.BuildState = buildFailure ? View.State.Failure : View.State.Success;
                 });
             }
         }
         private void ExecuteAll_Click(object sender, RoutedEventArgs e)
         {
             FileInfo copyExe = new FileInfo(_ViewModel.GetSetting("CopyExe"));
-            //if (!copyExe.Exists)
-            //    return;
-            this.textBoxLog.Clear();
+            if (!copyExe.Exists)
+                return;
+            ClearLog();
             foreach (var distribution in _ViewModel.DistributionList)
             {
                 if (!distribution.Selected)

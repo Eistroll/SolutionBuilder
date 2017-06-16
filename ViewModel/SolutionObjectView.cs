@@ -30,8 +30,8 @@ namespace SolutionBuilder
             get { return _Selected; }
             set { if (_Selected != value) { _Selected = value; NotifyPropertyChanged("Selected"); } }
         }
-        private ImageSource _BuildState;
-        public ImageSource BuildState
+        private View.State _BuildState;
+        public View.State BuildState
         {
             get { return _BuildState; }
             set { if (_BuildState != value) { _BuildState = value; NotifyPropertyChanged("BuildState"); } }
