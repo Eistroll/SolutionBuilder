@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -16,5 +17,6 @@ namespace SolutionBuilder.ViewModel
         public bool Start { get; set; }
         [IgnoreDataMemberAttribute]
         public int PID { get; set; }
+        public Process Proc;
     }
 }

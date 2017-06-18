@@ -194,7 +194,7 @@ namespace SolutionBuilder
             View.MainWindow mainWindow = (View.MainWindow)System.Windows.Application.Current.MainWindow;
             if (mainWindow != null) {
                 mainWindow.ClearLog();
-                Builder builder = new Builder(_ViewModel);
+                Executor builder = new Executor(_ViewModel);
                 builder.BuildSolutions(this, new FileInfo(_ViewModel.GetSetting("BuildExe")), new ObservableCollection<SolutionObjectView>() { solution }, mainWindow.AddToLog);
             }
         }

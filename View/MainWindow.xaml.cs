@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using SolutionBuilder.ViewModel;
 
 namespace SolutionBuilder.View
 {
@@ -144,7 +142,7 @@ namespace SolutionBuilder.View
             if (!buildExe.Exists)
                 return;
             ClearLog();
-            Builder builder = new Builder(_ViewModel);
+            Executor builder = new Executor(_ViewModel);
             foreach (var tab in _ViewModel.Tabs)
             {
                 if (!tab.DoBuild)
@@ -167,21 +165,36 @@ namespace SolutionBuilder.View
             if (!copyExe.Exists)
                 return;
             ClearLog();
+            Executor executor = new Executor(_ViewModel);
             foreach (var distribution in _ViewModel.DistributionList)
             {
                 if (!distribution.Selected)
                     continue;
-                if(distribution.Copy)
+                Task task = null;
+                if (distribution.Copy)
                 {
                     string source = cbDistributionSource.SelectedValue as string;
                     string target = _ViewModel.GetSetting(distribution.Folder, MainViewModel.DISTRIBUTION_TARGET);
-                    Task.Factory.StartNew(() =>
+                    task = Task.Factory.StartNew(() =>
                     {
-                        Copy(copyExe.ToString(), source, target, distribution);
+                        executor.Copy(copyExe.ToString(), source, target, distribution, AddToLog);
                     });
                 }
                 if(distribution.Start)
-                { }
+                {
+                    if (task != null)
+                        Task.WaitAll(task);
+
+                    string target = _ViewModel.GetSetting(distribution.Folder, MainViewModel.DISTRIBUTION_TARGET);
+                    string exe = target + Path.DirectorySeparatorChar + _ViewModel.GetSetting(distribution.Folder, MainViewModel.DISTRIBUTION_EXE);
+                    task = Task.Factory.StartNew(() =>
+                    {
+                        System.Diagnostics.Process process = new System.Diagnostics.Process();
+                        process.StartInfo.FileName=exe;
+                        process.Start();
+                        distribution.Proc = process;
+                    });
+                }
             }
         }
         private void KillAll_Click(object sender, RoutedEventArgs e)
@@ -192,53 +205,7 @@ namespace SolutionBuilder.View
         }
         private void KillDistribution_Click(object sender, RoutedEventArgs e)
         {
-        }
-
-        private void Copy(string copyExe, string source, string target, DistributionItem distribution)
-        {
-            try
-            {
-                System.Diagnostics.Process process = new System.Diagnostics.Process();
-                System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo()
-                { WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden, RedirectStandardOutput = false, UseShellExecute = false, CreateNoWindow = true };
-                startInfo.FileName = @copyExe;
-                string Platform = distribution.Platform;
-                target = target.Replace(@"{Platform}",Platform);
-                target = target.Replace(@"{Name}", distribution.Folder);
-                source = source.Replace(@"{Platform}", Platform);
-                string options = "/MIR";
-                startInfo.Arguments = $"{source} {target} {options}";
-                process.StartInfo = startInfo;
-                //process.OutputDataReceived += (s, eventargs) => BuildOutputHandler(s, eventargs, solution);
-                AddToLog($"Start: Copy {source} to {target}" + Environment.NewLine);
-                bool started = process.Start();
-                //process.BeginOutputReadLine();
-                process.WaitForExit();
-                int exitCode = process.ExitCode;
-                switch(exitCode) {
-                    case 0: 
-                    case 1:
-                    case 2:
-                    case 3: AddToLog($"Finished with code {exitCode} (Success): Copy {source} to {target}" + Environment.NewLine); break;
-                    case 4:
-                    case 5:
-                    case 6:
-                    case 7: AddToLog($"Finished with code {exitCode} (Warning): Copy {source} to {target}" + Environment.NewLine); break;
-                    case 8:
-                    case 9:
-                    case 10:
-                    case 11:
-                    case 12:
-                    case 13:
-                    case 14:
-                    case 15: AddToLog($"Finished with code {exitCode} (Error): Copy {source} to {target}" + Environment.NewLine); break;
-                    case 16: AddToLog($"Finished with code {exitCode}: did not run" + Environment.NewLine); break;
-                }
-            }
-            catch (System.Exception ex)
-            {
-                AddToLog(ex.Message + Environment.NewLine);
-            }
+            //Kill selected distribution process
         }
     }
 }

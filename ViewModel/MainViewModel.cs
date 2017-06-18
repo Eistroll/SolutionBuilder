@@ -17,6 +17,7 @@ namespace SolutionBuilder
     {
         public const string DISTRIBUTION_TARGET = "DistributionTarget";
         public const string DISTRIBUTION_SOURCE = "DistributionSource";
+        public const string DISTRIBUTION_EXE = "DistributionExe";
         public const string SCOPE_BASE = "Base";
         public ObservableCollection<DistributionItem> DistributionList { get; set; }
         public StringCollection Platforms { get; set; }
@@ -176,7 +177,11 @@ namespace SolutionBuilder
                     if (item.Scope == DISTRIBUTION_SOURCE)
                         DistributionSourceMap[item.Key] = item.Value;
                     if (item.Scope == DISTRIBUTION_TARGET)
+                    {
+                        DistributionList.Add(new DistributionItem() { Folder = item.Key });
                         DistributionTargetMap[item.Key] = item.Value;
+                    }
+                        
                 }
             }
             if (e.Action == NotifyCollectionChangedAction.Replace) {
