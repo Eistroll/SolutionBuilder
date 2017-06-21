@@ -1,5 +1,6 @@
 ﻿#define TRACE
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -57,9 +58,39 @@ namespace SolutionBuilder.View
                 textBoxLog.ScrollToEnd();
             }
         }
+        private void BuilderTabItem_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            var tabItem = e.Source as TabItem;
+
+            if (tabItem == null)
+                return;
+
+            if (Mouse.PrimaryDevice.LeftButton == MouseButtonState.Pressed) {
+                DragDrop.DoDragDrop(tabItem, tabItem, DragDropEffects.All);
+            }
+        }
+        private void BuilderTabItem_Drop(object sender, DragEventArgs e)
+        {
+            var tabItemTarget = e.Source as TabItem;
+            var buildTabTarget = tabItemTarget.DataContext as BuildTabItem;
+
+            var tabItemSource = e.Data.GetData(typeof(TabItem)) as TabItem;
+            var buildTabSource = tabItemSource.DataContext as BuildTabItem;
+
+            if (tabItemTarget.Equals(tabItemSource))
+                return;
+            int sourceIndex = _ViewModel.Tabs.IndexOf(buildTabSource);
+            int targetIndex = _ViewModel.Tabs.IndexOf(buildTabTarget);
+            if (sourceIndex == targetIndex || sourceIndex > _ViewModel.Tabs.Count || targetIndex > _ViewModel.Tabs.Count)
+                return;
+
+            var tmp = _ViewModel.Tabs[targetIndex];
+            _ViewModel.Tabs[targetIndex] = _ViewModel.Tabs[sourceIndex];
+            _ViewModel.Tabs[sourceIndex] = tmp;
+        }
         private void RemoveSolution_OnClick(object sender, RoutedEventArgs e)
         {
-            TabItem tab = (TabItem)tabs.SelectedContent;
+            BuildTabItem tab = (BuildTabItem)tabs.SelectedContent;
             int index = tab.SelectedSolutionIndex;
             if (index >= 0 && index < tab.Solutions.Count) {
                 var solutions = _Model.Scope2SolutionObjects[tab.Header];
@@ -102,12 +133,16 @@ namespace SolutionBuilder.View
         }
         private void MnuNewTab_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new StringQueryDialog("Enter Tab name:");
+            var dialog = new ListViewQueryDialog("New Tab");
+            dialog.Entries.Add(new SettingsPair("Name", ""));
+            dialog.Entries.Add(new SettingsPair("Base dir", ""));
             if ( dialog.ShowDialog() == true )
             {
-                String tabName = dialog.QueryString;
-                _ViewModel.SettingsList.Add(new Setting() { Scope = tabName, Key = "BaseDir", Value = "" });
-                TabItem tab = new TabItem() { Header = tabName };
+                String tabName = dialog.Entries.FirstOrDefault(x => x.Key == "Name").Value;
+                if (tabName == null && tabName.Length <= 0)
+                    return;
+                _ViewModel.SettingsList.Add(new Setting() { Scope = tabName, Key = "BaseDir", Value = dialog.Entries.FirstOrDefault(x => x.Key == "Base dir").Value });
+                BuildTabItem tab = new BuildTabItem() { Header = tabName };
                 tab.BindToModel(ref _Model, ref _ViewModel);
                 _ViewModel.Tabs.Add(tab);
             }
@@ -117,11 +152,11 @@ namespace SolutionBuilder.View
             var dialog = new StringQueryDialog("Enter Tab name:");
             if (dialog.ShowDialog() == true) {
                 String tabName = dialog.QueryString;
-                TabItem originalTab = tabs.SelectedItem as TabItem;
+                BuildTabItem originalTab = tabs.SelectedItem as BuildTabItem;
                 String originalBaseDir = _ViewModel.GetSetting("BaseDir", originalTab.Header);
                 String newBaseDir = originalBaseDir.Replace(originalTab.Header, tabName);
                 _ViewModel.SettingsList.Add(new Setting() { Scope = tabName, Key = "BaseDir", Value = newBaseDir });
-                TabItem tab = new TabItem() { Header = tabName };
+                BuildTabItem tab = new BuildTabItem() { Header = tabName };
                 var clonedList = _Model.Scope2SolutionObjects[originalTab.Header].Select(obj => (SolutionObject) obj.Clone()).ToList();
                 _Model.Scope2SolutionObjects[tabName] = new System.Collections.ObjectModel.ObservableCollection<SolutionObject>(clonedList);
                 tab.BindToModel(ref _Model, ref _ViewModel);
@@ -132,7 +167,7 @@ namespace SolutionBuilder.View
         {
             MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("Are you sure?", "Delete Tab Confirmation", System.Windows.MessageBoxButton.YesNo);
             if (messageBoxResult == MessageBoxResult.Yes) { 
-                TabItem selectedTab = tabs.SelectedItem as TabItem;
+                BuildTabItem selectedTab = tabs.SelectedItem as BuildTabItem;
                 _ViewModel.Tabs.Remove(selectedTab);
             }
         }
@@ -186,6 +221,8 @@ namespace SolutionBuilder.View
                         Task.WaitAll(task);
 
                     string target = _ViewModel.GetSetting(distribution.Folder, MainViewModel.DISTRIBUTION_TARGET);
+                    target = target.Replace(@"{Platform}", distribution.Platform);
+                    target = target.Replace(@"{Name}", distribution.Folder);
                     string exe = target + Path.DirectorySeparatorChar + _ViewModel.GetSetting(distribution.Folder, MainViewModel.DISTRIBUTION_EXE);
                     task = Task.Factory.StartNew(() =>
                     {

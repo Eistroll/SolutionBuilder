@@ -46,13 +46,13 @@ namespace Test_SolutionBuilder
                 Options = new Dictionary<string, string> { { "Release", "/p:Configuration=\"Unicode Release\"" }, { "Debug", "/p:Configuration=\"Unicode Debug\"" } }
             });
             MainViewModel viewModel = new MainViewModel();
-            viewModel.Tabs.Add(new TabItem() { Header = "test" });
+            viewModel.Tabs.Add(new BuildTabItem() { Header = "test" });
             viewModel.BindToModel(ref model);
             var tab = viewModel.Tabs[0];
             tab.Solutions[1].Selected = true;
             Assert.AreEqual(2, model.Scope2SolutionObjects["test"].Count);
             Assert.AreEqual(2, tab.Solutions.Count);
-            model.Save();
+            viewModel.Save();
             MainViewModel loadedModel = MainViewModel.Load();
             Assert.AreEqual(1, loadedModel.Tabs.Count);
             var loadedTab = loadedModel.Tabs[0];

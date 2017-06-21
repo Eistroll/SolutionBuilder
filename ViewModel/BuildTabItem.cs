@@ -15,7 +15,7 @@ using System.Windows.Media;
 namespace SolutionBuilder
 {
     [DataContract]
-    public class TabItem : INotifyPropertyChanged
+    public class BuildTabItem : INotifyPropertyChanged
     {
         [DataMember]
         public string Header { get; set; }
@@ -64,11 +64,11 @@ namespace SolutionBuilder
             get { return _Solutions ?? (Solutions = new ObservableCollection<SolutionObjectView>()); }
             set { _Solutions = value; }
         }
-        private StringCollection _AllSolutions;
-        public StringCollection AllSolutions
+        private ObservableCollection<string> _AllSolutionsInBaseDir;
+        public ObservableCollection<string> AllSolutionsInBaseDir
         {
-            get { return _AllSolutions ?? (_AllSolutions = new StringCollection()); }
-            set { _AllSolutions = value; }
+            get { return _AllSolutionsInBaseDir ?? (_AllSolutionsInBaseDir = new ObservableCollection<string>()); }
+            set { _AllSolutionsInBaseDir = value; }
         }
         private View.State _BuildState;
         public View.State BuildState
@@ -79,9 +79,9 @@ namespace SolutionBuilder
         private MainViewModel _ViewModel;
         private Model _Model;
 
-        public TabItem()
+        public BuildTabItem()
         {
-            AllSolutions = new StringCollection();
+            AllSolutionsInBaseDir = new ObservableCollection<string>();
             SelectedSolutions = new StringCollection();
             Solutions = new ObservableCollection<SolutionObjectView>();
             Platforms = new StringCollection() { "Release", "Debug" };
@@ -90,7 +90,7 @@ namespace SolutionBuilder
         }
         public void UpdateAvailableSolutions()
         {
-            AllSolutions.Clear();
+            AllSolutionsInBaseDir.Clear();
             String BaseDir = _ViewModel.GetSetting("BaseDir", Header);
             if (BaseDir.Length == 0)
                 return;
@@ -99,7 +99,7 @@ namespace SolutionBuilder
                 var solutionPaths = Directory.GetFiles(BaseDir, @"*.sln", SearchOption.AllDirectories);
                 foreach (var path in solutionPaths) {
                     String newPath = path.Replace(BaseDir, "");
-                    AllSolutions.Add(newPath);
+                    AllSolutionsInBaseDir.Add(newPath);
                 }
             }
         }
@@ -177,6 +177,8 @@ namespace SolutionBuilder
         }
         public void RemoveSolution(object parameter)
         {
+            SolutionObjectView solution = Solutions[SelectedSolutionIndex];
+            _Model.Scope2SolutionObjects[Header].Remove(solution.SolutionObject);
             Solutions.RemoveAt(SelectedSolutionIndex);
         }
         private CommandHandler _BuildSolutionCmd;
@@ -213,6 +215,32 @@ namespace SolutionBuilder
             StringBuilder path = new StringBuilder(_ViewModel.GetSetting("BaseDir", Header));
             path.Append("\\" + solution.Name);
             Process.Start(path.ToString());
+        }
+        private CommandHandler _CopySolutionsToCmd;
+        public CommandHandler CopySolutionsToCmd
+        {
+            get { return _CopySolutionsToCmd ?? (_CopySolutionsToCmd = new CommandHandler(param => CopySolutionsTo(param), param => RemoveSolution_CanExecute(param))); }
+        }
+        public bool CopySolutionsTo_CanExecute(object parameter)
+        {
+            return _ViewModel.Tabs.Count > 1;
+        }
+        public void CopySolutionsTo(object parameter)
+        {
+            StringCollection tabNames = new StringCollection();
+            foreach (var tab in _ViewModel.Tabs)
+                if(tab.Header != Header)
+                    tabNames.Add(tab.Header);
+            var dialog = new View.ComboBoxQueryDialog() { DialogTitle="Copy solutions to...", ComboBoxLabel="Build tab", Entries = tabNames, SelectedEntry=tabNames[0] };
+            if (dialog.ShowDialog() == true) {
+                String tabName = dialog.SelectedEntry;
+                foreach (var solutionName in SelectedSolutions)
+                {
+                    SolutionObjectView solutionView = _Solutions.First(x => x.Name == solutionName);
+                    if (solutionView != null)
+                        _Model.Scope2SolutionObjects[tabName].Add(solutionView.SolutionObject);
+                }
+            }
         }
     }
 }

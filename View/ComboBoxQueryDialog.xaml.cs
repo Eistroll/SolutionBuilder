@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,18 +16,17 @@ using System.Windows.Shapes;
 namespace SolutionBuilder.View
 {
     /// <summary>
-    /// Interaction logic for StringQueryDialog.xaml
+    /// Interaction logic for ComboBoxQueryDialog.xaml
     /// </summary>
-    public partial class StringQueryDialog : Window
+    public partial class ComboBoxQueryDialog : Window
     {
-        public String QueryString { get { return QueryStringBox.Text; } set { QueryStringBox.Text = value; } }
-        public String Text { get; set; }
-        public String DialogTitle { get; set; }
-        public StringQueryDialog(String text)
+        public StringCollection Entries { get; set; }
+        public string SelectedEntry { get; set; }
+        public string ComboBoxLabel { get; set; }
+        public string DialogTitle { get; set; }
+        public ComboBoxQueryDialog()
         {
             InitializeComponent();
-            DialogTitle = "StringQueryDialog";
-            TextBlock.Text = text;
             DataContext = this;
         }
         private void OkButton_Click(object sender, System.Windows.RoutedEventArgs e)

@@ -17,6 +17,7 @@ namespace SolutionBuilder.ViewModel
         public bool Start { get; set; }
         [IgnoreDataMemberAttribute]
         public int PID { get; set; }
+        [IgnoreDataMemberAttribute]
         public Process Proc;
     }
 }

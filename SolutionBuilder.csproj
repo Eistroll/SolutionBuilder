@@ -80,13 +80,27 @@
     <Compile Include="Converters\StateToImageSourceConverter.cs" />
     <Compile Include="Model\Executor.cs" />
     <Compile Include="ViewModel\DistributionItem.cs" />
-    <Compile Include="ViewModel\TabItem.cs" />
+    <Compile Include="ViewModel\BuildTabItem.cs" />
+    <Compile Include="View\ComboBoxQueryDialog.xaml.cs">
+      <DependentUpon>ComboBoxQueryDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ListViewQueryDialog.xaml.cs">
+      <DependentUpon>ListViewQueryDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\SettingCreationDialog.xaml.cs">
       <DependentUpon>SettingCreationDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\StringQueryDialog.xaml.cs">
       <DependentUpon>StringQueryDialog.xaml</DependentUpon>
     </Compile>
+    <Page Include="View\ComboBoxQueryDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ListViewQueryDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

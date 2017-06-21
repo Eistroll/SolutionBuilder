@@ -19,16 +19,9 @@ namespace SolutionBuilder
         public const string DISTRIBUTION_SOURCE = "DistributionSource";
         public const string DISTRIBUTION_EXE = "DistributionExe";
         public const string SCOPE_BASE = "Base";
+
         public ObservableCollection<DistributionItem> DistributionList { get; set; }
         public StringCollection Platforms { get; set; }
-        [IgnoreDataMemberAttribute]
-        public Dictionary<string, string> DistributionSourceMap { get; set; }
-        [IgnoreDataMemberAttribute]
-        public Dictionary<string, string> DistributionTargetMap { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
-        private Model _Model;
         private int _SelectedSettingIndex = -1;
         public int SelectedSettingIndex
         {
@@ -40,17 +33,19 @@ namespace SolutionBuilder
             }
         }
         public ObservableCollection<Setting> SettingsList { get; set; }
-        public ObservableCollection<TabItem> Tabs { get; set; }
+        public ObservableCollection<BuildTabItem> Tabs { get; set; }
         public int SelectedTabIndex { get; set; }
+
+
         [IgnoreDataMemberAttribute]
-        public StringCollection AllSolutionsForSelectedTab
+        public ObservableCollection<string> AllSolutionsForSelectedTab
         {
             get
             {
                 if (SelectedTabIndex >= 0 && SelectedTabIndex < Tabs.Count)
-                    return Tabs[SelectedTabIndex].AllSolutions;
+                    return Tabs[SelectedTabIndex].AllSolutionsInBaseDir;
                 else
-                    return new StringCollection();
+                    return new ObservableCollection<string>();
             }
         }
         private String _Log;
@@ -66,6 +61,7 @@ namespace SolutionBuilder
                 }
             }
         }
+        [IgnoreDataMemberAttribute]
         public String CompleteLog
         {
             get
@@ -79,7 +75,12 @@ namespace SolutionBuilder
                 return log.ToString();
             }
         }
+        [IgnoreDataMemberAttribute]
+        public Dictionary<string, string> DistributionSourceMap { get; set; }
+        [IgnoreDataMemberAttribute]
+        public Dictionary<string, string> DistributionTargetMap { get; set; }
 
+        private Model _Model;
         // Constructor
         public MainViewModel()
         {
@@ -87,12 +88,12 @@ namespace SolutionBuilder
             Platforms = new StringCollection() { "Release", "Debug" };
             DistributionSourceMap = new Dictionary<string, string>();
             DistributionTargetMap = new Dictionary<string, string>();
-            Tabs = new ObservableCollection<TabItem>();
+            Tabs = new ObservableCollection<BuildTabItem>();
             var me = this;
             SettingsList = new ObservableCollection<Setting>
             {
                 new Setting { Scope = SCOPE_BASE, Key = "BuildExe", Value = @"C:\Program Files (x86)\MSBuild\14.0\Bin\msbuild.exe" },
-                new Setting { Scope = SCOPE_BASE, Key = "CopyExe", Value= @"robocopy.exe" },
+                new Setting { Scope = SCOPE_BASE, Key = "CopyExe", Value= @"C:\Windows\System32\Robocopy.exe" },
             };
             SelectedSettingIndex = -1;
             Init();
@@ -140,13 +141,20 @@ namespace SolutionBuilder
             FileInfo file = new FileInfo("DataViewModel.xml");
             if (!file.Exists)
                 return new MainViewModel();
-            FileStream stream = new FileStream(file.Name, FileMode.Open);
-            XmlDictionaryReader reader = XmlDictionaryReader.CreateTextReader(stream, new XmlDictionaryReaderQuotas());
-            DataContractSerializer serializer = new DataContractSerializer(typeof(MainViewModel));
-            MainViewModel model = (MainViewModel)serializer.ReadObject(reader, true);
-            reader.Close();
-            model.Init();
-            return model;
+            try
+            {
+                FileStream stream = new FileStream(file.Name, FileMode.Open);
+                XmlDictionaryReader reader = XmlDictionaryReader.CreateTextReader(stream, new XmlDictionaryReaderQuotas());
+                DataContractSerializer serializer = new DataContractSerializer(typeof(MainViewModel));
+                MainViewModel model = (MainViewModel)serializer.ReadObject(reader, true);
+                reader.Close();
+                model.Init();
+                return model;
+            }
+            catch (System.Exception )
+            {
+                return new MainViewModel();
+            }
         }
 
         public void BindToModel( ref Model Model )
@@ -174,9 +182,9 @@ namespace SolutionBuilder
             if (e.Action == NotifyCollectionChangedAction.Add) {
                 foreach (Setting item in e.NewItems) {
                     item.PropertyChanged += Setting_PropertyChanged;
-                    if (item.Scope == DISTRIBUTION_SOURCE)
+                    if (item.Scope == DISTRIBUTION_SOURCE && item.Key != null)
                         DistributionSourceMap[item.Key] = item.Value;
-                    if (item.Scope == DISTRIBUTION_TARGET)
+                    if (item.Scope == DISTRIBUTION_TARGET && item.Key != null)
                     {
                         DistributionList.Add(new DistributionItem() { Folder = item.Key });
                         DistributionTargetMap[item.Key] = item.Value;
@@ -193,9 +201,9 @@ namespace SolutionBuilder
             if (e.Action == NotifyCollectionChangedAction.Remove) {
                 foreach (Setting item in e.OldItems) {
                     item.PropertyChanged -= Setting_PropertyChanged;
-                    if (item.Scope == DISTRIBUTION_SOURCE)
+                    if (item.Scope == DISTRIBUTION_SOURCE && item.Key != null)
                         DistributionSourceMap.Remove(item.Key);
-                    if (item.Scope == DISTRIBUTION_TARGET)
+                    if (item.Scope == DISTRIBUTION_TARGET && item.Key != null)
                         DistributionTargetMap.Remove(item.Key);
                 }
             }
@@ -230,6 +238,7 @@ namespace SolutionBuilder
                 if (Tab.Header == setting.Scope)
                 {
                     Tab.UpdateAvailableSolutions();
+                    NotifyPropertyChanged("AllSolutionsForSelectedTab");
                 }
             }
             if (setting.Scope == DISTRIBUTION_SOURCE)
@@ -253,6 +262,7 @@ namespace SolutionBuilder
             scopes.Add(SCOPE_BASE);
             scopes.Add(DISTRIBUTION_SOURCE);
             scopes.Add(DISTRIBUTION_TARGET);
+            scopes.Add(DISTRIBUTION_EXE);
             foreach( var tab in Tabs ) 
                 scopes.Add(tab.Header);
             var dialog = new SettingCreationDialog() { Scopes = scopes };

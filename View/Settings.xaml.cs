@@ -46,5 +46,9 @@ namespace SolutionBuilder.View
                     mainWindow.ViewModel.DistributionTargetMap.Add(name, "");
             }
         }
+        private void OkButton_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            DialogResult = true;
+        }
     }
 }

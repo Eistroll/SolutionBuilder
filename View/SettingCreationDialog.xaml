@@ -23,6 +23,6 @@
         <TextBox x:Name="KeyTextBox" Text="{Binding Key}" Grid.Row="1" Grid.Column="1" Margin="2"></TextBox>
         <Label Grid.Row="2" Grid.Column="0">Value:</Label>
         <TextBox x:Name="ValueTextBox" Text="{Binding Value}" Grid.Row="2" Grid.Column="1" Margin="2"></TextBox>
-        <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"  Content="Ok" Click="OkButton_Click" Width="50" Margin="5"/>
+        <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" IsDefault="True" Content="Ok" Click="OkButton_Click" Width="50" Margin="5"/>
     </Grid>
 </Window>

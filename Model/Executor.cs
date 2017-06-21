@@ -22,7 +22,7 @@ namespace SolutionBuilder
             string line = e.Data + Environment.NewLine;
             solution.BuildLog += line;
         }
-        public bool BuildSolutions(TabItem tab, FileInfo buildExe, ObservableCollection<SolutionObjectView> solutions = null, Action<string> AddToLog = null)
+        public bool BuildSolutions(BuildTabItem tab, FileInfo buildExe, ObservableCollection<SolutionObjectView> solutions = null, Action<string> AddToLog = null)
         {
             bool buildFailure = false;
             bool ignoreSelection = true;
