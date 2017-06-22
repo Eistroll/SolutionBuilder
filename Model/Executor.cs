@@ -33,7 +33,7 @@ namespace SolutionBuilder
             }
             foreach (SolutionObjectView solution in solutions)
             {
-                if (ignoreSelection || solution.Selected)
+                if (ignoreSelection || solution.Checked)
                 {
                     System.Diagnostics.Process process = new System.Diagnostics.Process();
                     System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo()

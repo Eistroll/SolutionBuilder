@@ -49,7 +49,7 @@ namespace Test_SolutionBuilder
             viewModel.Tabs.Add(new BuildTabItem() { Header = "test" });
             viewModel.BindToModel(ref model);
             var tab = viewModel.Tabs[0];
-            tab.Solutions[1].Selected = true;
+            tab.Solutions[1].Checked = true;
             Assert.AreEqual(2, model.Scope2SolutionObjects["test"].Count);
             Assert.AreEqual(2, tab.Solutions.Count);
             viewModel.Save();
@@ -58,8 +58,8 @@ namespace Test_SolutionBuilder
             var loadedTab = loadedModel.Tabs[0];
             CollectionAssert.AreEqual(tab.Platforms, loadedTab.Platforms);
             Assert.AreEqual(tab.SelectedPath, loadedTab.SelectedPath);
-            Assert.IsFalse(tab.Solutions[0].Selected);
-            Assert.IsTrue(tab.Solutions[1].Selected);
+            Assert.IsFalse(tab.Solutions[0].Checked);
+            Assert.IsTrue(tab.Solutions[1].Checked);
         }
 
     }

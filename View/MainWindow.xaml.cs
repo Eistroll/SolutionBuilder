@@ -35,7 +35,7 @@ namespace SolutionBuilder.View
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             DataContext = _ViewModel;
-            _ViewModel.BindToModel( ref _Model);
+            _ViewModel.BindToModel(ref _Model);
         }
         private void Window_Closing(object sender, CancelEventArgs e)
         {
@@ -65,7 +65,8 @@ namespace SolutionBuilder.View
             if (tabItem == null)
                 return;
 
-            if (Mouse.PrimaryDevice.LeftButton == MouseButtonState.Pressed) {
+            if (Mouse.PrimaryDevice.LeftButton == MouseButtonState.Pressed)
+            {
                 DragDrop.DoDragDrop(tabItem, tabItem, DragDropEffects.All);
             }
         }
@@ -92,7 +93,8 @@ namespace SolutionBuilder.View
         {
             BuildTabItem tab = (BuildTabItem)tabs.SelectedContent;
             int index = tab.SelectedSolutionIndex;
-            if (index >= 0 && index < tab.Solutions.Count) {
+            if (index >= 0 && index < tab.Solutions.Count)
+            {
                 var solutions = _Model.Scope2SolutionObjects[tab.Header];
                 solutions.RemoveAt(index);
                 tab.Solutions.RemoveAt(index);
@@ -118,7 +120,7 @@ namespace SolutionBuilder.View
             this.DataContext = _ViewModel;
             _ViewModel.BindToModel(ref _Model);
         }
-        private void Platform_SelectionChanged( object sender, SelectionChangedEventArgs e )
+        private void Platform_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
         }
@@ -136,7 +138,7 @@ namespace SolutionBuilder.View
             var dialog = new ListViewQueryDialog("New Tab");
             dialog.Entries.Add(new SettingsPair("Name", ""));
             dialog.Entries.Add(new SettingsPair("Base dir", ""));
-            if ( dialog.ShowDialog() == true )
+            if (dialog.ShowDialog() == true)
             {
                 String tabName = dialog.Entries.FirstOrDefault(x => x.Key == "Name").Value;
                 if (tabName == null && tabName.Length <= 0)
@@ -150,14 +152,15 @@ namespace SolutionBuilder.View
         private void MnuCopyTab_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new StringQueryDialog("Enter Tab name:");
-            if (dialog.ShowDialog() == true) {
+            if (dialog.ShowDialog() == true)
+            {
                 String tabName = dialog.QueryString;
                 BuildTabItem originalTab = tabs.SelectedItem as BuildTabItem;
                 String originalBaseDir = _ViewModel.GetSetting("BaseDir", originalTab.Header);
                 String newBaseDir = originalBaseDir.Replace(originalTab.Header, tabName);
                 _ViewModel.SettingsList.Add(new Setting() { Scope = tabName, Key = "BaseDir", Value = newBaseDir });
                 BuildTabItem tab = new BuildTabItem() { Header = tabName };
-                var clonedList = _Model.Scope2SolutionObjects[originalTab.Header].Select(obj => (SolutionObject) obj.Clone()).ToList();
+                var clonedList = _Model.Scope2SolutionObjects[originalTab.Header].Select(obj => (SolutionObject)obj.Clone()).ToList();
                 _Model.Scope2SolutionObjects[tabName] = new System.Collections.ObjectModel.ObservableCollection<SolutionObject>(clonedList);
                 tab.BindToModel(ref _Model, ref _ViewModel);
                 _ViewModel.Tabs.Add(tab);
@@ -166,7 +169,8 @@ namespace SolutionBuilder.View
         private void MnuRemoveTab_Click(object sender, RoutedEventArgs e)
         {
             MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("Are you sure?", "Delete Tab Confirmation", System.Windows.MessageBoxButton.YesNo);
-            if (messageBoxResult == MessageBoxResult.Yes) { 
+            if (messageBoxResult == MessageBoxResult.Yes)
+            {
                 BuildTabItem selectedTab = tabs.SelectedItem as BuildTabItem;
                 _ViewModel.Tabs.Remove(selectedTab);
             }
@@ -215,7 +219,7 @@ namespace SolutionBuilder.View
                         executor.Copy(copyExe.ToString(), source, target, distribution, AddToLog);
                     });
                 }
-                if(distribution.Start)
+                if (distribution.Start)
                 {
                     if (task != null)
                         Task.WaitAll(task);
@@ -227,7 +231,7 @@ namespace SolutionBuilder.View
                     task = Task.Factory.StartNew(() =>
                     {
                         System.Diagnostics.Process process = new System.Diagnostics.Process();
-                        process.StartInfo.FileName=exe;
+                        process.StartInfo.FileName = exe;
                         process.Start();
                         distribution.Proc = process;
                     });

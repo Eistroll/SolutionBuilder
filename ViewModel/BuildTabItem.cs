@@ -24,7 +24,7 @@ namespace SolutionBuilder
         [DataMember]
         public String BaseOptions { get; set; }
         [DataMember]
-        public StringCollection SelectedSolutions { get; set; }
+        public StringCollection CheckedSolutions { get; set; }
         [DataMember]
         public StringCollection Platforms { get; set; }
         [DataMember]
@@ -35,7 +35,8 @@ namespace SolutionBuilder
             set
             {
                 _SelectedPlatform = value;
-                for (int i = 0; i < Solutions.Count; ++i) {
+                for (int i = 0; i < Solutions.Count; ++i)
+                {
                     Solutions[i].Options = _Model.Scope2SolutionObjects[Header][i].Options[_SelectedPlatform];
                 }
             }
@@ -82,11 +83,15 @@ namespace SolutionBuilder
         public BuildTabItem()
         {
             AllSolutionsInBaseDir = new ObservableCollection<string>();
-            SelectedSolutions = new StringCollection();
+            CheckedSolutions = new StringCollection();
             Solutions = new ObservableCollection<SolutionObjectView>();
             Platforms = new StringCollection() { "Release", "Debug" };
             _SelectedPlatform = "Debug";
             SelectedSolutionIndex = -1;
+        }
+        public IEnumerable<SolutionObjectView> SelectedSolutionViews
+        {
+            get { return _Solutions.Where(o => o.IsSelected); }
         }
         public void UpdateAvailableSolutions()
         {
@@ -95,9 +100,11 @@ namespace SolutionBuilder
             if (BaseDir.Length == 0)
                 return;
             System.IO.DirectoryInfo BaseDirInfo = new System.IO.DirectoryInfo(BaseDir);
-            if (BaseDirInfo.Exists) {
+            if (BaseDirInfo.Exists)
+            {
                 var solutionPaths = Directory.GetFiles(BaseDir, @"*.sln", SearchOption.AllDirectories);
-                foreach (var path in solutionPaths) {
+                foreach (var path in solutionPaths)
+                {
                     String newPath = path.Replace(BaseDir, "");
                     AllSolutionsInBaseDir.Add(newPath);
                 }
@@ -116,33 +123,37 @@ namespace SolutionBuilder
             Solutions.Clear();
             if (Model.Scope2SolutionObjects.Count == 0 || !Model.Scope2SolutionObjects.ContainsKey(Header))
                 return;
-            foreach (SolutionObject solution in Model.Scope2SolutionObjects[Header]) {
+            foreach (SolutionObject solution in Model.Scope2SolutionObjects[Header])
+            {
                 SolutionObject tmp = solution;
                 SolutionObjectView solutionView = new SolutionObjectView(ref tmp, SelectedPlatform);
-                if (SelectedSolutions.Contains(tmp.Name))
-                    solutionView.Selected = true;
+                if (CheckedSolutions != null && CheckedSolutions.Contains(tmp.Name))
+                    solutionView.Checked = true;
                 solutionView.PropertyChanged += new PropertyChangedEventHandler(SolutionView_PropertyChanged);
                 Solutions.Add(solutionView);
             }
         }
         private void SolutionView_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "Options") {
+            if (e.PropertyName == "Options")
+            {
                 SolutionObjectView solView = (SolutionObjectView)sender;
                 if (solView == null)
                     return;
-                if (solView.SolutionObject != null) {
+                if (solView.SolutionObject != null)
+                {
                     solView.SolutionObject.Options[SelectedPlatform] = solView.Options;
                 }
             }
-            if (e.PropertyName == "Selected") {
-                SolutionObjectView solView = (SolutionObjectView)sender;
-                if (solView == null)
+            if (e.PropertyName == "Checked")
+            {
+                SolutionObjectView solutionView = (SolutionObjectView)sender;
+                if (solutionView == null)
                     return;
-                if (!solView.Selected)
-                    SelectedSolutions.Remove(solView.Name);
+                if (!solutionView.Checked)
+                    CheckedSolutions.Remove(solutionView.Name);
                 else
-                    SelectedSolutions.Add(solView.Name);
+                    CheckedSolutions.Add(solutionView.Name);
             }
         }
         public event PropertyChangedEventHandler PropertyChanged;
@@ -158,7 +169,8 @@ namespace SolutionBuilder
         public void AddSolution()
         {
             SolutionObject solution = new SolutionObject();
-            if (!_Model.Scope2SolutionObjects.ContainsKey(Header)) {
+            if (!_Model.Scope2SolutionObjects.ContainsKey(Header))
+            {
                 _Model.Scope2SolutionObjects[Header] = new ObservableCollection<SolutionObject>();
             }
             _Model.Scope2SolutionObjects[Header].Add(solution);
@@ -169,7 +181,7 @@ namespace SolutionBuilder
         private CommandHandler _RemoveSolutionCmd;
         public CommandHandler RemoveSolutionCmd
         {
-            get { return _RemoveSolutionCmd ?? (_RemoveSolutionCmd = new CommandHandler(param => RemoveSolution(param),param => RemoveSolution_CanExecute(param) )); }
+            get { return _RemoveSolutionCmd ?? (_RemoveSolutionCmd = new CommandHandler(param => RemoveSolution(param), param => RemoveSolution_CanExecute(param))); }
         }
         public bool RemoveSolution_CanExecute(object parameter)
         {
@@ -194,7 +206,8 @@ namespace SolutionBuilder
         {
             SolutionObjectView solution = Solutions[SelectedSolutionIndex];
             View.MainWindow mainWindow = (View.MainWindow)System.Windows.Application.Current.MainWindow;
-            if (mainWindow != null) {
+            if (mainWindow != null)
+            {
                 mainWindow.ClearLog();
                 Executor builder = new Executor(_ViewModel);
                 builder.BuildSolutions(this, new FileInfo(_ViewModel.GetSetting("BuildExe")), new ObservableCollection<SolutionObjectView>() { solution }, mainWindow.AddToLog);
@@ -223,22 +236,27 @@ namespace SolutionBuilder
         }
         public bool CopySolutionsTo_CanExecute(object parameter)
         {
-            return _ViewModel.Tabs.Count > 1;
+            return _ViewModel.Tabs.Count > 1 && SelectedSolutionIndex != -1;
         }
         public void CopySolutionsTo(object parameter)
         {
             StringCollection tabNames = new StringCollection();
             foreach (var tab in _ViewModel.Tabs)
-                if(tab.Header != Header)
+                if (tab.Header != Header)
                     tabNames.Add(tab.Header);
-            var dialog = new View.ComboBoxQueryDialog() { DialogTitle="Copy solutions to...", ComboBoxLabel="Build tab", Entries = tabNames, SelectedEntry=tabNames[0] };
-            if (dialog.ShowDialog() == true) {
+            var dialog = new View.ComboBoxQueryDialog() { DialogTitle = "Copy solutions to...", ComboBoxLabel = "Build tab", Entries = tabNames, SelectedEntry = tabNames[0] };
+            if (dialog.ShowDialog() == true)
+            {
                 String tabName = dialog.SelectedEntry;
-                foreach (var solutionName in SelectedSolutions)
+                foreach (var solutionView in SelectedSolutionViews)
                 {
-                    SolutionObjectView solutionView = _Solutions.First(x => x.Name == solutionName);
                     if (solutionView != null)
+                    {
                         _Model.Scope2SolutionObjects[tabName].Add(solutionView.SolutionObject);
+                        SolutionObjectView newSolutionView = solutionView.Clone() as SolutionObjectView;
+                        _ViewModel.Tabs.First(x => x.Header == tabName).Solutions.Add(newSolutionView);
+                    }
+
                 }
             }
         }

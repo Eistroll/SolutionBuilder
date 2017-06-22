@@ -55,7 +55,8 @@ namespace SolutionBuilder
             get { return _Log; }
             set
             {
-                if (value != _Log) {
+                if (value != _Log)
+                {
                     _Log = value;
                     NotifyPropertyChanged("Log");
                 }
@@ -67,8 +68,10 @@ namespace SolutionBuilder
             get
             {
                 StringBuilder log = new StringBuilder();
-                foreach (var tab in Tabs) {
-                    foreach (SolutionObjectView solution in tab.Solutions) {
+                foreach (var tab in Tabs)
+                {
+                    foreach (SolutionObjectView solution in tab.Solutions)
+                    {
                         log.AppendLine(solution.BuildLog);
                     }
                 }
@@ -117,10 +120,12 @@ namespace SolutionBuilder
             UpdateDistributionSourceMap();
             UpdateDistributionTargetMap();
         }
-        public String GetSetting( String key, String scope=SCOPE_BASE )
+        public String GetSetting(String key, String scope = SCOPE_BASE)
         {
-            foreach (Setting setting in SettingsList) {
-                if (setting.Scope == scope && setting.Key == key) {
+            foreach (Setting setting in SettingsList)
+            {
+                if (setting.Scope == scope && setting.Key == key)
+                {
                     return setting.Value;
                 }
             }
@@ -151,36 +156,38 @@ namespace SolutionBuilder
                 model.Init();
                 return model;
             }
-            catch (System.Exception )
+            catch (System.Exception)
             {
                 return new MainViewModel();
             }
         }
 
-        public void BindToModel( ref Model Model )
+        public void BindToModel(ref Model Model)
         {
             Model.PropertyChanged += new PropertyChangedEventHandler(Model_PropertyChanged);
             _Model = Model;
             var me = this;
-            foreach( var tab in Tabs) 
+            foreach (var tab in Tabs)
             {
                 tab.BindToModel(ref _Model, ref me);
             }
         }
-        private void Model_PropertyChanged( object sender, PropertyChangedEventArgs e )
+        private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
         }
-        public void UpdateLog( SolutionObjectView solution )
+        public void UpdateLog(SolutionObjectView solution)
         {
-            StringBuilder logBuilder= new StringBuilder();
+            StringBuilder logBuilder = new StringBuilder();
             logBuilder.Append(solution.BuildLog);
             Log = logBuilder.ToString();
         }
         private void SettingsChangedMethod(object sender, NotifyCollectionChangedEventArgs e)
         {
             //different kind of changes that may have occurred in collection
-            if (e.Action == NotifyCollectionChangedAction.Add) {
-                foreach (Setting item in e.NewItems) {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (Setting item in e.NewItems)
+                {
                     item.PropertyChanged += Setting_PropertyChanged;
                     if (item.Scope == DISTRIBUTION_SOURCE && item.Key != null)
                         DistributionSourceMap[item.Key] = item.Value;
@@ -189,17 +196,20 @@ namespace SolutionBuilder
                         DistributionList.Add(new DistributionItem() { Folder = item.Key });
                         DistributionTargetMap[item.Key] = item.Value;
                     }
-                        
+
                 }
             }
-            if (e.Action == NotifyCollectionChangedAction.Replace) {
+            if (e.Action == NotifyCollectionChangedAction.Replace)
+            {
                 foreach (Setting item in e.OldItems)
                     item.PropertyChanged -= Setting_PropertyChanged;
                 foreach (Setting item in e.NewItems)
                     item.PropertyChanged += Setting_PropertyChanged;
             }
-            if (e.Action == NotifyCollectionChangedAction.Remove) {
-                foreach (Setting item in e.OldItems) {
+            if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (Setting item in e.OldItems)
+                {
                     item.PropertyChanged -= Setting_PropertyChanged;
                     if (item.Scope == DISTRIBUTION_SOURCE && item.Key != null)
                         DistributionSourceMap.Remove(item.Key);
@@ -207,15 +217,18 @@ namespace SolutionBuilder
                         DistributionTargetMap.Remove(item.Key);
                 }
             }
-            if (e.Action == NotifyCollectionChangedAction.Move) {
+            if (e.Action == NotifyCollectionChangedAction.Move)
+            {
                 //your code
             }
         }
 
         private void UpdateDistributionSourceMap()
         {
-            foreach (Setting set in SettingsList) {
-                if (set.Scope == DISTRIBUTION_SOURCE) {
+            foreach (Setting set in SettingsList)
+            {
+                if (set.Scope == DISTRIBUTION_SOURCE)
+                {
                     DistributionSourceMap[set.Key] = set.Value;
                 }
             }
@@ -223,8 +236,10 @@ namespace SolutionBuilder
 
         private void UpdateDistributionTargetMap()
         {
-            foreach (Setting set in SettingsList) {
-                if (set.Scope == DISTRIBUTION_TARGET) {
+            foreach (Setting set in SettingsList)
+            {
+                if (set.Scope == DISTRIBUTION_TARGET)
+                {
                     DistributionTargetMap[set.Key] = set.Value;
                 }
             }
@@ -233,7 +248,7 @@ namespace SolutionBuilder
         private void Setting_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             Setting setting = (Setting)sender;
-            foreach ( var Tab in Tabs)
+            foreach (var Tab in Tabs)
             {
                 if (Tab.Header == setting.Scope)
                 {
@@ -242,7 +257,7 @@ namespace SolutionBuilder
                 }
             }
             if (setting.Scope == DISTRIBUTION_SOURCE)
-               DistributionSourceMap[setting.Key] = setting.Value;
+                DistributionSourceMap[setting.Key] = setting.Value;
             if (setting.Scope == DISTRIBUTION_TARGET)
                 DistributionTargetMap[setting.Key] = setting.Value;
         }
@@ -263,10 +278,11 @@ namespace SolutionBuilder
             scopes.Add(DISTRIBUTION_SOURCE);
             scopes.Add(DISTRIBUTION_TARGET);
             scopes.Add(DISTRIBUTION_EXE);
-            foreach( var tab in Tabs ) 
+            foreach (var tab in Tabs)
                 scopes.Add(tab.Header);
             var dialog = new SettingCreationDialog() { Scopes = scopes };
-            if (dialog.ShowDialog() == true) {
+            if (dialog.ShowDialog() == true)
+            {
                 View.MainWindow mainWindow = (View.MainWindow)System.Windows.Application.Current.MainWindow;
                 if (mainWindow != null)
                     SettingsList.Add(new Setting() { Scope = dialog.Scope, Key = dialog.Key, Value = dialog.Value });

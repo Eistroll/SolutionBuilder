@@ -24,11 +24,11 @@ namespace SolutionBuilder
             get { return _Options; }
             set { if (_Options != value) { _Options = value; NotifyPropertyChanged("Options"); } }
         }
-        private bool _Selected = false;
-        public bool Selected
+        private bool _Checked = false;
+        public bool Checked
         {
-            get { return _Selected; }
-            set { if (_Selected != value) { _Selected = value; NotifyPropertyChanged("Selected"); } }
+            get { return _Checked; }
+            set { if (_Checked != value) { _Checked = value; NotifyPropertyChanged("Checked"); } }
         }
         private View.State _BuildState;
         public View.State BuildState
@@ -44,6 +44,7 @@ namespace SolutionBuilder
         }
 
         [IgnoreDataMemberAttribute]
+        public bool IsSelected { get; set; }
         public String BuildLog { get; set; }
         public SolutionObjectView(ref SolutionObject SolutionObject, String selectedPlatform)
         {
@@ -61,7 +62,7 @@ namespace SolutionBuilder
                 return false;
             return this.Name == toCompareWith.Name &&
                 this._Options == toCompareWith._Options &&
-                this.Selected == toCompareWith.Selected;
+                this.Checked == toCompareWith.Checked;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
