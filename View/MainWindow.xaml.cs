@@ -177,7 +177,7 @@ namespace SolutionBuilder.View
         }
         private void BuildAll_Click(object sender, RoutedEventArgs e)
         {
-            FileInfo buildExe = new FileInfo(_ViewModel.GetSetting("BuildExe"));
+            FileInfo buildExe = new FileInfo(_ViewModel.GetSetting(Setting.Executables.BuildExe.ToString()));
             if (!buildExe.Exists)
                 return;
             ClearLog();
@@ -200,7 +200,7 @@ namespace SolutionBuilder.View
         }
         private void ExecuteAll_Click(object sender, RoutedEventArgs e)
         {
-            FileInfo copyExe = new FileInfo(_ViewModel.GetSetting("CopyExe"));
+            FileInfo copyExe = new FileInfo(_ViewModel.GetSetting(Setting.Executables.CopyExe.ToString()));
             if (!copyExe.Exists)
                 return;
             ClearLog();
@@ -213,7 +213,7 @@ namespace SolutionBuilder.View
                 if (distribution.Copy)
                 {
                     string source = cbDistributionSource.SelectedValue as string;
-                    string target = _ViewModel.GetSetting(distribution.Folder, MainViewModel.DISTRIBUTION_TARGET);
+                    string target = _ViewModel.GetSetting(distribution.Folder, Setting.Scopes.DistributionTarget);
                     task = Task.Factory.StartNew(() =>
                     {
                         executor.Copy(copyExe.ToString(), source, target, distribution, AddToLog);
@@ -224,10 +224,10 @@ namespace SolutionBuilder.View
                     if (task != null)
                         Task.WaitAll(task);
 
-                    string target = _ViewModel.GetSetting(distribution.Folder, MainViewModel.DISTRIBUTION_TARGET);
+                    string target = _ViewModel.GetSetting(distribution.Folder, Setting.Scopes.DistributionTarget);
                     target = target.Replace(@"{Platform}", distribution.Platform);
                     target = target.Replace(@"{Name}", distribution.Folder);
-                    string exe = target + Path.DirectorySeparatorChar + _ViewModel.GetSetting(distribution.Folder, MainViewModel.DISTRIBUTION_EXE);
+                    string exe = target + Path.DirectorySeparatorChar + _ViewModel.GetSetting(distribution.Folder, Setting.Scopes.DistributionExe);
                     task = Task.Factory.StartNew(() =>
                     {
                         System.Diagnostics.Process process = new System.Diagnostics.Process();

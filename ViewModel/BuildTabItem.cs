@@ -210,7 +210,7 @@ namespace SolutionBuilder
             {
                 mainWindow.ClearLog();
                 Executor builder = new Executor(_ViewModel);
-                builder.BuildSolutions(this, new FileInfo(_ViewModel.GetSetting("BuildExe")), new ObservableCollection<SolutionObjectView>() { solution }, mainWindow.AddToLog);
+                builder.BuildSolutions(this, new FileInfo(_ViewModel.GetSetting(Setting.Executables.BuildExe.ToString())), new ObservableCollection<SolutionObjectView>() { solution }, mainWindow.AddToLog);
             }
         }
         private CommandHandler _OpenSolutionCmd;

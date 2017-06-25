@@ -15,11 +15,6 @@ namespace SolutionBuilder
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-        public const string DISTRIBUTION_TARGET = "DistributionTarget";
-        public const string DISTRIBUTION_SOURCE = "DistributionSource";
-        public const string DISTRIBUTION_EXE = "DistributionExe";
-        public const string SCOPE_BASE = "Base";
-
         public ObservableCollection<DistributionItem> DistributionList { get; set; }
         public StringCollection Platforms { get; set; }
         private int _SelectedSettingIndex = -1;
@@ -95,8 +90,8 @@ namespace SolutionBuilder
             var me = this;
             SettingsList = new ObservableCollection<Setting>
             {
-                new Setting { Scope = SCOPE_BASE, Key = "BuildExe", Value = @"C:\Program Files (x86)\MSBuild\14.0\Bin\msbuild.exe" },
-                new Setting { Scope = SCOPE_BASE, Key = "CopyExe", Value= @"C:\Windows\System32\Robocopy.exe" },
+                new Setting { Scope = Setting.Scopes.Base.ToString(), Key = Setting.Executables.BuildExe.ToString(), Value = @"C:\Program Files (x86)\MSBuild\14.0\Bin\msbuild.exe" },
+                new Setting { Scope = Setting.Scopes.Base.ToString(), Key = Setting.Executables.CopyExe.ToString(), Value= @"C:\Windows\System32\Robocopy.exe" },
             };
             SelectedSettingIndex = -1;
             Init();
@@ -120,11 +115,22 @@ namespace SolutionBuilder
             UpdateDistributionSourceMap();
             UpdateDistributionTargetMap();
         }
-        public String GetSetting(String key, String scope = SCOPE_BASE)
+        public String GetSetting(String key, string scope)
         {
             foreach (Setting setting in SettingsList)
             {
                 if (setting.Scope == scope && setting.Key == key)
+                {
+                    return setting.Value;
+                }
+            }
+            return "";
+        }
+        public String GetSetting(String key, Setting.Scopes scope = Setting.Scopes.Base)
+        {
+            foreach (Setting setting in SettingsList)
+            {
+                if (setting.Scope == scope.ToString() && setting.Key == key)
                 {
                     return setting.Value;
                 }
@@ -189,9 +195,9 @@ namespace SolutionBuilder
                 foreach (Setting item in e.NewItems)
                 {
                     item.PropertyChanged += Setting_PropertyChanged;
-                    if (item.Scope == DISTRIBUTION_SOURCE && item.Key != null)
+                    if (item.Scope == Setting.Scopes.DistributionSource.ToString() && item.Key != null)
                         DistributionSourceMap[item.Key] = item.Value;
-                    if (item.Scope == DISTRIBUTION_TARGET && item.Key != null)
+                    if (item.Scope == Setting.Scopes.DistributionTarget.ToString() && item.Key != null)
                     {
                         DistributionList.Add(new DistributionItem() { Folder = item.Key });
                         DistributionTargetMap[item.Key] = item.Value;
@@ -211,9 +217,9 @@ namespace SolutionBuilder
                 foreach (Setting item in e.OldItems)
                 {
                     item.PropertyChanged -= Setting_PropertyChanged;
-                    if (item.Scope == DISTRIBUTION_SOURCE && item.Key != null)
+                    if (item.Scope == Setting.Scopes.DistributionSource.ToString() && item.Key != null)
                         DistributionSourceMap.Remove(item.Key);
-                    if (item.Scope == DISTRIBUTION_TARGET && item.Key != null)
+                    if (item.Scope == Setting.Scopes.DistributionTarget.ToString() && item.Key != null)
                         DistributionTargetMap.Remove(item.Key);
                 }
             }
@@ -227,7 +233,7 @@ namespace SolutionBuilder
         {
             foreach (Setting set in SettingsList)
             {
-                if (set.Scope == DISTRIBUTION_SOURCE)
+                if (set.Scope == Setting.Scopes.DistributionSource.ToString())
                 {
                     DistributionSourceMap[set.Key] = set.Value;
                 }
@@ -238,7 +244,7 @@ namespace SolutionBuilder
         {
             foreach (Setting set in SettingsList)
             {
-                if (set.Scope == DISTRIBUTION_TARGET)
+                if (set.Scope == Setting.Scopes.DistributionTarget.ToString())
                 {
                     DistributionTargetMap[set.Key] = set.Value;
                 }
@@ -256,9 +262,9 @@ namespace SolutionBuilder
                     NotifyPropertyChanged("AllSolutionsForSelectedTab");
                 }
             }
-            if (setting.Scope == DISTRIBUTION_SOURCE)
+            if (setting.Scope == Setting.Scopes.DistributionSource.ToString())
                 DistributionSourceMap[setting.Key] = setting.Value;
-            if (setting.Scope == DISTRIBUTION_TARGET)
+            if (setting.Scope == Setting.Scopes.DistributionTarget.ToString())
                 DistributionTargetMap[setting.Key] = setting.Value;
         }
         public event PropertyChangedEventHandler PropertyChanged;
@@ -274,10 +280,10 @@ namespace SolutionBuilder
         public void AddSetting()
         {
             StringCollection scopes = new StringCollection();
-            scopes.Add(SCOPE_BASE);
-            scopes.Add(DISTRIBUTION_SOURCE);
-            scopes.Add(DISTRIBUTION_TARGET);
-            scopes.Add(DISTRIBUTION_EXE);
+            scopes.Add(Setting.Scopes.Base.ToString());
+            scopes.Add(Setting.Scopes.DistributionSource.ToString());
+            scopes.Add(Setting.Scopes.DistributionTarget.ToString());
+            scopes.Add(Setting.Scopes.DistributionExe.ToString());
             foreach (var tab in Tabs)
                 scopes.Add(tab.Header);
             var dialog = new SettingCreationDialog() { Scopes = scopes };

@@ -7,8 +7,10 @@ using System.ComponentModel;
 
 namespace SolutionBuilder
 {
-    public class Setting : INotifyPropertyChanged
+    public partial class Setting : INotifyPropertyChanged
     {
+        public enum Scopes { Base, DistributionExe, DistributionSource, DistributionTarget }
+        public enum Executables { CopyExe, BuildExe }
         private string _Scope;
         public string Scope { get { return _Scope; } set { if (value != _Scope) { _Scope = value; NotifyPropertyChanged("Scope"); } } }
         private string _Key;
