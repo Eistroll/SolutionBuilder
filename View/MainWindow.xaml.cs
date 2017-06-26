@@ -58,37 +58,6 @@ namespace SolutionBuilder.View
                 textBoxLog.ScrollToEnd();
             }
         }
-        private void BuilderTabItem_PreviewMouseMove(object sender, MouseEventArgs e)
-        {
-            var tabItem = e.Source as TabItem;
-
-            if (tabItem == null)
-                return;
-
-            if (Mouse.PrimaryDevice.LeftButton == MouseButtonState.Pressed)
-            {
-                DragDrop.DoDragDrop(tabItem, tabItem, DragDropEffects.All);
-            }
-        }
-        private void BuilderTabItem_Drop(object sender, DragEventArgs e)
-        {
-            var tabItemTarget = e.Source as TabItem;
-            var buildTabTarget = tabItemTarget.DataContext as BuildTabItem;
-
-            var tabItemSource = e.Data.GetData(typeof(TabItem)) as TabItem;
-            var buildTabSource = tabItemSource.DataContext as BuildTabItem;
-
-            if (tabItemTarget.Equals(tabItemSource))
-                return;
-            int sourceIndex = _ViewModel.Tabs.IndexOf(buildTabSource);
-            int targetIndex = _ViewModel.Tabs.IndexOf(buildTabTarget);
-            if (sourceIndex == targetIndex || sourceIndex > _ViewModel.Tabs.Count || targetIndex > _ViewModel.Tabs.Count)
-                return;
-
-            var tmp = _ViewModel.Tabs[targetIndex];
-            _ViewModel.Tabs[targetIndex] = _ViewModel.Tabs[sourceIndex];
-            _ViewModel.Tabs[sourceIndex] = tmp;
-        }
         private void RemoveSolution_OnClick(object sender, RoutedEventArgs e)
         {
             BuildTabItem tab = (BuildTabItem)tabs.SelectedContent;

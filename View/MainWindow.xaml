@@ -38,14 +38,18 @@
         </Menu>
         <TabControl Grid.Row="1">
             <TabItem Header="Builder">
-                <TabControl Name="tabs" ItemsSource="{Binding Tabs}" SelectedIndex="{Binding SelectedTabIndex}">
-                    <TabControl.Resources>
+                <TabControl Name="tabs" 
+                            ItemsSource="{Binding Tabs}" 
+                            SelectedIndex="{Binding SelectedTabIndex}"
+                            dd:DragDrop.IsDragSource="True" 
+                            dd:DragDrop.IsDropTarget="True">
+                    <!--<TabControl.Resources>
                         <Style TargetType="TabItem">
                             <Setter Property="AllowDrop" Value="True"/>
                             <EventSetter Event="PreviewMouseMove" Handler="BuilderTabItem_PreviewMouseMove"/>
                             <EventSetter Event="Drop" Handler="BuilderTabItem_Drop"/>
                         </Style>
-                    </TabControl.Resources>
+                    </TabControl.Resources>-->
                     <TabControl.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
