@@ -189,9 +189,19 @@ namespace SolutionBuilder
         }
         public void RemoveSolution(object parameter)
         {
-            SolutionObjectView solution = Solutions[SelectedSolutionIndex];
-            _Model.Scope2SolutionObjects[Header].Remove(solution.SolutionObject);
-            Solutions.RemoveAt(SelectedSolutionIndex);
+            List<int> indexListToRemove = new List<int>();
+            foreach (var solutionView in SelectedSolutionViews)
+            {
+                if (solutionView != null)
+                {
+                    _Model.Scope2SolutionObjects[Header].Remove(solutionView.SolutionObject);
+                    indexListToRemove.Add(Solutions.IndexOf(solutionView));
+                }
+            }
+            indexListToRemove.Reverse();
+            foreach (var index in indexListToRemove)
+                Solutions.RemoveAt(index);
+            SelectedSolutionIndex = Solutions.Count - 1;
         }
         private CommandHandler _BuildSolutionCmd;
         public CommandHandler BuildSolutionCmd
@@ -248,16 +258,21 @@ namespace SolutionBuilder
             if (dialog.ShowDialog() == true)
             {
                 String tabName = dialog.SelectedEntry;
+                BuildTabItem tab = _ViewModel.Tabs.First(x => x.Header == tabName);
                 foreach (var solutionView in SelectedSolutionViews)
                 {
                     if (solutionView != null)
                     {
+                        if (!_Model.Scope2SolutionObjects.ContainsKey(tabName))
+                            _Model.Scope2SolutionObjects[tabName] = new ObservableCollection<SolutionObject>();
                         _Model.Scope2SolutionObjects[tabName].Add(solutionView.SolutionObject);
                         SolutionObjectView newSolutionView = solutionView.Clone() as SolutionObjectView;
-                        _ViewModel.Tabs.First(x => x.Header == tabName).Solutions.Add(newSolutionView);
+                        newSolutionView.IsSelected = false;
+                        if (!tab.Solutions.Contains(newSolutionView))
+                            tab.Solutions.Add(newSolutionView);
                     }
-
                 }
+                tab.SelectedSolutionIndex = -1;
             }
         }
     }
