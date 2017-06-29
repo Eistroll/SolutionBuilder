@@ -8,7 +8,11 @@
         xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
         xmlns:local="clr-namespace:SolutionBuilder.View"
         mc:Ignorable="d"
-        Title="MainWindow" Height="550" Width="750" Loaded="Window_Loaded" Closing="Window_Closing" x:Name="wndMain">
+        Title="MainWindow" 
+        Height="550" Width="750" 
+        Loaded="Window_Loaded" 
+        Closing="Window_Closing" 
+        x:Name="wndMain">
     <Window.Resources>
         <converters:StateToImageSourceConverter x:Key="StateConverter"/>
     </Window.Resources>
@@ -67,11 +71,30 @@
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Orientation="Horizontal" Grid.Column="0">
-                                        <ComboBox x:Name="cbPlatform" ItemsSource="{Binding Platforms}" SelectedItem="{Binding SelectedPlatform}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120" Height="22"/>
+                                        <ComboBox x:Name="cbPlatform" 
+                                                  ItemsSource="{Binding Platforms}" 
+                                                  SelectedItem="{Binding SelectedPlatform}" 
+                                                  HorizontalAlignment="Left" 
+                                                  VerticalAlignment="Center" 
+                                                  Width="120" 
+                                                  Height="22"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Grid.Column="2">
-                                        <Button x:Name="btAdd" Content="Add" HorizontalAlignment="Right" VerticalAlignment="Center" Width="75" Command="{Binding AddSolutionCmd}" Margin="0,0,5,0"/>
-                                        <Button x:Name="btBuild" Content="Build" VerticalAlignment="Center" Width="75" HorizontalAlignment="Right" Click="BuildAll_Click" Height="20" Margin="5,0,0,0"/>
+                                        <Button x:Name="btAdd" 
+                                                Content="Add" 
+                                                HorizontalAlignment="Right" 
+                                                VerticalAlignment="Center" 
+                                                Width="75" 
+                                                Command="{Binding AddSolutionCmd}" 
+                                                Margin="0,0,5,0"/>
+                                        <Button x:Name="btBuild" 
+                                                Content="Build" 
+                                                VerticalAlignment="Center" 
+                                                Width="75" 
+                                                HorizontalAlignment="Right" 
+                                                Click="BuildAll_Click" 
+                                                Height="20" 
+                                                Margin="5,0,0,0"/>
                                     </StackPanel>
                                 </Grid>
                                 <Grid Grid.Row="1" Margin="5,5,5,0">
@@ -80,7 +103,10 @@
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <Label x:Name="lbBaseOptions" Grid.Column="0">Options:</Label>
-                                    <TextBox x:Name="tbBaseOptions" Grid.Column="1" Text="{Binding BaseOptions}" VerticalAlignment="Center"/>
+                                    <TextBox x:Name="tbBaseOptions" 
+                                             Grid.Column="1" 
+                                             Text="{Binding BaseOptions}" 
+                                             VerticalAlignment="Center"/>
                                 </Grid>
                                 <ListView Grid.Row="2"
                                           Name="lvSolutions" 
@@ -121,21 +147,28 @@
                                             <GridViewColumn Header="Name" Width="300">
                                                 <GridViewColumn.CellTemplate>
                                                     <DataTemplate>
-                                                        <ComboBox ItemsSource="{Binding DataContext.AllSolutionsForSelectedTab, ElementName=wndMain, UpdateSourceTrigger=PropertyChanged, Mode=OneWay }" SelectedItem="{Binding Name}" Margin="-5,0" IsEditable="True"/>
+                                                        <ComboBox ItemsSource="{Binding DataContext.AllSolutionsForSelectedTab, ElementName=wndMain, UpdateSourceTrigger=PropertyChanged, Mode=OneWay }" 
+                                                                  SelectedItem="{Binding Name}" 
+                                                                  Width="Auto" 
+                                                                  Margin="-5,0" 
+                                                                  IsEditable="True"/>
                                                     </DataTemplate>
                                                 </GridViewColumn.CellTemplate>
                                             </GridViewColumn>
                                             <GridViewColumn Header="Options" Width="300">
                                                 <GridViewColumn.CellTemplate>
                                                     <DataTemplate>
-                                                        <TextBox Text="{Binding Options}" Margin="-5,0"/>
+                                                        <TextBox Text="{Binding Options}" Width="Auto" Margin="-5,0"/>
                                                     </DataTemplate>
                                                 </GridViewColumn.CellTemplate>
                                             </GridViewColumn>
                                             <GridViewColumn Header="State" Width="32">
                                                 <GridViewColumn.CellTemplate>
                                                     <DataTemplate>
-                                                        <Image Source="{Binding BuildState, Converter={StaticResource StateConverter}}" Height="20" Width="20" Margin="-5,0"/>
+                                                        <Image Source="{Binding BuildState, Converter={StaticResource StateConverter}}" 
+                                                               Height="20" 
+                                                               Width="20" 
+                                                               Margin="-5,0"/>
                                                     </DataTemplate>
                                                 </GridViewColumn.CellTemplate>
                                             </GridViewColumn>
@@ -161,16 +194,30 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0" Orientation="Horizontal">
-                            <ComboBox x:Name="cbDistributionSource" ItemsSource="{Binding DistributionSourceMap}" DisplayMemberPath="Key" SelectedValuePath="Value" SelectedIndex="0" Margin="5" Width="100">
+                            <ComboBox x:Name="cbDistributionSource" 
+                                      ItemsSource="{Binding DistributionSourceMap}" 
+                                      DisplayMemberPath="Key" 
+                                      SelectedValuePath="Value" 
+                                      SelectedIndex="0" 
+                                      Margin="5" 
+                                      Width="100">
                             </ComboBox>
-                            <ComboBox x:Name="cbDistributionPlatforms" ItemsSource="{Binding Platforms}" SelectedIndex="0" Margin="5" Width="100"/>
+                            <ComboBox x:Name="cbDistributionPlatforms" 
+                                      ItemsSource="{Binding Platforms}" 
+                                      SelectedIndex="0" 
+                                      Margin="5" 
+                                      Width="100"/>
                         </StackPanel>
                         <StackPanel Grid.Column="2" Orientation="Horizontal">
                             <Button Margin="5" Click="ExecuteAll_Click">Execute all</Button>
                             <Button Margin="5" Click="KillAll_Click">Kill all</Button>
                         </StackPanel>
                     </Grid>
-                    <ListView Grid.Row="1" Name="lvDistribution" ItemsSource="{Binding DistributionList}" Margin="5" HorizontalContentAlignment="Stretch">
+                    <ListView Grid.Row="1" 
+                              Name="lvDistribution" 
+                              ItemsSource="{Binding DistributionList}" 
+                              Margin="5" 
+                              HorizontalContentAlignment="Stretch">
                         <ListView.Resources>
                             <Style TargetType="ListViewItem">
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
@@ -188,14 +235,24 @@
                                 <GridViewColumn Header="Folder" Width="200">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ComboBox ItemsSource="{Binding DataContext.DistributionTargetMap, ElementName=wndMain }" DisplayMemberPath="Key" SelectedValuePath="Key" SelectedValue="{Binding Folder}" Height="20" Margin="-5,0"/>
+                                            <ComboBox ItemsSource="{Binding DataContext.DistributionTargetMap, ElementName=wndMain }" 
+                                                      DisplayMemberPath="Key" 
+                                                      SelectedValuePath="Key" 
+                                                      SelectedValue="{Binding Folder}" 
+                                                      Width="Auto" 
+                                                      Height="20" 
+                                                      Margin="-5,0"/>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
                                 <GridViewColumn Header="Platform" Width="200">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ComboBox ItemsSource="{Binding DataContext.Platforms, ElementName=wndMain}" SelectedItem="{Binding Platform}" Height="20" Margin="-5,0"/>
+                                            <ComboBox ItemsSource="{Binding DataContext.Platforms, ElementName=wndMain}" 
+                                                      SelectedItem="{Binding Platform}" 
+                                                      Height="20" 
+                                                      Width="Auto" 
+                                                      Margin="-5,0"/>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>

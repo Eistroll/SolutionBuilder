@@ -11,7 +11,11 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <ListView Grid.Row="0" x:Name="lvSettings" ItemsSource="{Binding SettingsList}" HorizontalContentAlignment="Stretch" SelectedIndex="{Binding SelectedSettingIndex}">
+        <ListView Grid.Row="0" 
+                  x:Name="lvSettings" 
+                  ItemsSource="{Binding SettingsList}" 
+                  HorizontalContentAlignment="Stretch" 
+                  SelectedIndex="{Binding SelectedSettingIndex}">
             <ListView.Resources>
                 <Style TargetType="{x:Type ListViewItem}">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
