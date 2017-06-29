@@ -79,7 +79,8 @@ namespace SolutionBuilder
         }
         private MainViewModel _ViewModel;
         private Model _Model;
-
+        private bool ExplicitAddInProgress = false;
+        private bool ExplicitRemoveInProgress = false;
         public BuildTabItem()
         {
             AllSolutionsInBaseDir = new ObservableCollection<string>();
@@ -132,6 +133,27 @@ namespace SolutionBuilder
                 solutionView.PropertyChanged += new PropertyChangedEventHandler(SolutionView_PropertyChanged);
                 Solutions.Add(solutionView);
             }
+            Solutions.CollectionChanged += new NotifyCollectionChangedEventHandler(Solutions_CollectionChanged);
+       }
+        private void Solutions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (ExplicitRemoveInProgress || ExplicitRemoveInProgress)
+                return;
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                int index = e.NewStartingIndex;
+                foreach (SolutionObjectView solution in e.NewItems)
+                {
+                    _Model.Scope2SolutionObjects[Header].Insert(index++, solution.SolutionObject);
+                }
+            }
+            if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (SolutionObjectView solution in e.OldItems)
+                {
+                    _Model.Scope2SolutionObjects[Header].Remove(solution.SolutionObject);
+                }
+            }
         }
         private void SolutionView_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -176,7 +198,9 @@ namespace SolutionBuilder
             _Model.Scope2SolutionObjects[Header].Add(solution);
             SolutionObjectView solutionView = new SolutionObjectView(ref solution, SelectedPlatform);
             solutionView.PropertyChanged += new PropertyChangedEventHandler(SolutionView_PropertyChanged);
+            ExplicitAddInProgress = true;
             Solutions.Add(solutionView);
+            ExplicitAddInProgress = false;
         }
         private CommandHandler _RemoveSolutionCmd;
         public CommandHandler RemoveSolutionCmd
@@ -199,8 +223,10 @@ namespace SolutionBuilder
                 }
             }
             indexListToRemove.Reverse();
+            ExplicitRemoveInProgress = true;
             foreach (var index in indexListToRemove)
                 Solutions.RemoveAt(index);
+            ExplicitRemoveInProgress = false;
             SelectedSolutionIndex = Solutions.Count - 1;
         }
         private CommandHandler _BuildSolutionCmd;

@@ -121,14 +121,14 @@
                                             <GridViewColumn Header="Name" Width="300">
                                                 <GridViewColumn.CellTemplate>
                                                     <DataTemplate>
-                                                        <ComboBox ItemsSource="{Binding DataContext.AllSolutionsForSelectedTab, ElementName=wndMain, UpdateSourceTrigger=PropertyChanged, Mode=OneWay }" SelectedItem="{Binding Name}" Height="20" Margin="-5,0" IsEditable="True"/>
+                                                        <ComboBox ItemsSource="{Binding DataContext.AllSolutionsForSelectedTab, ElementName=wndMain, UpdateSourceTrigger=PropertyChanged, Mode=OneWay }" SelectedItem="{Binding Name}" Margin="-5,0" IsEditable="True"/>
                                                     </DataTemplate>
                                                 </GridViewColumn.CellTemplate>
                                             </GridViewColumn>
                                             <GridViewColumn Header="Options" Width="300">
                                                 <GridViewColumn.CellTemplate>
                                                     <DataTemplate>
-                                                        <TextBox Text="{Binding Options}" Height="20" Margin="-5,0"/>
+                                                        <TextBox Text="{Binding Options}" Margin="-5,0"/>
                                                     </DataTemplate>
                                                 </GridViewColumn.CellTemplate>
                                             </GridViewColumn>
