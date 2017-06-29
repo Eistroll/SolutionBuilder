@@ -1,24 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
-using System.Xml.Serialization;
 
 namespace SolutionBuilder
 {
     public class Model : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged(string name)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
+        // Properties
+        public Dictionary<string, ObservableCollection<SolutionObject>> Scope2SolutionObjects = new Dictionary<string, ObservableCollection<SolutionObject>>();
+        
+        //Constructor
         public Model()
         {
         }
@@ -31,15 +25,21 @@ namespace SolutionBuilder
             var toCompareWith = obj as Model;
             if (toCompareWith == null)
                 return false;
-            return this.SolutionObjects.Count == toCompareWith.SolutionObjects.Count &&
-                this.SolutionObjects.SequenceEqual(toCompareWith.SolutionObjects);
+            return this.Scope2SolutionObjects.Count == toCompareWith.Scope2SolutionObjects.Count;
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged(string name)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        public ObservableCollection<SolutionObject> SolutionObjects = new ObservableCollection<SolutionObject>();
+        // IO
         public void Save()
         {
             DataContractSerializer serializer = new DataContractSerializer(typeof(Model));
             FileStream writer = new FileStream("DataModel.xml", FileMode.Create);
+            if (!writer.CanWrite)
+                return;
             serializer.WriteObject(writer, this);
             writer.Close();
         }

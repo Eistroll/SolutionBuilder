@@ -6,8 +6,14 @@ using System.Runtime.Serialization;
 namespace SolutionBuilder
 {
     [DataContract]
-    public class SolutionObject
+    public class SolutionObject : ICloneable
     {
+        [DataMember]
+        public String Name { get; set; }
+        [DataMember]
+        public Dictionary<string, string> Options = new Dictionary<string, string>();
+
+        // Constructor
         public SolutionObject()
         {
             Options["Release"] = "/p:Configuration=Release";
@@ -25,9 +31,10 @@ namespace SolutionBuilder
             return this.Name == toCompareWith.Name &&
                 this.Options.OrderBy(kvp=>kvp.Key).SequenceEqual(toCompareWith.Options.OrderBy(kvp=>kvp.Key));
         }
-        [DataMember]
-        public String Name { get; set; }
-        [DataMember]
-        public Dictionary<string, string> Options = new Dictionary<string, string>();
+
+        public object Clone()
+        {
+            return MemberwiseClone();
+        }
     }
 }

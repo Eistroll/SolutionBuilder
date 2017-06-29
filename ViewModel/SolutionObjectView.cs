@@ -8,19 +8,48 @@ using System.ComponentModel;
 using System.Xml.Serialization;
 using System.Runtime.Serialization;
 using System.Windows.Media.Imaging;
+using System.Windows.Media;
 
 namespace SolutionBuilder
 {
-    public class SolutionObjectView : INotifyPropertyChanged
+    public class SolutionObjectView : INotifyPropertyChanged, ICloneable
     {
+        private SolutionObject _SolutionObject;
+        public SolutionObject SolutionObject { get { return _SolutionObject; } }
+        public string Name { get { return _SolutionObject?.Name; } set { _SolutionObject.Name = value; } }
+
+        private string _Options;
+        public string Options
+        {
+            get { return _Options; }
+            set { if (_Options != value) { _Options = value; NotifyPropertyChanged("Options"); } }
+        }
+        private bool _Checked = false;
+        public bool Checked
+        {
+            get { return _Checked; }
+            set { if (_Checked != value) { _Checked = value; NotifyPropertyChanged("Checked"); } }
+        }
+        private View.State _BuildState;
+        public View.State BuildState
+        {
+            get { return _BuildState; }
+            set { if (_BuildState != value) { _BuildState = value; NotifyPropertyChanged("BuildState"); } }
+        }
+        private bool _SuccessFlag;
+        public bool SuccessFlag
+        {
+            get { return _SuccessFlag; }
+            set { if (_SuccessFlag != value) { _SuccessFlag = value; NotifyPropertyChanged("SuccessFlag"); } }
+        }
+
+        [IgnoreDataMemberAttribute]
+        public bool IsSelected { get; set; }
+        public String BuildLog { get; set; }
         public SolutionObjectView(ref SolutionObject SolutionObject, String selectedPlatform)
         {
             _SolutionObject = SolutionObject;
             Options = _SolutionObject.Options[selectedPlatform];
-        }
-        public SolutionObjectView()
-        {
-            _SolutionObject = new SolutionObject();
         }
         public override int GetHashCode()
         {
@@ -33,33 +62,8 @@ namespace SolutionBuilder
                 return false;
             return this.Name == toCompareWith.Name &&
                 this._Options == toCompareWith._Options &&
-                this.Selected == toCompareWith.Selected;
+                this.Checked == toCompareWith.Checked;
         }
-        private SolutionObject _SolutionObject;
-        public SolutionObject SolutionObject { get { return _SolutionObject; } }
-        public string Name { get { return _SolutionObject?.Name; } set{ _SolutionObject.Name = value; } }
-
-        private string _Options;
-        public string Options
-        {
-            get { return _Options; }
-            set { if (_Options != value) { _Options = value; NotifyPropertyChanged("Options"); } }
-        }
-        private bool _Selected = false;
-        public bool Selected
-        {
-            get { return _Selected; }
-            set { if (_Selected != value) { _Selected = value; NotifyPropertyChanged("Selected"); } }
-        }
-        private BitmapImage _BuildState;
-        public BitmapImage BuildState
-        {
-            get { return _BuildState; }
-            set { if (_BuildState != value) { _BuildState = value; NotifyPropertyChanged("BuildState"); } }
-        }
-
-        [IgnoreDataMemberAttribute]
-        public String BuildLog { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged(string name)
@@ -67,5 +71,9 @@ namespace SolutionBuilder
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
+        public object Clone()
+        {
+            return MemberwiseClone();
+        }
     }
 }

@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionBuilder", "SolutionBuilder.csproj", "{A11D397B-2CFA-40A3-843F-871ACFF0CA8E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test_SolutionBuilder", "Test_BuildWG_IO\Test_SolutionBuilder.csproj", "{CA2C2486-325D-466B-8F28-F1E6C9F3C42C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test_SolutionBuilder", "Test_SolutionBuilder\Test_SolutionBuilder.csproj", "{CA2C2486-325D-466B-8F28-F1E6C9F3C42C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
