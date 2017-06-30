@@ -15,6 +15,7 @@
         x:Name="wndMain">
     <Window.Resources>
         <converters:StateToImageSourceConverter x:Key="StateConverter"/>
+        <converters:BoolToVisibilityConverter x:Key="VisibilityConverter"/>
     </Window.Resources>
     <Window.CommandBindings>
         <CommandBinding Command="Save" CanExecute="SaveCmd_CanExecute" Executed="SaveCmd_Executed"/>
@@ -52,7 +53,7 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="{Binding Header}" Margin="0,0,2,0" />
                                 <CheckBox IsChecked="{Binding DoBuild}" Margin="0,0,2,0"/>
-                                <Image Source="{Binding BuildState, Converter={StaticResource StateConverter}}" Margin="2"/>
+                                <Image Source="{Binding BuildState, Converter={StaticResource StateConverter}}" Height="16" Margin="2"/>
                             </StackPanel>
                         </DataTemplate>
                     </TabControl.ItemTemplate>
@@ -78,6 +79,15 @@
                                                   VerticalAlignment="Center" 
                                                   Width="120" 
                                                   Height="22"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Visibility="{Binding ProgressVisible, Converter={StaticResource VisibilityConverter}}">
+                                        <Label Margin="0,5">Progress:</Label>
+                                        <ProgressBar Minimum="{Binding ProgressMin}" 
+                                                     Maximum="{Binding ProgressMax}" 
+                                                     Value="{Binding ProgressCurrent}"
+                                                     Width="100"
+                                                     Height="16"
+                                                     Margin="10,10"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Grid.Column="2">
                                         <Button x:Name="btAdd" 
@@ -149,9 +159,8 @@
                                                     <DataTemplate>
                                                         <ComboBox ItemsSource="{Binding DataContext.AllSolutionsForSelectedTab, ElementName=wndMain, UpdateSourceTrigger=PropertyChanged, Mode=OneWay }" 
                                                                   SelectedItem="{Binding Name}" 
-                                                                  Width="Auto" 
-                                                                  Margin="-5,0" 
-                                                                  IsEditable="True"/>
+                                                                  Width="Auto"
+                                                                  Margin="-5,0"/>
                                                     </DataTemplate>
                                                 </GridViewColumn.CellTemplate>
                                             </GridViewColumn>
@@ -219,7 +228,7 @@
                               Margin="5" 
                               HorizontalContentAlignment="Stretch">
                         <ListView.Resources>
-                            <Style TargetType="ListViewItem">
+                            <Style TargetType="{x:Type ListViewItem}">
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                             </Style>
                         </ListView.Resources>

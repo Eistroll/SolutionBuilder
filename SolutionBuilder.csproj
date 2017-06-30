@@ -82,6 +82,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters\StateToImageSourceConverter.cs" />
+    <Compile Include="Converters\VisibilityConverter.cs" />
     <Compile Include="Model\Executor.cs" />
     <Compile Include="ViewModel\DistributionItem.cs" />
     <Compile Include="ViewModel\BuildTabItem.cs" />

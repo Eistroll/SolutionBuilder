@@ -81,6 +81,30 @@ namespace SolutionBuilder
         private Model _Model;
         private bool ExplicitAddInProgress = false;
         private bool ExplicitRemoveInProgress = false;
+        private bool _ProgressVisible = false;
+        public bool ProgressVisible
+        {
+            get { return _ProgressVisible; }
+            set { if (_ProgressVisible != value) { _ProgressVisible = value; NotifyPropertyChanged("ProgressVisible"); } }
+        }
+        private int _ProgressMin = 0;
+        public int ProgressMin
+        {
+            get { return _ProgressMin; }
+            set { if (_ProgressMin != value) { _ProgressMin = value; NotifyPropertyChanged("ProgressMin"); } }
+        }
+        private int _ProgressMax = 0;
+        public int ProgressMax
+        {
+            get { return _ProgressMax; }
+            set { if (_ProgressMax != value) { _ProgressMax = value; NotifyPropertyChanged("ProgressMax"); } }
+        }
+        private int _ProgressCurrent = 0;
+        public int ProgressCurrent
+        {
+            get { return _ProgressCurrent; }
+            set { if (_ProgressCurrent != value) { _ProgressCurrent = value; NotifyPropertyChanged("ProgressCurrent"); } }
+        }
         public BuildTabItem()
         {
             AllSolutionsInBaseDir = new ObservableCollection<string>();
@@ -175,7 +199,11 @@ namespace SolutionBuilder
                 if (!solutionView.Checked)
                     CheckedSolutions.Remove(solutionView.Name);
                 else
+                {
+                    if (CheckedSolutions == null)
+                        CheckedSolutions = new StringCollection();
                     CheckedSolutions.Add(solutionView.Name);
+                }
             }
         }
         public event PropertyChangedEventHandler PropertyChanged;
@@ -238,6 +266,12 @@ namespace SolutionBuilder
         {
             return SelectedSolutionIndex != -1;
         }
+        public void UpdateProgress(int min, int max, int current)
+        {
+            ProgressMin = min;
+            ProgressMax = max;
+            ProgressCurrent = current;
+        }
         public void BuildSolution(object parameter)
         {
             SolutionObjectView solution = Solutions[SelectedSolutionIndex];
@@ -246,7 +280,11 @@ namespace SolutionBuilder
             {
                 mainWindow.ClearLog();
                 Executor builder = new Executor(_ViewModel);
-                builder.BuildSolutions(this, new FileInfo(_ViewModel.GetSetting(Setting.Executables.BuildExe.ToString())), new ObservableCollection<SolutionObjectView>() { solution }, mainWindow.AddToLog);
+                builder.BuildSolutions(this, 
+                    new FileInfo(_ViewModel.GetSetting(Setting.Executables.BuildExe.ToString())), 
+                    new ObservableCollection<SolutionObjectView>() { solution }, 
+                    mainWindow.AddToLog, 
+                    (int min, int max, int current) => { ProgressMin = min; ProgressMax = max; ProgressCurrent = current; });
             }
         }
         private CommandHandler _OpenSolutionCmd;

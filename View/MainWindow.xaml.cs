@@ -162,7 +162,7 @@ namespace SolutionBuilder.View
                 }
                 Task.Factory.StartNew(() =>
                 {
-                    bool buildFailure = builder.BuildSolutions(tab, buildExe, null, AddToLog);
+                    bool buildFailure = builder.BuildSolutions(tab, buildExe, null, AddToLog, tab.UpdateProgress);
                     tab.BuildState = buildFailure ? View.State.Failure : View.State.Success;
                 });
             }

@@ -22,49 +22,71 @@ namespace SolutionBuilder
             string line = e.Data + Environment.NewLine;
             solution.BuildLog += line;
         }
-        public bool BuildSolutions(BuildTabItem tab, FileInfo buildExe, ObservableCollection<SolutionObjectView> solutions = null, Action<string> AddToLog = null)
+
+        private bool BuildSolution(FileInfo buildExe, string solutionPath, string baseOptions, SolutionObjectView solution)
         {
-            bool buildFailure = false;
+            bool buildFailure = true;
+            System.Diagnostics.Process process = new System.Diagnostics.Process();
+            System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo()
+            { WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden, RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true };
+            startInfo.FileName = buildExe.ToString();
+            startInfo.Arguments = baseOptions + " " + solution.Options + " " + solutionPath;
+            process.StartInfo = startInfo;
+            // Set event handler
+            process.OutputDataReceived += (s, eventargs) => BuildOutputHandler(s, eventargs, solution);
+            bool Success = process.Start();
+            process.BeginOutputReadLine();
+            process.WaitForExit();
+            int exitCode = process.ExitCode;
+            if (exitCode == 0)
+            {
+                buildFailure = false;
+                solution.BuildState = View.State.Success;
+            }
+            else
+            {
+                buildFailure = true;
+                solution.BuildState = View.State.Failure;
+            }
+
+            solution.SuccessFlag = exitCode == 0 ? true : false;
+            return buildFailure;
+        }
+
+        public bool BuildSolutions(BuildTabItem tab, FileInfo buildExe, ObservableCollection<SolutionObjectView> solutions = null, Action<string> AddToLog = null, Action<int,int,int> UpdateProgress = null)
+        {
+            bool atLeastOneBuildFailed = false;
             bool ignoreSelection = true;
             if (solutions == null)
             {
                 solutions = tab.Solutions;
                 ignoreSelection = false;
             }
+            Collection<SolutionObjectView> solutionsToBuild = new Collection<SolutionObjectView>();
             foreach (SolutionObjectView solution in solutions)
             {
                 if (ignoreSelection || solution.Checked)
                 {
-                    System.Diagnostics.Process process = new System.Diagnostics.Process();
-                    System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo()
-                    { WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden, RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true };
-                    startInfo.FileName = buildExe.ToString();
-                    StringBuilder path = new StringBuilder(_ViewModel.GetSetting("BaseDir", tab.Header));
-                    path.Append("\\" + solution.Name);
-                    startInfo.Arguments = tab.BaseOptions + " " + solution.Options + " " + path;
-                    process.StartInfo = startInfo;
-                    // Set event handler
-                    process.OutputDataReceived += (s, eventargs) => BuildOutputHandler(s, eventargs, solution);
-                    bool Success = process.Start();
-                    process.BeginOutputReadLine();
-                    process.WaitForExit();
-                    int exitCode = process.ExitCode;
-                    if (exitCode == 0)
-                    {
-                        buildFailure = false;
-                        solution.BuildState = View.State.Success;
-                    }
-                    else
-                    {
-                        buildFailure = true;
-                        solution.BuildState = View.State.Failure;
-                    }
-
-                    AddToLog?.Invoke(path + (buildFailure ? " failed" : " successful") + Environment.NewLine);
-                    solution.SuccessFlag = exitCode == 0 ? true : false;
+                    solutionsToBuild.Add(solution);
                 }
             }
-            return buildFailure;
+            if (solutionsToBuild.Count == 0)
+                return true;
+            tab.ProgressVisible = true;
+            UpdateProgress?.Invoke(0, solutionsToBuild.Count, 0);
+            int count = 0;
+            string baseDir = _ViewModel.GetSetting("BaseDir", tab.Header);
+            foreach (SolutionObjectView solution in solutionsToBuild)
+            {
+                string solutionPath = baseDir + "\\" + solution.Name;
+                bool failure = BuildSolution(buildExe, solutionPath, tab.BaseOptions, solution);
+                atLeastOneBuildFailed = atLeastOneBuildFailed || failure;
+                AddToLog?.Invoke(solutionPath + (failure ? " failed" : " successful") + Environment.NewLine);
+                UpdateProgress?.Invoke(0, solutionsToBuild.Count, ++count);
+
+            }
+            tab.ProgressVisible = false;
+            return atLeastOneBuildFailed;
         }
         public void Copy(string copyExe, string source, string target, DistributionItem distribution, Action<string> AddToLog = null)
         {
