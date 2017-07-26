@@ -171,13 +171,19 @@ namespace SolutionBuilder.View
 
         private bool ExecuteDistribution(DistributionItem distribution, Executor executor, FileInfo copyExe)
         {
-            if (!distribution.Checked)
+            if (!distribution.Checked || (!distribution.Copy && !distribution.Start))
                 return false;
+
             Task task = null;
+            string target = _ViewModel.GetSetting(distribution.Folder, Setting.Scopes.DistributionTarget);
+            if (target.Count() == 0)
+            {
+                AddToLog($"No folder defined for DistributionTarget {distribution.Folder}\n");
+                return false;
+            }
             if (distribution.Copy)
             {
                 string source = cbDistributionSource.SelectedValue as string;
-                string target = _ViewModel.GetSetting(distribution.Folder, Setting.Scopes.DistributionTarget);
                 task = Task.Factory.StartNew(() =>
                 {
                     executor.Copy(copyExe.ToString(), source, target, distribution, AddToLog);
@@ -187,13 +193,6 @@ namespace SolutionBuilder.View
             {
                 if (task != null)
                     Task.WaitAll(task);
-
-                string target = _ViewModel.GetSetting(distribution.Folder, Setting.Scopes.DistributionTarget);
-                if (target.Count() == 0)
-                {
-                    AddToLog($"No folder defined for DistributionTarget {distribution.Folder}\n");
-                    return false;
-                }
                 target = target.Replace(@"{Platform}", distribution.Platform);
                 target = target.Replace(@"{Name}", distribution.Folder);
                 string exe = _ViewModel.GetSetting(distribution.Folder, Setting.Scopes.DistributionExe);
@@ -236,6 +235,10 @@ namespace SolutionBuilder.View
         }
         private void KillAll_Click(object sender, RoutedEventArgs e)
         {
+            foreach (var distribution in _ViewModel.DistributionList)
+            {
+                distribution.Proc?.Kill();
+            }
         }
         private void ExecuteDistribution_Click(object sender, RoutedEventArgs e)
         {
@@ -253,7 +256,9 @@ namespace SolutionBuilder.View
         }
         private void KillDistribution_Click(object sender, RoutedEventArgs e)
         {
-            //Kill selected distribution process
+            Button killButton = (Button)sender;
+            DistributionItem distribution = killButton.DataContext as DistributionItem;
+            distribution.Proc?.Kill();
         }
     }
 }
