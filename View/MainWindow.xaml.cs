@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using SolutionBuilder.ViewModel;
 
 namespace SolutionBuilder.View
 {
@@ -167,44 +168,70 @@ namespace SolutionBuilder.View
                 });
             }
         }
+
+        private bool ExecuteDistribution(DistributionItem distribution, Executor executor, FileInfo copyExe)
+        {
+            if (!distribution.Checked)
+                return false;
+            Task task = null;
+            if (distribution.Copy)
+            {
+                string source = cbDistributionSource.SelectedValue as string;
+                string target = _ViewModel.GetSetting(distribution.Folder, Setting.Scopes.DistributionTarget);
+                task = Task.Factory.StartNew(() =>
+                {
+                    executor.Copy(copyExe.ToString(), source, target, distribution, AddToLog);
+                });
+            }
+            if (distribution.Start)
+            {
+                if (task != null)
+                    Task.WaitAll(task);
+
+                string target = _ViewModel.GetSetting(distribution.Folder, Setting.Scopes.DistributionTarget);
+                if (target.Count() == 0)
+                {
+                    AddToLog($"No folder defined for DistributionTarget {distribution.Folder}\n");
+                    return false;
+                }
+                target = target.Replace(@"{Platform}", distribution.Platform);
+                target = target.Replace(@"{Name}", distribution.Folder);
+                string exe = _ViewModel.GetSetting(distribution.Folder, Setting.Scopes.DistributionExe);
+                if (exe.Count() == 0)
+                {
+                    AddToLog($"No file defined for DistributionExe {distribution.Folder}\n");
+                    return false;
+                }
+                FileInfo exePath = new FileInfo(target + Path.DirectorySeparatorChar + exe);
+                if (!exePath.Exists)
+                {
+                    AddToLog($"Executable for starting does not exist: {exePath.ToString()}");
+                    return false;
+                }
+                task = Task.Factory.StartNew(() =>
+                {
+                    System.Diagnostics.Process process = new System.Diagnostics.Process();
+                    process.StartInfo.FileName = exePath.ToString();
+                    process.Start();
+                    distribution.Proc = process;
+                });
+            }
+            return true;
+        }
+
         private void ExecuteAll_Click(object sender, RoutedEventArgs e)
         {
+            ClearLog();
             FileInfo copyExe = new FileInfo(_ViewModel.GetSetting(Setting.Executables.CopyExe.ToString()));
             if (!copyExe.Exists)
+            {
+                AddToLog("Executable for copying is not defined!");
                 return;
-            ClearLog();
+            }
             Executor executor = new Executor(_ViewModel);
             foreach (var distribution in _ViewModel.DistributionList)
             {
-                if (!distribution.Selected)
-                    continue;
-                Task task = null;
-                if (distribution.Copy)
-                {
-                    string source = cbDistributionSource.SelectedValue as string;
-                    string target = _ViewModel.GetSetting(distribution.Folder, Setting.Scopes.DistributionTarget);
-                    task = Task.Factory.StartNew(() =>
-                    {
-                        executor.Copy(copyExe.ToString(), source, target, distribution, AddToLog);
-                    });
-                }
-                if (distribution.Start)
-                {
-                    if (task != null)
-                        Task.WaitAll(task);
-
-                    string target = _ViewModel.GetSetting(distribution.Folder, Setting.Scopes.DistributionTarget);
-                    target = target.Replace(@"{Platform}", distribution.Platform);
-                    target = target.Replace(@"{Name}", distribution.Folder);
-                    string exe = target + Path.DirectorySeparatorChar + _ViewModel.GetSetting(distribution.Folder, Setting.Scopes.DistributionExe);
-                    task = Task.Factory.StartNew(() =>
-                    {
-                        System.Diagnostics.Process process = new System.Diagnostics.Process();
-                        process.StartInfo.FileName = exe;
-                        process.Start();
-                        distribution.Proc = process;
-                    });
-                }
+                ExecuteDistribution(distribution, executor, copyExe);
             }
         }
         private void KillAll_Click(object sender, RoutedEventArgs e)
@@ -212,6 +239,17 @@ namespace SolutionBuilder.View
         }
         private void ExecuteDistribution_Click(object sender, RoutedEventArgs e)
         {
+            Button executeButton = (Button)sender;
+            DistributionItem distribution = executeButton.DataContext as DistributionItem;
+            ClearLog();
+            FileInfo copyExe = new FileInfo(_ViewModel.GetSetting(Setting.Executables.CopyExe.ToString()));
+            if (!copyExe.Exists)
+            {
+                AddToLog("Executable for copying is not defined!");
+                return;
+            }
+            Executor executor = new Executor(_ViewModel);
+            ExecuteDistribution(distribution, executor, copyExe);
         }
         private void KillDistribution_Click(object sender, RoutedEventArgs e)
         {

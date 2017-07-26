@@ -80,7 +80,8 @@
                                                   Width="120" 
                                                   Height="22"/>
                                     </StackPanel>
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Visibility="{Binding ProgressVisible, Converter={StaticResource VisibilityConverter}}">
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" 
+                                                Visibility="{Binding ProgressVisible, Converter={StaticResource VisibilityConverter}}">
                                         <Label Margin="0,5">Progress:</Label>
                                         <ProgressBar Minimum="{Binding ProgressMin}" 
                                                      Maximum="{Binding ProgressMax}" 
@@ -127,7 +128,7 @@
                                           dd:DragDrop.IsDragSource="True" 
                                           dd:DragDrop.IsDropTarget="True">
                                     <ListView.Resources>
-                                        <Style TargetType="ListViewItem">
+                                        <Style TargetType="{x:Type ListViewItem}">
                                             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                                         </Style>
                                     </ListView.Resources>
