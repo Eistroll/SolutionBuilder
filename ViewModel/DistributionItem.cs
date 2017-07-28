@@ -13,6 +13,7 @@ namespace SolutionBuilder.ViewModel
         public bool Checked { get; set; }
         public string Folder { get; set; }
         public string Platform { get; set; }
+        public string Executable { get; set; }
         public bool Copy { get; set; }
         public bool Start { get; set; }
         [IgnoreDataMemberAttribute]

@@ -255,11 +255,22 @@
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
-                                <GridViewColumn Header="Platform" Width="200">
+                                <GridViewColumn Header="Platform" Width="100">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
                                             <ComboBox ItemsSource="{Binding DataContext.Platforms, ElementName=wndMain}" 
                                                       SelectedItem="{Binding Platform}" 
+                                                      Height="20" 
+                                                      Width="Auto" 
+                                                      Margin="-5,0"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Executable" Width="150">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ComboBox ItemsSource="{Binding DataContext.Executables, ElementName=wndMain}" 
+                                                      SelectedItem="{Binding Executable}" 
                                                       Height="20" 
                                                       Width="Auto" 
                                                       Margin="-5,0"/>

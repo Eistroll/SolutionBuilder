@@ -10,6 +10,7 @@ using SolutionBuilder.ViewModel;
 using System.Collections.Generic;
 using System.Windows.Input;
 using SolutionBuilder.View;
+using System.Linq;
 
 namespace SolutionBuilder
 {
@@ -77,6 +78,8 @@ namespace SolutionBuilder
         public Dictionary<string, string> DistributionSourceMap { get; set; }
         [IgnoreDataMemberAttribute]
         public Dictionary<string, string> DistributionTargetMap { get; set; }
+        [IgnoreDataMemberAttribute]
+        public ObservableCollection<string> Executables { get; set; }
 
         private Model _Model;
         // Constructor
@@ -84,6 +87,7 @@ namespace SolutionBuilder
         {
             DistributionList = new ObservableCollection<DistributionItem>();
             Platforms = new StringCollection() { "Release", "Debug" };
+            Executables = new ObservableCollection<string>();
             DistributionSourceMap = new Dictionary<string, string>();
             DistributionTargetMap = new Dictionary<string, string>();
             Tabs = new ObservableCollection<BuildTabItem>();
@@ -111,7 +115,13 @@ namespace SolutionBuilder
         {
             SettingsList.CollectionChanged += new NotifyCollectionChangedEventHandler(SettingsChangedMethod);
             foreach (Setting item in SettingsList)
+            {
                 item.PropertyChanged += Setting_PropertyChanged;
+                if(item.Scope == Setting.Scopes.DistributionExe.ToString())
+                    if (!Executables.Contains(item.Value))
+                        Executables.Add(item.Value);
+            }
+
             UpdateDistributionSourceMap();
             UpdateDistributionTargetMap();
         }
@@ -196,13 +206,28 @@ namespace SolutionBuilder
                 {
                     item.PropertyChanged += Setting_PropertyChanged;
                     if (item.Scope == Setting.Scopes.DistributionSource.ToString() && item.Key != null)
+                    {
                         DistributionSourceMap[item.Key] = item.Value;
+                        NotifyPropertyChanged("DistributionSourceMap");
+                    }
                     if (item.Scope == Setting.Scopes.DistributionTarget.ToString() && item.Key != null)
                     {
                         DistributionList.Add(new DistributionItem() { Folder = item.Key });
                         DistributionTargetMap[item.Key] = item.Value;
+                        NotifyPropertyChanged("DistributionTargetMap");
                     }
-
+                    if (item.Scope == Setting.Scopes.DistributionExe.ToString() && item.Key != null)
+                    {
+                        if ( !Executables.Contains(item.Value) )
+                        {
+                            Executables.Add(item.Value);
+                        }
+                        var distribution = DistributionList.First(x => x.Folder == item.Key);
+                        if ( distribution != null )
+                        {
+                            distribution.Executable = item.Value;
+                        }
+                    }
                 }
             }
             if (e.Action == NotifyCollectionChangedAction.Replace)
@@ -221,6 +246,19 @@ namespace SolutionBuilder
                         DistributionSourceMap.Remove(item.Key);
                     if (item.Scope == Setting.Scopes.DistributionTarget.ToString() && item.Key != null)
                         DistributionTargetMap.Remove(item.Key);
+                    if (item.Scope == Setting.Scopes.DistributionExe.ToString() && item.Key != null)
+                    {
+                        var setting = SettingsList.First(x => (x.Scope == item.Scope && x.Value == item.Value));
+                        if ( setting == null && Executables.Contains( item.Value ) )
+                        {
+                            Executables.Remove(item.Value);
+                        }
+                        var distribution = DistributionList.First(x => x.Folder == item.Key);
+                        if (distribution != null)
+                        {
+                            distribution.Executable = "";
+                        }
+                    }
                 }
             }
             if (e.Action == NotifyCollectionChangedAction.Move)
@@ -263,9 +301,15 @@ namespace SolutionBuilder
                 }
             }
             if (setting.Scope == Setting.Scopes.DistributionSource.ToString())
+            {
                 DistributionSourceMap[setting.Key] = setting.Value;
+                NotifyPropertyChanged("DistributionSourceMap");
+            }
             if (setting.Scope == Setting.Scopes.DistributionTarget.ToString())
+            {
                 DistributionTargetMap[setting.Key] = setting.Value;
+                NotifyPropertyChanged("DistributionTargetMap");
+            }
         }
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged(string name)
