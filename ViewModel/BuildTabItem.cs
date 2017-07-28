@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 namespace SolutionBuilder
 {
@@ -280,6 +280,7 @@ namespace SolutionBuilder
             if (mainWindow != null)
             {
                 mainWindow.ClearLog();
+                //(mainWindow.FindResource("showMe") as Storyboard).Begin(mainWindow.);
                 Executor builder = new Executor(_ViewModel);
                 builder.BuildSolutions(this, 
                     new FileInfo(_ViewModel.GetSetting(Setting.Executables.BuildExe.ToString())), 

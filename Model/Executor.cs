@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Animation;
 
 namespace SolutionBuilder
 {
@@ -72,6 +73,7 @@ namespace SolutionBuilder
             }
             if (solutionsToBuild.Count == 0)
                 return true;
+            //(FindResource("showMe") as Storyboard).Begin();
             tab.ProgressVisible = true;
             UpdateProgress?.Invoke(0, solutionsToBuild.Count, 0);
             int count = 0;

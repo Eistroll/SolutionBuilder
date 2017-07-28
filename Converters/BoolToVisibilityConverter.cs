@@ -8,6 +8,7 @@ using System.Windows.Data;
 
 namespace SolutionBuilder.Converters
 {
+    [ValueConversion(typeof(bool), typeof(Visibility))]
     public class BoolToVisibilityConverter : IValueConverter
     {
         /// <summary>
