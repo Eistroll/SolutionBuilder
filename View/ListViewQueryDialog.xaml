@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:SolutionBuilder.View"
         mc:Ignorable="d"
         x:Name="lvQueryDialog"
-        Title="{Binding DialogTitle}" Height="240" Width="350">
+        Title="{Binding DialogTitle}" Height="240" Width="350"
+        WindowStartupLocation="CenterOwner">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition></RowDefinition>

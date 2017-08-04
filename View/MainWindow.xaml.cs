@@ -115,12 +115,12 @@ namespace SolutionBuilder.View
         }
         private void MnuSettings_Click(object sender, RoutedEventArgs e)
         {
-            Window settings = new Settings() { DataContext = _ViewModel };
+            Window settings = new Settings() { DataContext = _ViewModel, Owner = this };
             settings.ShowDialog();
         }
         private void MnuNewTab_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new ListViewQueryDialog("New Tab");
+            var dialog = new ListViewQueryDialog("New Tab") { Owner = this };
             dialog.Entries.Add(new SettingsPair("Name", ""));
             dialog.Entries.Add(new SettingsPair("Base dir", ""));
             if (dialog.ShowDialog() == true)
@@ -136,7 +136,7 @@ namespace SolutionBuilder.View
         }
         private void MnuCopyTab_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new StringQueryDialog("Enter Tab name:");
+            var dialog = new StringQueryDialog("Enter Tab name:") { Owner = this };
             if (dialog.ShowDialog() == true)
             {
                 String tabName = dialog.QueryString;

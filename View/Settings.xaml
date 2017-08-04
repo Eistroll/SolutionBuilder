@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SolutionBuilder.View"
         mc:Ignorable="d"
-        Title="Settings" Height="340" Width="825">
+        Title="Settings" Height="340" Width="825"
+        WindowStartupLocation="CenterOwner">
     <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>

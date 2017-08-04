@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Windows.Input;
 using SolutionBuilder.View;
 using System.Linq;
+using System.Windows;
 
 namespace SolutionBuilder
 {
@@ -330,7 +331,7 @@ namespace SolutionBuilder
             scopes.Add(Setting.Scopes.DistributionExe.ToString());
             foreach (var tab in Tabs)
                 scopes.Add(tab.Header);
-            var dialog = new SettingCreationDialog() { Scopes = scopes };
+            var dialog = new SettingCreationDialog() { Owner = Application.Current.MainWindow, Scopes = scopes }; // TODO #GUI access SettingsDialog
             if (dialog.ShowDialog() == true)
             {
                 View.MainWindow mainWindow = (View.MainWindow)System.Windows.Application.Current.MainWindow;

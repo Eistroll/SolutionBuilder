@@ -28,7 +28,7 @@ namespace SolutionBuilder.View
         }
         private void NewDistributionSource_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new StringQueryDialog("Enter Source name:");
+            var dialog = new StringQueryDialog("Enter Source name:") { Owner = this };
             if (dialog.ShowDialog() == true) {
                 String name = dialog.QueryString;
                 View.MainWindow mainWindow = (View.MainWindow)System.Windows.Application.Current.MainWindow;
@@ -38,7 +38,7 @@ namespace SolutionBuilder.View
         }
         private void NewDistributionTarget_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new StringQueryDialog("Enter Target name:");
+            var dialog = new StringQueryDialog("Enter Target name:") { Owner = this };
             if (dialog.ShowDialog() == true) {
                 String name = dialog.QueryString;
                 View.MainWindow mainWindow = (View.MainWindow)System.Windows.Application.Current.MainWindow;

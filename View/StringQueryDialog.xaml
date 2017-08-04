@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SolutionBuilder.View"
         mc:Ignorable="d"
-        Title="{Binding DialogTitle}" Height="124.138" Width="300">
+        Title="{Binding DialogTitle}" Height="124.138" Width="300"
+        WindowStartupLocation="CenterOwner">
     <Grid>
         <StackPanel Height="93" VerticalAlignment="Top">
             <TextBlock x:Name="TextBlock"  Margin="5"/>

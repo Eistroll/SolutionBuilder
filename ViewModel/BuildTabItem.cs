@@ -9,6 +9,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -318,7 +319,7 @@ namespace SolutionBuilder
             foreach (var tab in _ViewModel.Tabs)
                 if (tab.Header != Header)
                     tabNames.Add(tab.Header);
-            var dialog = new View.ComboBoxQueryDialog() { DialogTitle = "Copy solutions to...", ComboBoxLabel = "Build tab", Entries = tabNames, SelectedEntry = tabNames[0] };
+            var dialog = new View.ComboBoxQueryDialog() { Owner = Application.Current.MainWindow, DialogTitle = "Copy solutions to...", ComboBoxLabel = "Build tab", Entries = tabNames, SelectedEntry = tabNames[0] };
             if (dialog.ShowDialog() == true)
             {
                 String tabName = dialog.SelectedEntry;

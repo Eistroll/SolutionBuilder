@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SolutionBuilder.View"
         mc:Ignorable="d"
-        Title="SettingCreationDialog" Height="159.151" Width="463.13">
+        Title="SettingCreationDialog" Height="159.151" Width="463.13"
+        WindowStartupLocation="CenterOwner">
     <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
