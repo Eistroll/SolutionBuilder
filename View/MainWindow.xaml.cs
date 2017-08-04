@@ -29,6 +29,13 @@ namespace SolutionBuilder.View
         public MainWindow()
         {
             InitializeComponent();
+            var userPrefs = new UserPreferences();
+            this.Height = userPrefs.WindowHeight;
+            this.Width = userPrefs.WindowWidth;
+            this.Top = userPrefs.WindowTop;
+            this.Left = userPrefs.WindowLeft;
+            this.WindowState = userPrefs.WindowState;
+
             _Model = Model.Load();
             _ViewModel = MainViewModel.Load();
         }
@@ -40,6 +47,14 @@ namespace SolutionBuilder.View
         }
         private void Window_Closing(object sender, CancelEventArgs e)
         {
+            var userPrefs = new UserPreferences();
+            userPrefs.WindowHeight = this.Height;
+            userPrefs.WindowWidth = this.Width;
+            userPrefs.WindowTop = this.Top;
+            userPrefs.WindowLeft = this.Left;
+            userPrefs.WindowState = this.WindowState;
+            userPrefs.Save();
+
             _ViewModel.Save();
             _Model.Save();
         }

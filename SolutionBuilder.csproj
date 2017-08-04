@@ -84,6 +84,7 @@
     <Compile Include="Converters\StateToImageSourceConverter.cs" />
     <Compile Include="Converters\VisibilityConverter.cs" />
     <Compile Include="Model\Executor.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="ViewModel\DistributionItem.cs" />
     <Compile Include="ViewModel\BuildTabItem.cs" />
     <Compile Include="View\ComboBoxQueryDialog.xaml.cs">
@@ -98,6 +99,7 @@
     <Compile Include="View\StringQueryDialog.xaml.cs">
       <DependentUpon>StringQueryDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\UserPreferences.cs" />
     <Page Include="View\ComboBoxQueryDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
