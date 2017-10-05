@@ -115,7 +115,7 @@ namespace SolutionBuilder.View
         }
         private void MnuSettings_Click(object sender, RoutedEventArgs e)
         {
-            Window settings = new Settings() { DataContext = _ViewModel, Owner = this };
+            Window settings = new TreeSettings();
             settings.ShowDialog();
         }
         private void MnuNewTab_Click(object sender, RoutedEventArgs e)

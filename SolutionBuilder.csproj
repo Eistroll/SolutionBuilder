@@ -84,6 +84,7 @@
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Model\Executor.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="ViewModel\Class1.cs" />
     <Compile Include="ViewModel\DistributionItem.cs" />
     <Compile Include="ViewModel\BuildTabItem.cs" />
     <Compile Include="View\ComboBoxQueryDialog.xaml.cs">
@@ -97,6 +98,9 @@
     </Compile>
     <Compile Include="View\StringQueryDialog.xaml.cs">
       <DependentUpon>StringQueryDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\TreeSettings.xaml.cs">
+      <DependentUpon>TreeSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\UserPreferences.cs" />
     <Page Include="View\ComboBoxQueryDialog.xaml">
@@ -137,6 +141,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\StringQueryDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\TreeSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
