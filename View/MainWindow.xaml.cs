@@ -260,10 +260,16 @@ namespace SolutionBuilder.View
             Button executeButton = (Button)sender;
             DistributionItem distribution = executeButton.DataContext as DistributionItem;
             ClearLog();
-            FileInfo copyExe = new FileInfo(_ViewModel.GetSetting(Setting.Executables.CopyExe.ToString()));
-            if (!copyExe.Exists)
+            var nameExe = _ViewModel.GetSetting(Setting.Executables.CopyExe.ToString());
+            if (nameExe.Length == 0)
             {
                 AddToLog("Executable for copying is not defined!");
+                return;
+            }
+            FileInfo copyExe = new FileInfo(nameExe);
+            if (!copyExe.Exists)
+            {
+                AddToLog("Executable for copying does not exists!");
                 return;
             }
             Executor executor = new Executor(_ViewModel);
