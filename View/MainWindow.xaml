@@ -175,7 +175,7 @@
                                             <MenuItem Header="Remove" Command="{Binding RemoveSolutionCmd}"/>
                                             <MenuItem Header="Build" Command="{Binding BuildSolutionCmd}"/>
                                             <MenuItem Header="Open" Command="{Binding OpenSolutionCmd}"/>
-                                            <MenuItem Header="Copy to..." Command="{Binding CopySolutionsToCmd}"/>
+                                            <MenuItem Header="Copy to tab..." Command="{Binding CopySolutionsToCmd}"/>
                                         </ContextMenu>
                                     </ListView.ContextMenu>
                                     <ListView.View>
