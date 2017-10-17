@@ -340,6 +340,12 @@
             </TabItem>
         </TabControl>
         <GridSplitter Grid.Row="2" Height="5" HorizontalAlignment="Stretch"/>
-        <TextBox Grid.Row="3" x:Name="textBoxLog" Text="{Binding Log, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Stretch" ScrollViewer.CanContentScroll="True" HorizontalScrollBarVisibility="Visible" IsReadOnly="True" AcceptsReturn="True" Margin="5" VerticalScrollBarVisibility="Auto"/>
+        <TextBox Grid.Row="3" x:Name="textBoxLog" Text="{Binding Log, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Stretch" ScrollViewer.CanContentScroll="True" HorizontalScrollBarVisibility="Visible" IsReadOnly="True" AcceptsReturn="True" Margin="5" VerticalScrollBarVisibility="Auto">
+            <TextBox.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Refresh Log" Click="RefreshLog_Click"/>
+                    </ContextMenu>
+            </TextBox.ContextMenu>
+        </TextBox>
     </Grid>
 </Window>
