@@ -115,7 +115,7 @@ namespace SolutionBuilder.View
         }
         private void MnuSettings_Click(object sender, RoutedEventArgs e)
         {
-            Window settings = new TreeSettings();
+            Window settings = new Settings();
             settings.ShowDialog();
         }
         private void MnuNewTab_Click(object sender, RoutedEventArgs e)
@@ -183,7 +183,18 @@ namespace SolutionBuilder.View
                 });
             }
         }
-
+        private void RefreshLog_Click(object sender, RoutedEventArgs e)
+        {
+            RefreshLog();
+        }
+        public void RefreshLog()
+        {
+            BuildTabItem tab = (BuildTabItem)tabs.SelectedContent;
+            if ( tab.SelectedSolutionIndex != -1 )
+            {
+                _ViewModel.UpdateLog(tab.Solutions[tab.SelectedSolutionIndex]);
+            }
+        }
         private bool ExecuteDistribution(DistributionItem distribution, Executor executor, FileInfo copyExe)
         {
             if (!distribution.Checked || (!distribution.Copy && !distribution.Start))
