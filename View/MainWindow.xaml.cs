@@ -209,7 +209,7 @@ namespace SolutionBuilder.View
             }
             if (distribution.Copy)
             {
-                string source = cbDistributionSource.SelectedValue as string;
+                string source = _ViewModel.DistributionSourceMap[distribution.Source];
                 task = Task.Factory.StartNew(() =>
                 {
                     executor.Copy(copyExe.ToString(), source, target, distribution, AddToLog);
