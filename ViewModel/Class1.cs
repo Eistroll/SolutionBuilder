@@ -8,22 +8,22 @@ using System.Collections.ObjectModel;
 
 namespace SolutionBuilder.ViewModel
 {
-    public class Family
+    public class TreeSettings
     {
-        public Family()
+        public TreeSettings()
         {
-            this.Members = new ObservableCollection<FamilyMember>();
+            this.Members = new ObservableCollection<TreeSetting>();
         }
 
         public string Name { get; set; }
 
-        public ObservableCollection<FamilyMember> Members { get; set; }
+        public ObservableCollection<TreeSetting> Members { get; set; }
     }
 
-    public class FamilyMember
+    public class TreeSetting
     {
-        public string Name { get; set; }
+        public string Key { get; set; }
 
-        public int Age { get; set; }
+        public string Value { get; set; }
     }
 }

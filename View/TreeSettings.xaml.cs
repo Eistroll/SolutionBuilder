@@ -24,20 +24,19 @@ namespace SolutionBuilder.View
         {
             InitializeComponent();
 
-            List<Family> families = new List<Family>();
+            List<ViewModel.TreeSettings> settings = new List<ViewModel.TreeSettings>();
 
-            Family family1 = new Family() { Name = "The Doe's" };
-            family1.Members.Add(new FamilyMember() { Name = "John Doe", Age = 42 });
-            family1.Members.Add(new FamilyMember() { Name = "Jane Doe", Age = 39 });
-            family1.Members.Add(new FamilyMember() { Name = "Sammy Doe", Age = 13 });
-            families.Add(family1);
+            ViewModel.TreeSettings baseSettings = new ViewModel.TreeSettings() { Name = "Base" };
+            baseSettings.Members.Add(new TreeSetting() { Key = "BuildExe", Value = "MSBuild.exe" });
+            baseSettings.Members.Add(new TreeSetting() { Key = "BaseDir", Value = "C:" });
+            settings.Add(baseSettings);
 
-            Family family2 = new Family() { Name = "The Moe's" };
-            family2.Members.Add(new FamilyMember() { Name = "Mark Moe", Age = 31 });
-            family2.Members.Add(new FamilyMember() { Name = "Norma Moe", Age = 28 });
-            families.Add(family2);
+            ViewModel.TreeSettings distributionSettings = new ViewModel.TreeSettings() { Name = "Distribution" };
+            distributionSettings.Members.Add(new TreeSetting() { Key = "CopyExe", Value = "Robocopy.exe" });
+            distributionSettings.Members.Add(new TreeSetting() { Key = "Executable", Value = "WinGuard.exe" });
+            settings.Add(distributionSettings);
 
-            trvFamilies.ItemsSource = families;
+            trvFamilies.ItemsSource = settings;
         }
     }
 }

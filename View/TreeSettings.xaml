@@ -7,28 +7,24 @@
         xmlns:local="clr-namespace:SolutionBuilder.View"
         mc:Ignorable="d"
         Title="TreeSettings" Height="300" Width="300">
-        <Grid Margin="10">
-                <TreeView Name="trvFamilies">
-                        <TreeView.Resources>
-                                <HierarchicalDataTemplate DataType="{x:Type self:Family}" ItemsSource="{Binding Members}">
-                                        <StackPanel Orientation="Horizontal">
-                                                <Image Source="/WpfTutorialSamples;component/Images/group.png" Margin="0,0,5,0" />
-                                                <TextBlock Text="{Binding Name}" />
-                                                <TextBlock Text=" [" Foreground="Blue" />
-                                                <TextBlock Text="{Binding Members.Count}" Foreground="Blue" />
-                                                <TextBlock Text="]" Foreground="Blue" />
-                                        </StackPanel>
-                                </HierarchicalDataTemplate>
-                                <DataTemplate DataType="{x:Type self:FamilyMember}">
-                                        <StackPanel Orientation="Horizontal">
-                                                <Image Source="/WpfTutorialSamples;component/Images/user.png" Margin="0,0,5,0" />
-                                                <TextBlock Text="{Binding Name}" />
-                                                <TextBlock Text=" (" Foreground="Green" />
-                                                <TextBlock Text="{Binding Age}" Foreground="Green" />
-                                                <TextBlock Text=" years)" Foreground="Green" />
-                                        </StackPanel>
-                                </DataTemplate>
-                        </TreeView.Resources>
-                </TreeView>
-        </Grid>
+    <Grid Margin="10">
+        <TreeView Name="trvFamilies">
+            <TreeView.Resources>
+                <HierarchicalDataTemplate DataType="{x:Type self:TreeSettings}" ItemsSource="{Binding Members}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Name}" />
+                        <TextBlock Text=" [" Foreground="Blue" />
+                        <TextBlock Text="{Binding Members.Count}" Foreground="Blue" />
+                        <TextBlock Text="]" Foreground="Blue" />
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+                <DataTemplate DataType="{x:Type self:TreeSetting}">
+                    <StackPanel Orientation="Horizontal" Width="auto">
+                        <TextBox Text="{Binding Key}" Width="200"/>
+                        <TextBox Text="{Binding Value}" Width="auto"/>
+                    </StackPanel>
+                </DataTemplate>
+            </TreeView.Resources>
+        </TreeView>
+    </Grid>
 </Window>
