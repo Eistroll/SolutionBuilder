@@ -282,11 +282,15 @@ namespace SolutionBuilder
                 mainWindow.ClearLog();
                 //(mainWindow.FindResource("showMe") as Storyboard).Begin(mainWindow.);
                 Executor builder = new Executor(_ViewModel);
-                builder.BuildSolutions(this, 
-                    new FileInfo(_ViewModel.GetSetting(Setting.Executables.BuildExe.ToString())), 
-                    new ObservableCollection<SolutionObjectView>() { solution }, 
-                    mainWindow.AddToLog, 
-                    (int min, int max, int current) => { ProgressMin = min; ProgressMax = max; ProgressCurrent = current; });
+                Task.Factory.StartNew(() =>
+                {
+                    bool buildFailure = builder.BuildSolutions(this,
+                        new FileInfo(_ViewModel.GetSetting(Setting.Executables.BuildExe.ToString())),
+                        new ObservableCollection<SolutionObjectView>() { solution },
+                        mainWindow.AddToLog,
+                        (int min, int max, int current) => { ProgressMin = min; ProgressMax = max; ProgressCurrent = current; });
+                });
+                
             }
         }
         private CommandHandler _OpenSolutionCmd;

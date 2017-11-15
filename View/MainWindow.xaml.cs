@@ -197,7 +197,7 @@ namespace SolutionBuilder.View
         }
         private bool ExecuteDistribution(DistributionItem distribution, Executor executor, FileInfo copyExe)
         {
-            if (!distribution.Checked || (!distribution.Copy && !distribution.Start))
+            if (!distribution.Copy && !distribution.Start)
                 return false;
 
             Task task = null;
@@ -209,7 +209,7 @@ namespace SolutionBuilder.View
             }
             if (distribution.Copy)
             {
-                string source = cbDistributionSource.SelectedValue as string;
+                string source = _ViewModel.DistributionSourceMap[distribution.Source];
                 task = Task.Factory.StartNew(() =>
                 {
                     executor.Copy(copyExe.ToString(), source, target, distribution, AddToLog);
@@ -221,7 +221,7 @@ namespace SolutionBuilder.View
                     Task.WaitAll(task);
                 target = target.Replace(@"{Platform}", distribution.Platform);
                 target = target.Replace(@"{Name}", distribution.Folder);
-                string exe = _ViewModel.GetSetting(distribution.Folder, Setting.Scopes.DistributionExe);
+                string exe = distribution.Executable;
                 if (exe.Count() == 0)
                 {
                     AddToLog($"No file defined for DistributionExe {distribution.Folder}\n");
@@ -256,7 +256,8 @@ namespace SolutionBuilder.View
             Executor executor = new Executor(_ViewModel);
             foreach (var distribution in _ViewModel.DistributionList)
             {
-                ExecuteDistribution(distribution, executor, copyExe);
+                if(distribution.Checked)
+                    ExecuteDistribution(distribution, executor, copyExe);
             }
         }
         private void KillAll_Click(object sender, RoutedEventArgs e)

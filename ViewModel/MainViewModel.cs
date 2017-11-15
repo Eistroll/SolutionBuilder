@@ -17,7 +17,7 @@ namespace SolutionBuilder
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-        public ObservableCollection<DistributionItem> DistributionList { get; set; }
+        public BindingList<DistributionItem> DistributionList { get; set; }
         public StringCollection Platforms { get; set; }
         private int _SelectedSettingIndex = -1;
         public int SelectedSettingIndex
@@ -86,7 +86,7 @@ namespace SolutionBuilder
         // Constructor
         public MainViewModel()
         {
-            DistributionList = new ObservableCollection<DistributionItem>();
+            DistributionList = new BindingList<DistributionItem>();
             Platforms = new StringCollection() { "Release", "Debug" };
             Executables = new ObservableCollection<string>();
             DistributionSourceMap = new Dictionary<string, string>();
@@ -123,6 +123,7 @@ namespace SolutionBuilder
                         Executables.Add(item.Value);
             }
 
+            DistributionList.ListChanged += new ListChangedEventHandler(DistributionListChangedMethod);
             UpdateDistributionSourceMap();
             UpdateDistributionTargetMap();
         }
@@ -197,6 +198,20 @@ namespace SolutionBuilder
             StringBuilder logBuilder = new StringBuilder();
             logBuilder.Append(solution.BuildLog);
             Log = logBuilder.ToString();
+        }
+        private void DistributionListChangedMethod(object sender, ListChangedEventArgs e)
+        {
+            if (e.ListChangedType==ListChangedType.ItemChanged)
+            {
+                if (e.PropertyDescriptor.Name == "ApplyToAllProperty")
+                {
+                    DistributionItem itemModified = DistributionList[e.NewIndex];
+                    foreach ( DistributionItem item in DistributionList)
+                    {
+                        item[itemModified.ApplyToAllProperty] = itemModified[itemModified.ApplyToAllProperty];
+                    }
+                }
+            }
         }
         private void SettingsChangedMethod(object sender, NotifyCollectionChangedEventArgs e)
         {

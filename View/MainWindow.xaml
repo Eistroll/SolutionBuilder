@@ -175,7 +175,7 @@
                                             <MenuItem Header="Remove" Command="{Binding RemoveSolutionCmd}"/>
                                             <MenuItem Header="Build" Command="{Binding BuildSolutionCmd}"/>
                                             <MenuItem Header="Open" Command="{Binding OpenSolutionCmd}"/>
-                                            <MenuItem Header="Copy to..." Command="{Binding CopySolutionsToCmd}"/>
+                                            <MenuItem Header="Copy to tab..." Command="{Binding CopySolutionsToCmd}"/>
                                         </ContextMenu>
                                     </ListView.ContextMenu>
                                     <ListView.View>
@@ -274,6 +274,28 @@
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
+                                <GridViewColumn Header="Source" Width="100">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ComboBox ItemsSource="{Binding DataContext.DistributionSourceMap, ElementName=wndMain }" 
+                                                      DisplayMemberPath="Key" 
+                                                      SelectedValuePath="Key" 
+                                                      SelectedValue="{Binding Source}" 
+                                                      Width="Auto" 
+                                                      Height="20" 
+                                                      Margin="-5,0"
+                                                      Tag="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
+                                                <ComboBox.ContextMenu>
+                                                    <ContextMenu>
+                                                        <MenuItem Header="Apply to all" 
+                                                                  Command="{Binding ApplyToAllCmd}" 
+                                                                  CommandParameter="Source"/>
+                                                    </ContextMenu>
+                                                </ComboBox.ContextMenu>
+                                            </ComboBox>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
                                 <GridViewColumn Header="Folder" Width="200">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
@@ -294,7 +316,15 @@
                                                       SelectedItem="{Binding Platform}" 
                                                       Height="20" 
                                                       Width="Auto" 
-                                                      Margin="-5,0"/>
+                                                      Margin="-5,0">
+                                                <ComboBox.ContextMenu>
+                                                    <ContextMenu>
+                                                        <MenuItem Header="Apply to all" 
+                                                                  Command="{Binding ApplyToAllCmd}" 
+                                                                  CommandParameter="Platform"/>
+                                                    </ContextMenu>
+                                                </ComboBox.ContextMenu>
+                                            </ComboBox>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
@@ -305,21 +335,45 @@
                                                       SelectedItem="{Binding Executable}" 
                                                       Height="20" 
                                                       Width="Auto" 
-                                                      Margin="-5,0"/>
+                                                      Margin="-5,0">
+                                                <ComboBox.ContextMenu>
+                                                    <ContextMenu>
+                                                        <MenuItem Header="Apply to all" 
+                                                                  Command="{Binding ApplyToAllCmd}" 
+                                                                  CommandParameter="Executable"/>
+                                                    </ContextMenu>
+                                                </ComboBox.ContextMenu>
+                                            </ComboBox>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
                                 <GridViewColumn Header="Copy" Width="50">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <CheckBox IsChecked="{Binding Copy}"></CheckBox>
+                                            <CheckBox IsChecked="{Binding Copy}">
+                                                <CheckBox.ContextMenu>
+                                                    <ContextMenu>
+                                                        <MenuItem Header="Apply to all" 
+                                                                  Command="{Binding ApplyToAllCmd}" 
+                                                                  CommandParameter="Copy"/>
+                                                    </ContextMenu>
+                                                </CheckBox.ContextMenu>
+                                            </CheckBox>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
                                 <GridViewColumn Header="Start" Width="50">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <CheckBox IsChecked="{Binding Start}"></CheckBox>
+                                            <CheckBox IsChecked="{Binding Start}">
+                                                <CheckBox.ContextMenu>
+                                                    <ContextMenu>
+                                                        <MenuItem Header="Apply to all" 
+                                                                  Command="{Binding ApplyToAllCmd}" 
+                                                                  CommandParameter="Start"/>
+                                                    </ContextMenu>
+                                                </CheckBox.ContextMenu>
+                                            </CheckBox>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
