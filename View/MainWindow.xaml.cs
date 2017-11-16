@@ -9,6 +9,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using SolutionBuilder.ViewModel;
+using System.Threading;
+using System.Collections.ObjectModel;
 
 namespace SolutionBuilder.View
 {
@@ -25,6 +27,8 @@ namespace SolutionBuilder.View
     {
         private Model _Model = new Model();
         private MainViewModel _ViewModel = new MainViewModel();
+        public Executor executor;
+
         public MainViewModel ViewModel { get { return _ViewModel; } set { _ViewModel = value; } }
         public MainWindow()
         {
@@ -38,6 +42,7 @@ namespace SolutionBuilder.View
 
             _Model = Model.Load();
             _ViewModel = MainViewModel.Load();
+            executor = new Executor(_ViewModel);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -166,21 +171,11 @@ namespace SolutionBuilder.View
             if (!buildExe.Exists)
                 return;
             ClearLog();
-            Executor builder = new Executor(_ViewModel);
             foreach (var tab in _ViewModel.Tabs)
             {
                 if (!tab.DoBuild)
                     continue;
-                tab.BuildState = View.State.None;
-                foreach (SolutionObjectView solution in tab.Solutions)
-                {
-                    solution.BuildState = View.State.None;
-                }
-                Task.Factory.StartNew(() =>
-                {
-                    bool buildFailure = builder.BuildSolutions(tab, buildExe, null, AddToLog, tab.UpdateProgress);
-                    tab.BuildState = buildFailure ? View.State.Failure : View.State.Success;
-                });
+                tab.BuildCheckedSolutions();
             }
         }
         private void RefreshLog_Click(object sender, RoutedEventArgs e)
@@ -210,9 +205,19 @@ namespace SolutionBuilder.View
             if (distribution.Copy)
             {
                 string source = _ViewModel.DistributionSourceMap[distribution.Source];
-                task = Task.Factory.StartNew(() =>
+                target = target.Replace(@"{Platform}", distribution.Platform);
+                target = target.Replace(@"{Name}", distribution.Folder);
+                source = source.Replace(@"{Platform}", distribution.Platform);
+                Distributor distributeExecution = new Distributor()
                 {
-                    executor.Copy(copyExe.ToString(), source, target, distribution, AddToLog);
+                    copyExe = copyExe.ToString(),
+                    source = source,
+                    target = target,
+                    AddToLog = AddToLog
+                };
+                executor.Execute(() =>
+                {
+                    distributeExecution.Copy();
                 });
             }
             if (distribution.Start)
@@ -240,6 +245,19 @@ namespace SolutionBuilder.View
                     process.Start();
                     distribution.Proc = process;
                 });
+                //try
+                //{
+                //    task.Wait();
+                //}
+                //catch (AggregateException e)
+                //{
+                //    foreach (var v in e.InnerExceptions)
+                //        Console.WriteLine(e.Message + " " + v.Message);
+                //}
+                //finally
+                //{
+                //    executor.cancelTokenSource.Dispose()
+                //}
             }
             return true;
         }
@@ -253,7 +271,6 @@ namespace SolutionBuilder.View
                 AddToLog("Executable for copying is not defined!");
                 return;
             }
-            Executor executor = new Executor(_ViewModel);
             foreach (var distribution in _ViewModel.DistributionList)
             {
                 if(distribution.Checked)
@@ -284,7 +301,6 @@ namespace SolutionBuilder.View
                 AddToLog("Executable for copying does not exists!");
                 return;
             }
-            Executor executor = new Executor(_ViewModel);
             ExecuteDistribution(distribution, executor, copyExe);
         }
         private void KillDistribution_Click(object sender, RoutedEventArgs e)

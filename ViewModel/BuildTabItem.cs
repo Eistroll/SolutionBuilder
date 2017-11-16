@@ -267,8 +267,25 @@ namespace SolutionBuilder
         {
             return SelectedSolutionIndex != -1;
         }
+        private ICommand _CancelBuildCmd;
+        public ICommand CancelBuildCmd
+        {
+            get { return _CancelBuildCmd ?? (_CancelBuildCmd = new CommandHandler(param => CancelBuild())); }
+        }
+        public void CancelBuild()
+        {
+            View.MainWindow mainWindow = (View.MainWindow)System.Windows.Application.Current.MainWindow;
+            if (mainWindow != null)
+            {
+                mainWindow.executor.Cancel();
+            }
+        }
         public void UpdateProgress(int min, int max, int current)
         {
+            if (current >= min && current < max)
+                ProgressVisible = true;
+            else if (current == max)
+                ProgressVisible = false;
             ProgressMin = min;
             ProgressMax = max;
             ProgressCurrent = current;
@@ -281,17 +298,52 @@ namespace SolutionBuilder
             {
                 mainWindow.ClearLog();
                 //(mainWindow.FindResource("showMe") as Storyboard).Begin(mainWindow.);
-                Executor builder = new Executor(_ViewModel);
-                Task.Factory.StartNew(() =>
+                solution.BuildState = View.State.None;
+                Builder buildExecution = new Builder()
                 {
-                    bool buildFailure = builder.BuildSolutions(this,
-                        new FileInfo(_ViewModel.GetSetting(Setting.Executables.BuildExe.ToString())),
-                        new ObservableCollection<SolutionObjectView>() { solution },
-                        mainWindow.AddToLog,
-                        (int min, int max, int current) => { ProgressMin = min; ProgressMax = max; ProgressCurrent = current; });
+                    BaseDir = _ViewModel.GetSetting("BaseDir", Header),
+                    BaseOptions = BaseOptions,
+                    BuildExe = new FileInfo(_ViewModel.GetSetting(Setting.Executables.BuildExe.ToString())),
+                    solutions = new ObservableCollection<SolutionObjectView>() { solution },
+                    AddToLog = mainWindow.AddToLog,
+                    UpdateProgress = UpdateProgress
+                };
+                var task = mainWindow.executor.Execute( action =>
+                {
+                    buildExecution.Build(action);
                 });
-                
             }
+        }
+        public void BuildCheckedSolutions()
+        {
+            View.MainWindow mainWindow = (View.MainWindow)System.Windows.Application.Current.MainWindow;
+            if (mainWindow == null)
+                return;
+            BuildState = View.State.None;
+            ProgressVisible = true;
+            ObservableCollection<SolutionObjectView> solutionsToBuild = new ObservableCollection<SolutionObjectView>();
+            foreach (SolutionObjectView solution in Solutions)
+            {
+                solution.BuildState = View.State.None;
+                if (solution.Checked)
+                {
+                    solutionsToBuild.Add(solution);
+                }
+            }
+            Builder buildExecution = new Builder()
+            {
+                BaseDir = _ViewModel.GetSetting("BaseDir", Header),
+                BaseOptions = BaseOptions,
+                BuildExe = new FileInfo(_ViewModel.GetSetting(Setting.Executables.BuildExe.ToString())),
+                solutions = solutionsToBuild,
+                AddToLog = mainWindow.AddToLog,
+                UpdateProgress = UpdateProgress
+            };
+            var task = mainWindow.executor.Execute(action =>
+            {
+                buildExecution.Build(action);
+            });
+
         }
         private CommandHandler _OpenSolutionCmd;
         public CommandHandler OpenSolutionCmd
