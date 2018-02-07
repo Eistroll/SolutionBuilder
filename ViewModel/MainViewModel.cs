@@ -50,14 +50,14 @@ namespace SolutionBuilder
         public String Log
         {
             get { return _Log; }
-            set
-            {
-                if (value != _Log)
-                {
-                    _Log = value;
-                    NotifyPropertyChanged("Log");
-                }
-            }
+            set { if (value != _Log) { _Log = value; NotifyPropertyChanged("Log"); } }
+        }
+        private double _BuildProgressValue;
+        [IgnoreDataMemberAttribute]
+        public double BuildProgressValue
+        {
+            get { return _BuildProgressValue; }
+            set { if (value != _BuildProgressValue) { _BuildProgressValue = value; NotifyPropertyChanged("BuildProgressValue"); } }
         }
         [IgnoreDataMemberAttribute]
         public String CompleteLog

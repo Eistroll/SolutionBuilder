@@ -289,6 +289,7 @@ namespace SolutionBuilder
             ProgressMin = min;
             ProgressMax = max;
             ProgressCurrent = current;
+            _ViewModel.BuildProgressValue = (double)current / (max - min);
         }
         public void BuildSolution(object parameter)
         {
