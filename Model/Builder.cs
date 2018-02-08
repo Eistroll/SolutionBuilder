@@ -18,21 +18,21 @@ namespace SolutionBuilder
         public FileInfo BuildExe;
         public ObservableCollection<SolutionObjectView> solutions;
         public Action<string> AddToLog;
-        public Action<int, int, int> UpdateProgress;
+        public Action<int, int, int, bool> UpdateProgress;
         public bool Build(CancellationToken token)
         {
             bool atLeastOneBuildFailed = false;
             if (solutions.Count == 0)
                 return false;
             //(FindResource("showMe") as Storyboard).Begin();
-            UpdateProgress?.Invoke(0, solutions.Count, 0);
+            UpdateProgress?.Invoke(0, solutions.Count, 0, atLeastOneBuildFailed);
             int count = 0;
             foreach (SolutionObjectView solution in solutions)
             {
                 if (token.IsCancellationRequested == true)
                 {
                     AddToLog?.Invoke("Build has been canceled.");
-                    UpdateProgress?.Invoke(0, solutions.Count, solutions.Count);
+                    UpdateProgress?.Invoke(0, solutions.Count, solutions.Count, atLeastOneBuildFailed);
                     //token.ThrowIfCancellationRequested();
                     return false;
                 }
@@ -40,7 +40,7 @@ namespace SolutionBuilder
                 bool failure = BuildSolution(BuildExe, solutionPath, BaseOptions, solution);
                 atLeastOneBuildFailed = atLeastOneBuildFailed || failure;
                 AddToLog?.Invoke(solutionPath + (failure ? " failed" : " successful") + Environment.NewLine);
-                UpdateProgress?.Invoke(0, solutions.Count, ++count);
+                UpdateProgress?.Invoke(0, solutions.Count, ++count, atLeastOneBuildFailed);
 
             }
             return atLeastOneBuildFailed;

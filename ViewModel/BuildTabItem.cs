@@ -280,7 +280,7 @@ namespace SolutionBuilder
                 mainWindow.executor.Cancel();
             }
         }
-        public void UpdateProgress(int min, int max, int current)
+        public void UpdateProgress(int min, int max, int current, bool failure)
         {
             if (current >= min && current < max)
                 ProgressVisible = true;
@@ -290,6 +290,14 @@ namespace SolutionBuilder
             ProgressMax = max;
             ProgressCurrent = current;
             _ViewModel.BuildProgressValue = (double)current / (max - min);
+            if ( current == min && !failure )
+            {
+                _ViewModel.BuildProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
+            }
+            if ( failure && _ViewModel.BuildProgressState != System.Windows.Shell.TaskbarItemProgressState.Error)
+            {
+                _ViewModel.BuildProgressState = System.Windows.Shell.TaskbarItemProgressState.Error;
+            }
         }
         public void BuildSolution(object parameter)
         {

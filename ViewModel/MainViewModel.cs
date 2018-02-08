@@ -12,6 +12,7 @@ using System.Windows.Input;
 using SolutionBuilder.View;
 using System.Linq;
 using System.Windows;
+using System.Windows.Shell;
 
 namespace SolutionBuilder
 {
@@ -52,6 +53,13 @@ namespace SolutionBuilder
             get { return _Log; }
             set { if (value != _Log) { _Log = value; NotifyPropertyChanged("Log"); } }
         }
+        private TaskbarItemProgressState _BuildProgressState;
+        public TaskbarItemProgressState BuildProgressState
+        {
+            get { return _BuildProgressState; }
+            set { if (value != _BuildProgressState) { _BuildProgressState = value; NotifyPropertyChanged("BuildProgressState"); } }
+        }
+
         private double _BuildProgressValue;
         [IgnoreDataMemberAttribute]
         public double BuildProgressValue
@@ -99,6 +107,8 @@ namespace SolutionBuilder
                 new Setting { Scope = Setting.Scopes.Base.ToString(), Key = Setting.Executables.CopyExe.ToString(), Value= @"C:\Windows\System32\Robocopy.exe" },
             };
             SelectedSettingIndex = -1;
+            BuildProgressState = TaskbarItemProgressState.Normal;
+            BuildProgressValue = 0;
             Init();
         }
         public override int GetHashCode()

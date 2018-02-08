@@ -33,7 +33,7 @@
         <CommandBinding Command="Save" CanExecute="SaveCmd_CanExecute" Executed="SaveCmd_Executed"/>
     </Window.CommandBindings>
     <Window.TaskbarItemInfo>
-        <TaskbarItemInfo Description="My Taskbar Sample" ProgressState="Normal" ProgressValue="{Binding BuildProgressValue}">
+        <TaskbarItemInfo Description="My Taskbar Sample" ProgressState="{Binding BuildProgressState}" ProgressValue="{Binding BuildProgressValue}">
         </TaskbarItemInfo>
     </Window.TaskbarItemInfo>
     <Grid>
