@@ -280,23 +280,28 @@ namespace SolutionBuilder
                 mainWindow.executor.Cancel();
             }
         }
-        public void UpdateProgress(int min, int max, int current, bool failure)
+        public void UpdateProgress(int min, int max, int current, string text, bool failure)
         {
-            if (current >= min && current < max)
-                ProgressVisible = true;
-            else if (current == max)
-                ProgressVisible = false;
             ProgressMin = min;
             ProgressMax = max;
             ProgressCurrent = current;
-            _ViewModel.BuildProgressValue = (double)current / (max - min);
+            _ViewModel.ProgressValue = (double)current / (max - min);
+            _ViewModel.ProgressDesc = text;
             if ( current == min && !failure )
             {
-                _ViewModel.BuildProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
+                _ViewModel.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
             }
-            if ( failure && _ViewModel.BuildProgressState != System.Windows.Shell.TaskbarItemProgressState.Error)
+            if ( failure && _ViewModel.ProgressState != System.Windows.Shell.TaskbarItemProgressState.Error)
             {
-                _ViewModel.BuildProgressState = System.Windows.Shell.TaskbarItemProgressState.Error;
+                _ViewModel.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Error;
+            }
+            if (current >= min && current < max)
+                ProgressVisible = true;
+            else if (current == max)
+            {
+                ProgressVisible = false;
+                _ViewModel.ProgressType = "";
+                _ViewModel.ProgressDesc = "";
             }
         }
         public void BuildSolution(object parameter)
@@ -317,10 +322,12 @@ namespace SolutionBuilder
                     AddToLog = mainWindow.AddToLog,
                     UpdateProgress = UpdateProgress
                 };
+                _ViewModel.ProgressType = "Building single solution";
                 var task = mainWindow.executor.Execute( action =>
                 {
                     buildExecution.Build(action);
                 });
+                //_ViewModel.ProgressType = "";
             }
         }
         public void BuildCheckedSolutions()
@@ -348,11 +355,11 @@ namespace SolutionBuilder
                 AddToLog = mainWindow.AddToLog,
                 UpdateProgress = UpdateProgress
             };
+            _ViewModel.ProgressType = "Building checked solutions";
             var task = mainWindow.executor.Execute(action =>
             {
                 buildExecution.Build(action);
             });
-
         }
         private CommandHandler _OpenSolutionCmd;
         public CommandHandler OpenSolutionCmd
