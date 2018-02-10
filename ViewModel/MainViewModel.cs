@@ -12,6 +12,7 @@ using System.Windows.Input;
 using SolutionBuilder.View;
 using System.Linq;
 using System.Windows;
+using System.Windows.Shell;
 
 namespace SolutionBuilder
 {
@@ -50,14 +51,34 @@ namespace SolutionBuilder
         public String Log
         {
             get { return _Log; }
-            set
-            {
-                if (value != _Log)
-                {
-                    _Log = value;
-                    NotifyPropertyChanged("Log");
-                }
-            }
+            set { if (value != _Log) { _Log = value; NotifyPropertyChanged("Log"); } }
+        }
+        private TaskbarItemProgressState _ProgressState;
+        public TaskbarItemProgressState ProgressState
+        {
+            get { return _ProgressState; }
+            set { if (value != _ProgressState) { _ProgressState = value; NotifyPropertyChanged("ProgressState"); } }
+        }
+        private String _ProgressType;
+        [IgnoreDataMemberAttribute]
+        public String ProgressType
+        {
+            get { return _ProgressType; }
+            set { if (value != _ProgressType) { _ProgressType = value; NotifyPropertyChanged("ProgressType"); } }
+        }
+        private String _ProgressDesc;
+        [IgnoreDataMemberAttribute]
+        public String ProgressDesc
+        {
+            get { return _ProgressDesc; }
+            set { if (value != _ProgressDesc) { _ProgressDesc = value; NotifyPropertyChanged("ProgressDesc"); } }
+        }
+        private double _ProgressValue;
+        [IgnoreDataMemberAttribute]
+        public double ProgressValue
+        {
+            get { return _ProgressValue; }
+            set { if (value != _ProgressValue) { _ProgressValue = value; NotifyPropertyChanged("ProgressValue"); } }
         }
         [IgnoreDataMemberAttribute]
         public String CompleteLog
@@ -99,6 +120,8 @@ namespace SolutionBuilder
                 new Setting { Scope = Setting.Scopes.Base.ToString(), Key = Setting.Executables.CopyExe.ToString(), Value= @"C:\Windows\System32\Robocopy.exe" },
             };
             SelectedSettingIndex = -1;
+            ProgressState = TaskbarItemProgressState.Normal;
+            ProgressValue = 0;
             Init();
         }
         public override int GetHashCode()

@@ -57,7 +57,7 @@ namespace SolutionBuilder.ViewModel
         public string ApplyToAllProperty
         {
             get { return _ApplyToAllProperty; }
-            set { if (_ApplyToAllProperty != value) { _ApplyToAllProperty = value; NotifyPropertyChanged("ApplyToAllProperty"); } }
+            set { _ApplyToAllProperty = value; NotifyPropertyChanged("ApplyToAllProperty"); }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

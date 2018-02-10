@@ -32,98 +32,106 @@
     <Window.CommandBindings>
         <CommandBinding Command="Save" CanExecute="SaveCmd_CanExecute" Executed="SaveCmd_Executed"/>
     </Window.CommandBindings>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*" MinHeight="100"/>
-        </Grid.RowDefinitions>
-        <Menu Grid.Row="0">
-            <MenuItem Header="_File">
-                <MenuItem Command="Save"/>
-                <Separator/>
-                <MenuItem Header="_Settings" Click="MnuSettings_Click"/>
-                <Separator/>
-                <MenuItem Header="_Exit" Click="MnuExit_Click"/>
-            </MenuItem>
-            <MenuItem Header="_Build tabs">
-                <MenuItem Header="_New" Click="MnuNewTab_Click"/>
-                <MenuItem Header="_Copy" Click="MnuCopyTab_Click"/>
-                <MenuItem Header="_Remove" Click="MnuRemoveTab_Click"/>
-            </MenuItem>
-        </Menu>
-        <TabControl Grid.Row="1">
-            <TabItem Header="Builder">
-                <TabControl Name="tabs" 
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo Description="My Taskbar Sample" ProgressState="{Binding ProgressState}" ProgressValue="{Binding ProgressValue}">
+        </TaskbarItemInfo>
+    </Window.TaskbarItemInfo>
+    <DockPanel LastChildFill="True">
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="150" />
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+            <StatusBarItem>
+                <TextBlock Text="{Binding ProgressType}" />
+            </StatusBarItem>
+            <Separator Grid.Column="1" />
+            <StatusBarItem Grid.Column="2">
+                <TextBlock Text="{Binding ProgressDesc}" />
+            </StatusBarItem>
+            <Separator Grid.Column="3" />
+            <StatusBarItem Grid.Column="4">
+                <ProgressBar Minimum="0" Maximum="1" Value="{Binding ProgressValue}" Width="150" Height="16"/>
+            </StatusBarItem>
+        </StatusBar>
+        <Grid DockPanel.Dock="Top">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*" MinHeight="100"/>
+            </Grid.RowDefinitions>
+            <Menu Grid.Row="0">
+                <MenuItem Header="_File">
+                    <MenuItem Command="Save"/>
+                    <Separator/>
+                    <MenuItem Header="_Settings" Click="MnuSettings_Click"/>
+                    <Separator/>
+                    <MenuItem Header="_Exit" Click="MnuExit_Click"/>
+                </MenuItem>
+                <MenuItem Header="_Build tabs">
+                    <MenuItem Header="_New" Click="MnuNewTab_Click"/>
+                    <MenuItem Header="_Copy" Click="MnuCopyTab_Click"/>
+                    <MenuItem Header="_Remove" Click="MnuRemoveTab_Click"/>
+                </MenuItem>
+            </Menu>
+            <TabControl Grid.Row="1">
+                <TabItem Header="Builder">
+                    <TabControl Name="tabs" 
                             ItemsSource="{Binding Tabs}" 
                             SelectedIndex="{Binding SelectedTabIndex}"
                             dd:DragDrop.IsDragSource="True" 
                             dd:DragDrop.IsDropTarget="True">
-                    <TabControl.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding Header}" Margin="0,0,2,0" />
-                                <CheckBox IsChecked="{Binding DoBuild}" Margin="0,0,2,0"/>
-                                <Image Source="{Binding BuildState, Converter={StaticResource StateConverter}}" Height="16" Margin="2"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </TabControl.ItemTemplate>
-                    <TabControl.ContentTemplate>
-                        <DataTemplate>
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-                                <Grid Grid.Row="0"  Margin="5,5,5,0">
-                                    <Grid.Resources>
-                                        <Storyboard x:Key="OnStartBuildProgress">
-                                            <ObjectAnimationUsingKeyFrames 
-                                                BeginTime="00:00:00" 
-                                                Storyboard.TargetName="PanelProgress" 
-                                                Storyboard.TargetProperty="(UIElement.Visibility)">
-                                                <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{x:Static Visibility.Visible}"/>
-                                                <DiscreteObjectKeyFrame KeyTime="00:00:00.8000000" Value="{x:Static Visibility.Collapsed}"/>
-                                                <DiscreteObjectKeyFrame KeyTime="00:00:01.4000000" Value="{x:Static Visibility.Visible}"/>
-                                            </ObjectAnimationUsingKeyFrames>
-                                        </Storyboard>
-                                    </Grid.Resources>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Orientation="Horizontal" Grid.Column="0">
-                                        <ComboBox x:Name="cbPlatform" 
+                        <TabControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Header}" Margin="0,0,2,0" />
+                                    <CheckBox IsChecked="{Binding DoBuild}" Margin="0,0,2,0"/>
+                                    <Image Source="{Binding BuildState, Converter={StaticResource StateConverter}}" Height="16" Margin="2"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </TabControl.ItemTemplate>
+                        <TabControl.ContentTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0"  Margin="5,5,5,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Orientation="Horizontal" Grid.Column="0">
+                                            <ComboBox x:Name="cbPlatform" 
                                                   ItemsSource="{Binding Platforms}" 
                                                   SelectedItem="{Binding SelectedPlatform}" 
                                                   HorizontalAlignment="Left" 
                                                   VerticalAlignment="Center" 
                                                   Width="120" 
                                                   Height="22"/>
-                                    </StackPanel>
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal"
-                                                x:Name="PanelProgress"
-                                                Visibility="{Binding ProgressVisible, Converter={StaticResource VisibilityConverter}}">
-                                        <Label Margin="0,5">Progress:</Label>
-                                        <ProgressBar Minimum="{Binding ProgressMin}" 
-                                                     Maximum="{Binding ProgressMax}" 
-                                                     Value="{Binding ProgressCurrent}"
-                                                     Width="100"
-                                                     Height="16"
-                                                     Margin="10,10"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Grid.Column="2">
-                                        <Button x:Name="btAdd" 
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Grid.Column="2">
+                                            <Button x:Name="btAdd" 
                                                 Content="Add" 
                                                 HorizontalAlignment="Right" 
                                                 VerticalAlignment="Center" 
                                                 Width="75" 
                                                 Command="{Binding AddSolutionCmd}" 
                                                 Margin="0,0,5,0"/>
-                                        <Button x:Name="btBuild" 
+                                            <Button x:Name="btBuild" 
                                                 Content="Build" 
                                                 VerticalAlignment="Center" 
                                                 Width="75" 
@@ -131,27 +139,31 @@
                                                 Click="BuildAll_Click" 
                                                 Height="20" 
                                                 Margin="5,0,0,0">
-                                            <Button.Triggers>
-                                                <EventTrigger RoutedEvent="Button.Click">
-                                                    <BeginStoryboard Storyboard="{StaticResource OnStartBuildProgress}"/>
-                                                </EventTrigger>
-                                            </Button.Triggers>
-
-                                        </Button>
-                                    </StackPanel>
-                                </Grid>
-                                <Grid Grid.Row="1" Margin="5,5,5,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="100"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <Label x:Name="lbBaseOptions" Grid.Column="0">Options:</Label>
-                                    <TextBox x:Name="tbBaseOptions" 
+                                                <Button.Triggers>
+                                                    <EventTrigger RoutedEvent="Button.Click"/>
+                                                </Button.Triggers>
+                                            </Button>
+                                            <Button x:Name="btCancel" 
+                                                Content="Cancel" 
+                                                HorizontalAlignment="Right" 
+                                                VerticalAlignment="Center" 
+                                                Width="75" 
+                                                Command="{Binding CancelBuildCmd}" 
+                                                Margin="5,0,5,0"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    <Grid Grid.Row="1" Margin="5,5,5,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Label x:Name="lbBaseOptions" Grid.Column="0">Options:</Label>
+                                        <TextBox x:Name="tbBaseOptions" 
                                              Grid.Column="1" 
                                              Text="{Binding BaseOptions}" 
                                              VerticalAlignment="Center"/>
-                                </Grid>
-                                <ListView Grid.Row="2"
+                                    </Grid>
+                                    <ListView Grid.Row="2"
                                           Name="lvSolutions" 
                                           ItemsSource="{Binding Solutions}" 
                                           SelectedIndex="{Binding SelectedSolutionIndex}"
@@ -159,125 +171,112 @@
                                           HorizontalContentAlignment="Stretch" 
                                           dd:DragDrop.IsDragSource="True" 
                                           dd:DragDrop.IsDropTarget="True">
-                                    <ListView.Resources>
-                                        <Style TargetType="{x:Type ListViewItem}">
-                                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                                        </Style>
-                                    </ListView.Resources>
-                                    <ListView.ItemContainerStyle>
-                                        <Style TargetType="{x:Type ListViewItem}">
-                                            <Setter Property="IsSelected" Value="{Binding Mode=TwoWay, Path=IsSelected}"/>
-                                        </Style>
-                                    </ListView.ItemContainerStyle>
-                                    <ListView.ContextMenu>
-                                        <ContextMenu>
-                                            <MenuItem Header="Add" Command="{Binding AddSolutionCmd}"/>
-                                            <MenuItem Header="Remove" Command="{Binding RemoveSolutionCmd}"/>
-                                            <MenuItem Header="Build" Command="{Binding BuildSolutionCmd}"/>
-                                            <MenuItem Header="Open" Command="{Binding OpenSolutionCmd}"/>
-                                            <MenuItem Header="Copy to tab..." Command="{Binding CopySolutionsToCmd}"/>
-                                        </ContextMenu>
-                                    </ListView.ContextMenu>
-                                    <ListView.View>
-                                        <GridView>
-                                            <GridViewColumn Header="" Width="30">
-                                                <GridViewColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <CheckBox IsChecked="{Binding Checked}"></CheckBox>
-                                                    </DataTemplate>
-                                                </GridViewColumn.CellTemplate>
-                                            </GridViewColumn>
-                                            <GridViewColumn Header="Name" Width="300">
-                                                <GridViewColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <ComboBox ItemsSource="{Binding DataContext.AllSolutionsForSelectedTab, ElementName=wndMain, UpdateSourceTrigger=PropertyChanged, Mode=OneWay }" 
+                                        <ListView.Resources>
+                                            <Style TargetType="{x:Type ListViewItem}">
+                                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                            </Style>
+                                        </ListView.Resources>
+                                        <ListView.ItemContainerStyle>
+                                            <Style TargetType="{x:Type ListViewItem}">
+                                                <Setter Property="IsSelected" Value="{Binding Mode=TwoWay, Path=IsSelected}"/>
+                                            </Style>
+                                        </ListView.ItemContainerStyle>
+                                        <ListView.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Add" Command="{Binding AddSolutionCmd}"/>
+                                                <MenuItem Header="Remove" Command="{Binding RemoveSolutionCmd}"/>
+                                                <MenuItem Header="Build" Command="{Binding BuildSolutionCmd}"/>
+                                                <MenuItem Header="Open" Command="{Binding OpenSolutionCmd}"/>
+                                                <MenuItem Header="Copy to tab..." Command="{Binding CopySolutionsToCmd}"/>
+                                            </ContextMenu>
+                                        </ListView.ContextMenu>
+                                        <ListView.View>
+                                            <GridView>
+                                                <GridViewColumn Header="" Width="30">
+                                                    <GridViewColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <CheckBox IsChecked="{Binding Checked}"></CheckBox>
+                                                        </DataTemplate>
+                                                    </GridViewColumn.CellTemplate>
+                                                </GridViewColumn>
+                                                <GridViewColumn Header="Name" Width="300">
+                                                    <GridViewColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <ComboBox ItemsSource="{Binding DataContext.AllSolutionsForSelectedTab, ElementName=wndMain, UpdateSourceTrigger=PropertyChanged, Mode=OneWay }" 
                                                                   SelectedItem="{Binding Name}" 
                                                                   Width="Auto"
                                                                   Margin="-5,0"/>
-                                                    </DataTemplate>
-                                                </GridViewColumn.CellTemplate>
-                                            </GridViewColumn>
-                                            <GridViewColumn Header="Options" Width="300">
-                                                <GridViewColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <TextBox Text="{Binding Options}" Width="Auto" Margin="-5,0"/>
-                                                    </DataTemplate>
-                                                </GridViewColumn.CellTemplate>
-                                            </GridViewColumn>
-                                            <GridViewColumn Header="State" Width="32">
-                                                <GridViewColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <Image Source="{Binding BuildState, Converter={StaticResource StateConverter}}" 
+                                                        </DataTemplate>
+                                                    </GridViewColumn.CellTemplate>
+                                                </GridViewColumn>
+                                                <GridViewColumn Header="Options" Width="300">
+                                                    <GridViewColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <TextBox Text="{Binding Options}" Width="Auto" Margin="-5,0"/>
+                                                        </DataTemplate>
+                                                    </GridViewColumn.CellTemplate>
+                                                </GridViewColumn>
+                                                <GridViewColumn Header="State" Width="32">
+                                                    <GridViewColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <Image Source="{Binding BuildState, Converter={StaticResource StateConverter}}" 
                                                                Height="20" 
                                                                Width="20" 
                                                                Margin="-5,0"/>
-                                                    </DataTemplate>
-                                                </GridViewColumn.CellTemplate>
-                                            </GridViewColumn>
-                                        </GridView>
-                                    </ListView.View>
-                                </ListView>
+                                                        </DataTemplate>
+                                                    </GridViewColumn.CellTemplate>
+                                                </GridViewColumn>
+                                            </GridView>
+                                        </ListView.View>
+                                    </ListView>
 
-                            </Grid>
-                        </DataTemplate>
-                    </TabControl.ContentTemplate>
-                </TabControl>
-            </TabItem>
-            <TabItem Header="Distributor">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <Grid Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0" Orientation="Horizontal">
-                            <ComboBox x:Name="cbDistributionSource" 
-                                      ItemsSource="{Binding DistributionSourceMap}" 
-                                      DisplayMemberPath="Key" 
-                                      SelectedValuePath="Value" 
-                                      SelectedIndex="0" 
-                                      Margin="5" 
-                                      Width="100">
-                            </ComboBox>
-                            <ComboBox x:Name="cbDistributionPlatforms" 
-                                      ItemsSource="{Binding Platforms}" 
-                                      SelectedIndex="0" 
-                                      Margin="5" 
-                                      Width="100"/>
-                        </StackPanel>
-                        <StackPanel Grid.Column="2" Orientation="Horizontal">
-                            <Button Margin="5" Click="ExecuteAll_Click">Execute all</Button>
-                            <Button Margin="5" Click="KillAll_Click">Kill all</Button>
-                        </StackPanel>
-                    </Grid>
-                    <ListView Grid.Row="1" 
+                                </Grid>
+                            </DataTemplate>
+                        </TabControl.ContentTemplate>
+                    </TabControl>
+                </TabItem>
+                <TabItem Header="Distributor">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                <Button Width="80" Margin="5" Click="ExecuteAll_Click">Execute all</Button>
+                                <Button Width="80" Margin="5" Click="KillAll_Click">Kill all</Button>
+                            </StackPanel>
+                        </Grid>
+                        <ListView Grid.Row="1" 
                               Name="lvDistribution" 
                               ItemsSource="{Binding DistributionList}" 
                               Margin="5" 
                               HorizontalContentAlignment="Stretch">
-                        <ListView.Resources>
-                            <Style TargetType="{x:Type ListViewItem}">
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                            </Style>
-                        </ListView.Resources>
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn Header="" Width="30">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <CheckBox IsChecked="{Binding Checked}"></CheckBox>
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                <GridViewColumn Header="Source" Width="100">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <ComboBox ItemsSource="{Binding DataContext.DistributionSourceMap, ElementName=wndMain }" 
+                            <ListView.Resources>
+                                <Style TargetType="{x:Type ListViewItem}">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                </Style>
+                            </ListView.Resources>
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Header="" Width="30">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <CheckBox IsChecked="{Binding Checked}"></CheckBox>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="Source" Width="100">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <ComboBox ItemsSource="{Binding DataContext.DistributionSourceMap, ElementName=wndMain }" 
                                                       DisplayMemberPath="Key" 
                                                       SelectedValuePath="Key" 
                                                       SelectedValue="{Binding Source}" 
@@ -285,121 +284,122 @@
                                                       Height="20" 
                                                       Margin="-5,0"
                                                       Tag="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
-                                                <ComboBox.ContextMenu>
-                                                    <ContextMenu>
-                                                        <MenuItem Header="Apply to all" 
+                                                    <ComboBox.ContextMenu>
+                                                        <ContextMenu>
+                                                            <MenuItem Header="Apply to all" 
                                                                   Command="{Binding ApplyToAllCmd}" 
                                                                   CommandParameter="Source"/>
-                                                    </ContextMenu>
-                                                </ComboBox.ContextMenu>
-                                            </ComboBox>
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                <GridViewColumn Header="Folder" Width="200">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <ComboBox ItemsSource="{Binding DataContext.DistributionTargetMap, ElementName=wndMain }" 
+                                                        </ContextMenu>
+                                                    </ComboBox.ContextMenu>
+                                                </ComboBox>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="Folder" Width="200">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <ComboBox ItemsSource="{Binding DataContext.DistributionTargetMap, ElementName=wndMain }" 
                                                       DisplayMemberPath="Key" 
                                                       SelectedValuePath="Key" 
                                                       SelectedValue="{Binding Folder}" 
                                                       Width="Auto" 
                                                       Height="20" 
                                                       Margin="-5,0"/>
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                <GridViewColumn Header="Platform" Width="100">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <ComboBox ItemsSource="{Binding DataContext.Platforms, ElementName=wndMain}" 
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="Platform" Width="100">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <ComboBox ItemsSource="{Binding DataContext.Platforms, ElementName=wndMain}" 
                                                       SelectedItem="{Binding Platform}" 
                                                       Height="20" 
                                                       Width="Auto" 
                                                       Margin="-5,0">
-                                                <ComboBox.ContextMenu>
-                                                    <ContextMenu>
-                                                        <MenuItem Header="Apply to all" 
+                                                    <ComboBox.ContextMenu>
+                                                        <ContextMenu>
+                                                            <MenuItem Header="Apply to all" 
                                                                   Command="{Binding ApplyToAllCmd}" 
                                                                   CommandParameter="Platform"/>
-                                                    </ContextMenu>
-                                                </ComboBox.ContextMenu>
-                                            </ComboBox>
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                <GridViewColumn Header="Executable" Width="150">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <ComboBox ItemsSource="{Binding DataContext.Executables, ElementName=wndMain}" 
+                                                        </ContextMenu>
+                                                    </ComboBox.ContextMenu>
+                                                </ComboBox>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="Executable" Width="150">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <ComboBox ItemsSource="{Binding DataContext.Executables, ElementName=wndMain}" 
                                                       SelectedItem="{Binding Executable}" 
                                                       Height="20" 
                                                       Width="Auto" 
                                                       Margin="-5,0">
-                                                <ComboBox.ContextMenu>
-                                                    <ContextMenu>
-                                                        <MenuItem Header="Apply to all" 
+                                                    <ComboBox.ContextMenu>
+                                                        <ContextMenu>
+                                                            <MenuItem Header="Apply to all" 
                                                                   Command="{Binding ApplyToAllCmd}" 
                                                                   CommandParameter="Executable"/>
-                                                    </ContextMenu>
-                                                </ComboBox.ContextMenu>
-                                            </ComboBox>
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                <GridViewColumn Header="Copy" Width="50">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <CheckBox IsChecked="{Binding Copy}">
-                                                <CheckBox.ContextMenu>
-                                                    <ContextMenu>
-                                                        <MenuItem Header="Apply to all" 
+                                                        </ContextMenu>
+                                                    </ComboBox.ContextMenu>
+                                                </ComboBox>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="Copy" Width="50">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <CheckBox IsChecked="{Binding Copy}">
+                                                    <CheckBox.ContextMenu>
+                                                        <ContextMenu>
+                                                            <MenuItem Header="Apply to all" 
                                                                   Command="{Binding ApplyToAllCmd}" 
                                                                   CommandParameter="Copy"/>
-                                                    </ContextMenu>
-                                                </CheckBox.ContextMenu>
-                                            </CheckBox>
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                <GridViewColumn Header="Start" Width="50">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <CheckBox IsChecked="{Binding Start}">
-                                                <CheckBox.ContextMenu>
-                                                    <ContextMenu>
-                                                        <MenuItem Header="Apply to all" 
+                                                        </ContextMenu>
+                                                    </CheckBox.ContextMenu>
+                                                </CheckBox>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="Start" Width="50">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <CheckBox IsChecked="{Binding Start}">
+                                                    <CheckBox.ContextMenu>
+                                                        <ContextMenu>
+                                                            <MenuItem Header="Apply to all" 
                                                                   Command="{Binding ApplyToAllCmd}" 
                                                                   CommandParameter="Start"/>
-                                                    </ContextMenu>
-                                                </CheckBox.ContextMenu>
-                                            </CheckBox>
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                <GridViewColumn Header="Actions" Width="150">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <StackPanel Orientation="Horizontal">
-                                                <Button Click="ExecuteDistribution_Click" Margin="2,0">Execute</Button>
-                                                <Button Click="KillDistribution_Click" Margin="2,0">Kill</Button>
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
-                </Grid>
-            </TabItem>
-        </TabControl>
-        <GridSplitter Grid.Row="2" Height="5" HorizontalAlignment="Stretch"/>
-        <TextBox Grid.Row="3" x:Name="textBoxLog" Text="{Binding Log, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Stretch" ScrollViewer.CanContentScroll="True" HorizontalScrollBarVisibility="Visible" IsReadOnly="True" AcceptsReturn="True" Margin="5" VerticalScrollBarVisibility="Auto">
-            <TextBox.ContextMenu>
+                                                        </ContextMenu>
+                                                    </CheckBox.ContextMenu>
+                                                </CheckBox>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="Actions" Width="150">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Button Click="ExecuteDistribution_Click" Margin="2,0">Execute</Button>
+                                                    <Button Click="KillDistribution_Click" Margin="2,0">Kill</Button>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+            <GridSplitter Grid.Row="2" Height="5" HorizontalAlignment="Stretch"/>
+            <TextBox Grid.Row="3" x:Name="textBoxLog" Text="{Binding Log, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Stretch" ScrollViewer.CanContentScroll="True" HorizontalScrollBarVisibility="Auto" IsReadOnly="True" AcceptsReturn="True" Margin="5" VerticalScrollBarVisibility="Auto">
+                <TextBox.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Refresh Log" Click="RefreshLog_Click"/>
                     </ContextMenu>
-            </TextBox.ContextMenu>
-        </TextBox>
-    </Grid>
+                </TextBox.ContextMenu>
+            </TextBox>
+        </Grid>
+    </DockPanel>
 </Window>
