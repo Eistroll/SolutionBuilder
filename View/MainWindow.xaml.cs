@@ -120,7 +120,7 @@ namespace SolutionBuilder.View
         }
         private void MnuSettings_Click(object sender, RoutedEventArgs e)
         {
-            Window settings = new TreeSettings();
+            Window settings = new TreeSettings(_ViewModel);
             settings.ShowDialog();
         }
         private void MnuNewTab_Click(object sender, RoutedEventArgs e)
@@ -167,7 +167,7 @@ namespace SolutionBuilder.View
         }
         private void BuildAll_Click(object sender, RoutedEventArgs e)
         {
-            FileInfo buildExe = new FileInfo(_ViewModel.GetSetting(Setting.Executables.BuildExe.ToString()));
+            FileInfo buildExe = new FileInfo(_ViewModel.GetSettingByScope(Setting.Executables.BuildExe.ToString()));
             if (!buildExe.Exists)
                 return;
             ClearLog();
@@ -196,7 +196,7 @@ namespace SolutionBuilder.View
                 return false;
 
             Task task = null;
-            string target = _ViewModel.GetSetting(distribution.Folder, Setting.Scopes.DistributionTarget);
+            string target = _ViewModel.GetSettingByScope(distribution.Folder, Setting.Scopes.DistributionTarget);
             if (target.Count() == 0)
             {
                 AddToLog($"No folder defined for DistributionTarget {distribution.Folder}\n");
@@ -265,7 +265,7 @@ namespace SolutionBuilder.View
         private void ExecuteAll_Click(object sender, RoutedEventArgs e)
         {
             ClearLog();
-            FileInfo copyExe = new FileInfo(_ViewModel.GetSetting(Setting.Executables.CopyExe.ToString()));
+            FileInfo copyExe = new FileInfo(_ViewModel.GetSettingByScope(Setting.Executables.CopyExe.ToString()));
             if (!copyExe.Exists)
             {
                 AddToLog("Executable for copying is not defined!");
@@ -289,7 +289,7 @@ namespace SolutionBuilder.View
             Button executeButton = (Button)sender;
             DistributionItem distribution = executeButton.DataContext as DistributionItem;
             ClearLog();
-            var nameExe = _ViewModel.GetSetting(Setting.Executables.CopyExe.ToString());
+            var nameExe = _ViewModel.GetSettingByScope(Setting.Executables.CopyExe.ToString());
             if (nameExe.Length == 0)
             {
                 AddToLog("Executable for copying is not defined!");

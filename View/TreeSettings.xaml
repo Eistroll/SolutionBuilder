@@ -6,9 +6,20 @@
         xmlns:self="clr-namespace:SolutionBuilder.ViewModel"
         xmlns:local="clr-namespace:SolutionBuilder.View"
         mc:Ignorable="d"
-        Title="TreeSettings" Height="300" Width="300">
+        Title="TreeSettings" Height="300" Width="600"
+        WindowStartupLocation="CenterOwner">
     <Grid Margin="10">
-        <TreeView Name="trvFamilies">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TreeView Grid.Row="0" Name="trvSettings">
+            <TreeView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Add" Command="{Binding AddSettingCmd}"/>
+                    <MenuItem Header="Remove" Command="{Binding RemoveSettingCmd}"/>
+                </ContextMenu>
+            </TreeView.ContextMenu>
             <TreeView.Resources>
                 <HierarchicalDataTemplate DataType="{x:Type self:TreeSettings}" ItemsSource="{Binding Members}">
                     <StackPanel Orientation="Horizontal">
@@ -20,11 +31,14 @@
                 </HierarchicalDataTemplate>
                 <DataTemplate DataType="{x:Type self:TreeSetting}">
                     <StackPanel Orientation="Horizontal" Width="auto">
-                        <TextBox Text="{Binding Key}" Width="200"/>
+                        <TextBlock Text="{Binding Key}" Width="200"/>
                         <TextBox Text="{Binding Value}" Width="auto"/>
                     </StackPanel>
                 </DataTemplate>
             </TreeView.Resources>
         </TreeView>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button IsDefault="True" Content="Ok" Click="OkButton_Click" Width="50" Margin="5"/>
+        </StackPanel>
     </Grid>
 </Window>

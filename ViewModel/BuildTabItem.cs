@@ -317,7 +317,7 @@ namespace SolutionBuilder
                 {
                     BaseDir = _ViewModel.GetSetting("BaseDir", Header),
                     BaseOptions = BaseOptions,
-                    BuildExe = new FileInfo(_ViewModel.GetSetting(Setting.Executables.BuildExe.ToString())),
+                    BuildExe = new FileInfo(_ViewModel.GetSettingByScope(Setting.Executables.BuildExe.ToString())),
                     solutions = new ObservableCollection<SolutionObjectView>() { solution },
                     AddToLog = mainWindow.AddToLog,
                     UpdateProgress = UpdateProgress
@@ -350,7 +350,7 @@ namespace SolutionBuilder
             {
                 BaseDir = _ViewModel.GetSetting("BaseDir", Header),
                 BaseOptions = BaseOptions,
-                BuildExe = new FileInfo(_ViewModel.GetSetting(Setting.Executables.BuildExe.ToString())),
+                BuildExe = new FileInfo(_ViewModel.GetSettingByScope(Setting.Executables.BuildExe.ToString())),
                 solutions = solutionsToBuild,
                 AddToLog = mainWindow.AddToLog,
                 UpdateProgress = UpdateProgress

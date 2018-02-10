@@ -20,23 +20,48 @@ namespace SolutionBuilder.View
     /// </summary>
     public partial class TreeSettings : Window
     {
-        public TreeSettings()
+        public TreeSettings( MainViewModel viewModel )
         {
             InitializeComponent();
 
-            List<ViewModel.TreeSettings> settings = new List<ViewModel.TreeSettings>();
-
-            ViewModel.TreeSettings baseSettings = new ViewModel.TreeSettings() { Name = "Base" };
-            baseSettings.Members.Add(new TreeSetting() { Key = "BuildExe", Value = "MSBuild.exe" });
-            baseSettings.Members.Add(new TreeSetting() { Key = "BaseDir", Value = "C:" });
-            settings.Add(baseSettings);
-
-            ViewModel.TreeSettings distributionSettings = new ViewModel.TreeSettings() { Name = "Distribution" };
-            distributionSettings.Members.Add(new TreeSetting() { Key = "CopyExe", Value = "Robocopy.exe" });
-            distributionSettings.Members.Add(new TreeSetting() { Key = "Executable", Value = "WinGuard.exe" });
-            settings.Add(distributionSettings);
-
-            trvFamilies.ItemsSource = settings;
+            trvSettings.ItemsSource = viewModel.TreeSettingsList;
+        }
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+        }
+        private ICommand _AddSettingCmd;
+        public ICommand AddSettingCmd
+        {
+            get { return _AddSettingCmd ?? (_AddSettingCmd = new CommandHandler(param => AddSetting())); }
+        }
+        public void AddSetting()
+        {
+        }
+            private void NewDistributionSource_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new StringQueryDialog("Enter Source name:") { Owner = this };
+            if (dialog.ShowDialog() == true)
+            {
+                String name = dialog.QueryString;
+                View.MainWindow mainWindow = (View.MainWindow)System.Windows.Application.Current.MainWindow;
+                if (mainWindow != null)
+                    mainWindow.ViewModel.DistributionSourceMap.Add(name, "");
+            }
+        }
+        private void NewDistributionTarget_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new StringQueryDialog("Enter Target name:") { Owner = this };
+            if (dialog.ShowDialog() == true)
+            {
+                String name = dialog.QueryString;
+                View.MainWindow mainWindow = (View.MainWindow)System.Windows.Application.Current.MainWindow;
+                if (mainWindow != null)
+                    mainWindow.ViewModel.DistributionTargetMap.Add(name, "");
+            }
+        }
+        private void OkButton_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            DialogResult = true;
         }
     }
 }

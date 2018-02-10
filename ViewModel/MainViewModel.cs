@@ -1,18 +1,18 @@
-﻿using System;
+﻿using SolutionBuilder.View;
+using SolutionBuilder.ViewModel;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Text;
-using System.Collections.ObjectModel;
 using System.IO;
-using System.Runtime.Serialization;
-using System.Xml;
-using SolutionBuilder.ViewModel;
-using System.Collections.Generic;
-using System.Windows.Input;
-using SolutionBuilder.View;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Text;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Shell;
+using System.Xml;
 
 namespace SolutionBuilder
 {
@@ -30,10 +30,12 @@ namespace SolutionBuilder
                 RemoveSettingCmd.RaiseCanExecuteChanged();
             }
         }
+        [IgnoreDataMemberAttribute]
         public ObservableCollection<Setting> SettingsList { get; set; }
         public ObservableCollection<BuildTabItem> Tabs { get; set; }
         public int SelectedTabIndex { get; set; }
 
+        public ObservableCollection<ViewModel.TreeSettings> TreeSettingsList { get; set; }
 
         [IgnoreDataMemberAttribute]
         public ObservableCollection<string> AllSolutionsForSelectedTab
@@ -114,11 +116,12 @@ namespace SolutionBuilder
             DistributionTargetMap = new Dictionary<string, string>();
             Tabs = new ObservableCollection<BuildTabItem>();
             var me = this;
-            SettingsList = new ObservableCollection<Setting>
-            {
-                new Setting { Scope = Setting.Scopes.Base.ToString(), Key = Setting.Executables.BuildExe.ToString(), Value = @"C:\Program Files (x86)\MSBuild\14.0\Bin\msbuild.exe" },
-                new Setting { Scope = Setting.Scopes.Base.ToString(), Key = Setting.Executables.CopyExe.ToString(), Value= @"C:\Windows\System32\Robocopy.exe" },
-            };
+            SettingsList = new ObservableCollection<Setting>();
+            TreeSettingsList = new ObservableCollection<ViewModel.TreeSettings>();
+            ViewModel.TreeSettings baseSettings = new ViewModel.TreeSettings { Name = Setting.Scopes.Base.ToString() };
+            baseSettings.Members.Add(new TreeSetting { Key = Setting.Executables.BuildExe.ToString(), Value = @"C:\Program Files (x86)\MSBuild\14.0\Bin\msbuild.exe" });
+            baseSettings.Members.Add(new TreeSetting { Key = Setting.Executables.CopyExe.ToString(), Value = @"C:\Windows\System32\Robocopy.exe" });
+
             SelectedSettingIndex = -1;
             ProgressState = TaskbarItemProgressState.Normal;
             ProgressValue = 0;
@@ -137,10 +140,18 @@ namespace SolutionBuilder
         }
         public void Init()
         {
-            SettingsList.CollectionChanged += new NotifyCollectionChangedEventHandler(SettingsChangedMethod);
+            TreeSettingsList.CollectionChanged += new NotifyCollectionChangedEventHandler(SettingsListCollectionChangedMethod);
             foreach (Setting item in SettingsList)
             {
-                item.PropertyChanged += Setting_PropertyChanged;
+                var treeSettings = TreeSettingsList.FirstOrDefault(x => x.Name == item.Scope);
+                if(treeSettings==null)
+                {
+                    treeSettings = new ViewModel.TreeSettings() { Name = item.Scope };
+                    TreeSettingsList.Add(treeSettings);
+                }
+                treeSettings.Members.CollectionChanged += new NotifyCollectionChangedEventHandler(SettingsCollectionChangedMethod);
+                treeSettings.Members.Add(new TreeSetting() { Key = item.Key, Value = item.Value });
+                treeSettings.Members.Last().PropertyChanged += SettingPropertyChangedMethod;
                 if(item.Scope == Setting.Scopes.DistributionExe.ToString())
                     if (!Executables.Contains(item.Value))
                         Executables.Add(item.Value);
@@ -152,25 +163,18 @@ namespace SolutionBuilder
         }
         public String GetSetting(String key, string scope)
         {
-            foreach (Setting setting in SettingsList)
+            ViewModel.TreeSettings treeSettings = TreeSettingsList.First(x => x.Name == scope);
+            if(treeSettings != null )
             {
-                if (setting.Scope == scope && setting.Key == key)
-                {
-                    return setting.Value;
-                }
+                var treeSetting = treeSettings.Members.First(x => x.Key == key);
+                if (treeSetting != null)
+                    return treeSetting.Value;
             }
             return "";
         }
-        public String GetSetting(String key, Setting.Scopes scope = Setting.Scopes.Base)
+        public String GetSettingByScope(String key, Setting.Scopes scope = Setting.Scopes.Base)
         {
-            foreach (Setting setting in SettingsList)
-            {
-                if (setting.Scope == scope.ToString() && setting.Key == key)
-                {
-                    return setting.Value;
-                }
-            }
-            return "";
+            return GetSetting(key, scope.ToString());
         }
         public void Save()
         {
@@ -236,63 +240,157 @@ namespace SolutionBuilder
                 }
             }
         }
-        private void SettingsChangedMethod(object sender, NotifyCollectionChangedEventArgs e)
+        private void SettingsListCollectionChangedMethod(object sender, NotifyCollectionChangedEventArgs e)
         {
             //different kind of changes that may have occurred in collection
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                foreach (Setting item in e.NewItems)
+                foreach (ViewModel.TreeSettings settings in e.NewItems)
                 {
-                    item.PropertyChanged += Setting_PropertyChanged;
-                    if (item.Scope == Setting.Scopes.DistributionSource.ToString() && item.Key != null)
+                    settings.Members.CollectionChanged += SettingsCollectionChangedMethod;
+                    if (settings.Name == Setting.Scopes.DistributionSource.ToString())
                     {
-                        DistributionSourceMap[item.Key] = item.Value;
-                        NotifyPropertyChanged("DistributionSourceMap");
-                    }
-                    if (item.Scope == Setting.Scopes.DistributionTarget.ToString() && item.Key != null)
-                    {
-                        DistributionList.Add(new DistributionItem() { Folder = item.Key });
-                        DistributionTargetMap[item.Key] = item.Value;
-                        NotifyPropertyChanged("DistributionTargetMap");
-                    }
-                    if (item.Scope == Setting.Scopes.DistributionExe.ToString() && item.Key != null)
-                    {
-                        if ( !Executables.Contains(item.Value) )
+                        foreach(TreeSetting setting in settings.Members)
                         {
-                            Executables.Add(item.Value);
+                            if (setting.Key == null)
+                                continue;
+                            DistributionSourceMap[setting.Key] = setting.Value;
+                            NotifyPropertyChanged("DistributionSourceMap");
                         }
-                        var distribution = DistributionList.First(x => x.Folder == item.Key);
-                        if ( distribution != null )
+                    }
+                    if (settings.Name == Setting.Scopes.DistributionTarget.ToString())
+                    {
+                        foreach(TreeSetting setting in settings.Members)
                         {
-                            distribution.Executable = item.Value;
+                            if (setting.Key != null)
+                                continue;
+                            DistributionList.Add(new DistributionItem() { Folder = setting.Key });
+                            DistributionTargetMap[setting.Key] = setting.Value;
+                            NotifyPropertyChanged("DistributionTargetMap");
+                        }
+                    }
+                    if (settings.Name == Setting.Scopes.DistributionExe.ToString())
+                    {
+                        foreach(TreeSetting setting in settings.Members)
+                        {
+                            if (setting.Key != null)
+                                continue;
+                            if (!Executables.Contains(setting.Value))
+                            {
+                                Executables.Add(setting.Value);
+                            }
+                            var distribution = DistributionList.First(x => x.Folder == setting.Key);
+                            if (distribution != null)
+                            {
+                                distribution.Executable = setting.Value;
+                            }
                         }
                     }
                 }
             }
             if (e.Action == NotifyCollectionChangedAction.Replace)
             {
-                foreach (Setting item in e.OldItems)
-                    item.PropertyChanged -= Setting_PropertyChanged;
-                foreach (Setting item in e.NewItems)
-                    item.PropertyChanged += Setting_PropertyChanged;
+                foreach (ViewModel.TreeSettings settings in e.OldItems)
+                {
+                    settings.Members.CollectionChanged -= SettingsCollectionChangedMethod;
+                    foreach (TreeSetting setting in settings.Members)
+                        setting.PropertyChanged -= SettingPropertyChangedMethod;
+                }
+                foreach (ViewModel.TreeSettings settings in e.NewItems)
+                {
+                    settings.Members.CollectionChanged += SettingsCollectionChangedMethod;
+                    foreach (TreeSetting setting in settings.Members)
+                        setting.PropertyChanged += SettingPropertyChangedMethod;
+                }
             }
             if (e.Action == NotifyCollectionChangedAction.Remove)
             {
-                foreach (Setting item in e.OldItems)
+                foreach (ViewModel.TreeSettings settings in e.OldItems)
                 {
-                    item.PropertyChanged -= Setting_PropertyChanged;
-                    if (item.Scope == Setting.Scopes.DistributionSource.ToString() && item.Key != null)
-                        DistributionSourceMap.Remove(item.Key);
-                    if (item.Scope == Setting.Scopes.DistributionTarget.ToString() && item.Key != null)
-                        DistributionTargetMap.Remove(item.Key);
-                    if (item.Scope == Setting.Scopes.DistributionExe.ToString() && item.Key != null)
+                    settings.Members.CollectionChanged -= SettingsCollectionChangedMethod;
+                    foreach (TreeSetting setting in settings.Members)
                     {
-                        var setting = SettingsList.First(x => (x.Scope == item.Scope && x.Value == item.Value));
-                        if ( setting == null && Executables.Contains( item.Value ) )
+                        setting.PropertyChanged -= SettingPropertyChangedMethod;
+                        if (setting.Scope == Setting.Scopes.DistributionSource.ToString() && setting.Key != null)
+                            DistributionSourceMap.Remove(setting.Key);
+                        if (setting.Scope == Setting.Scopes.DistributionTarget.ToString() && setting.Key != null)
+                            DistributionTargetMap.Remove(setting.Key);
+                        if (setting.Scope == Setting.Scopes.DistributionExe.ToString() && setting.Key != null)
                         {
-                            Executables.Remove(item.Value);
+                            if (Executables.Contains(setting.Value))
+                            {
+                                Executables.Remove(setting.Value);
+                            }
+                            var distribution = DistributionList.First(x => x.Folder == setting.Key);
+                            if (distribution != null)
+                            {
+                                distribution.Executable = "";
+                            }
                         }
-                        var distribution = DistributionList.First(x => x.Folder == item.Key);
+                    }
+                }
+            }
+            if (e.Action == NotifyCollectionChangedAction.Move)
+            {
+                //your code
+            }
+        }
+        private void SettingsCollectionChangedMethod(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            //different kind of changes that may have occurred in collection
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (TreeSetting setting in e.NewItems)
+                {
+                    setting.PropertyChanged += SettingPropertyChangedMethod;
+                    if (setting.Scope == Setting.Scopes.DistributionSource.ToString())
+                    {
+                        DistributionSourceMap[setting.Key] = setting.Value;
+                        NotifyPropertyChanged("DistributionSourceMap");
+                    }
+                    if (setting.Scope == Setting.Scopes.DistributionTarget.ToString() && setting.Key != null)
+                    {
+                        DistributionList.Add(new DistributionItem() { Folder = setting.Key });
+                        DistributionTargetMap[setting.Key] = setting.Value;
+                        NotifyPropertyChanged("DistributionTargetMap");
+                    }
+                    if (setting.Scope == Setting.Scopes.DistributionExe.ToString() && setting.Key != null)
+                    {
+                        if (!Executables.Contains(setting.Value))
+                        {
+                            Executables.Add(setting.Value);
+                        }
+                        var distribution = DistributionList.First(x => x.Folder == setting.Key);
+                        if (distribution != null)
+                        {
+                            distribution.Executable = setting.Value;
+                        }
+                    }
+                }
+            }
+            if (e.Action == NotifyCollectionChangedAction.Replace)
+            {
+                foreach (TreeSetting setting in e.OldItems)
+                    setting.PropertyChanged -= SettingPropertyChangedMethod;
+                foreach (TreeSetting setting in e.NewItems)
+                    setting.PropertyChanged += SettingPropertyChangedMethod;
+            }
+            if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (TreeSetting setting in e.OldItems)
+                {
+                    setting.PropertyChanged -= SettingPropertyChangedMethod;
+                    if (setting.Scope == Setting.Scopes.DistributionSource.ToString() && setting.Key != null)
+                        DistributionSourceMap.Remove(setting.Key);
+                    if (setting.Scope == Setting.Scopes.DistributionTarget.ToString() && setting.Key != null)
+                        DistributionTargetMap.Remove(setting.Key);
+                    if (setting.Scope == Setting.Scopes.DistributionExe.ToString() && setting.Key != null)
+                    {
+                        if (Executables.Contains(setting.Value))
+                        {
+                            Executables.Remove(setting.Value);
+                        }
+                        var distribution = DistributionList.First(x => x.Folder == setting.Key);
                         if (distribution != null)
                         {
                             distribution.Executable = "";
@@ -328,9 +426,9 @@ namespace SolutionBuilder
             }
         }
 
-        private void Setting_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void SettingPropertyChangedMethod(object sender, PropertyChangedEventArgs e)
         {
-            Setting setting = (Setting)sender;
+            TreeSetting setting = (TreeSetting)sender;
             foreach (var Tab in Tabs)
             {
                 if (Tab.Header == setting.Scope)
@@ -382,6 +480,7 @@ namespace SolutionBuilder
         {
             get { return _RemoveSettingCmd ?? (_RemoveSettingCmd = new CommandHandler(param => RemoveSetting(param), param => RemoveSetting_CanExecute(param))); }
         }
+
         public bool RemoveSetting_CanExecute(object parameter)
         {
             return SelectedSettingIndex != -1;
