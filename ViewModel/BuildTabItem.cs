@@ -289,6 +289,7 @@ namespace SolutionBuilder
             _ViewModel.ProgressDesc = text;
             if ( current == min && !failure )
             {
+                _ViewModel.ProgressBuildState = View.State.None;
                 _ViewModel.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
             }
             if ( failure && _ViewModel.ProgressState != System.Windows.Shell.TaskbarItemProgressState.Error)
@@ -300,6 +301,7 @@ namespace SolutionBuilder
             else if (current == max)
             {
                 ProgressVisible = false;
+                _ViewModel.ProgressBuildState = View.State.Success;
                 _ViewModel.ProgressType = "";
                 _ViewModel.ProgressDesc = "";
             }
