@@ -53,6 +53,7 @@ namespace SolutionBuilder
         private bool BuildSolution(FileInfo buildExe, string solutionPath, string baseOptions, SolutionObjectView solution)
         {
             bool buildFailure = true;
+            solution.BuildLog = "";
             System.Diagnostics.Process process = new System.Diagnostics.Process();
             System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo()
             { WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden, RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true };

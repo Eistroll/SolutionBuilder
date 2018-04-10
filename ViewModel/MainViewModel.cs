@@ -30,7 +30,6 @@ namespace SolutionBuilder
                 RemoveSettingCmd.RaiseCanExecuteChanged();
             }
         }
-        [IgnoreDataMemberAttribute]
         public ObservableCollection<Setting> SettingsList { get; set; }
         public ObservableCollection<BuildTabItem> Tabs { get; set; }
         public int SelectedTabIndex { get; set; }
@@ -81,6 +80,13 @@ namespace SolutionBuilder
         {
             get { return _ProgressValue; }
             set { if (value != _ProgressValue) { _ProgressValue = value; NotifyPropertyChanged("ProgressValue"); } }
+        }
+        private View.State _ProgressBuildState;
+        [IgnoreDataMemberAttribute]
+        public View.State ProgressBuildState
+        {
+            get { return _ProgressBuildState; }
+            set { if (value != _ProgressBuildState) { _ProgressBuildState = value; NotifyPropertyChanged("ProgressBuildState"); } }
         }
         [IgnoreDataMemberAttribute]
         public String CompleteLog

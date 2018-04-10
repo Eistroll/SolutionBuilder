@@ -33,7 +33,10 @@
         <CommandBinding Command="Save" CanExecute="SaveCmd_CanExecute" Executed="SaveCmd_Executed"/>
     </Window.CommandBindings>
     <Window.TaskbarItemInfo>
-        <TaskbarItemInfo Description="My Taskbar Sample" ProgressState="{Binding ProgressState}" ProgressValue="{Binding ProgressValue}">
+        <TaskbarItemInfo Description="My Taskbar Sample" 
+                         ProgressState="{Binding ProgressState}" 
+                         ProgressValue="{Binding ProgressValue}"
+                         Overlay="{Binding ProgressBuildState, Converter={StaticResource StateConverter}}">
         </TaskbarItemInfo>
     </Window.TaskbarItemInfo>
     <DockPanel LastChildFill="True">
