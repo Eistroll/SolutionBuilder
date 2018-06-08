@@ -27,18 +27,16 @@ namespace SolutionBuilder
         [DataMember]
         public StringCollection CheckedSolutions { get; set; }
         [DataMember]
-        public StringCollection Platforms { get; set; }
-        [DataMember]
-        private String _SelectedPlatform;
-        public String SelectedPlatform
+        private String _SelectedConfiguration;
+        public String SelectedConfiguration
         {
-            get { return _SelectedPlatform; }
+            get { return _SelectedConfiguration; }
             set
             {
-                _SelectedPlatform = value;
+                _SelectedConfiguration = value;
                 for (int i = 0; i < Solutions.Count; ++i)
                 {
-                    Solutions[i].Options = _Model.Scope2SolutionObjects[Header][i].Options[_SelectedPlatform];
+                    Solutions[i].Options = _Model.Scope2SolutionObjects[Header][i].Options[_SelectedConfiguration];
                 }
             }
         }
@@ -49,6 +47,7 @@ namespace SolutionBuilder
         //////////////////////////////////////////////////////////////////////////
         //Not serialized Data members
         //////////////////////////////////////////////////////////////////////////
+        public StringCollection Configurations { get; set; }
         public int SelectedSolutionIndex
         {
             get { return _SelectedSolutionIndex; }
@@ -108,12 +107,21 @@ namespace SolutionBuilder
         }
         public BuildTabItem()
         {
+            OnCreated();
+        }
+        private void OnCreated()
+        {
             AllSolutionsInBaseDir = new ObservableCollection<string>();
             CheckedSolutions = new StringCollection();
             Solutions = new ObservableCollection<SolutionObjectView>();
-            Platforms = new StringCollection() { "Release", "Debug" };
-            _SelectedPlatform = "Debug";
+            Configurations = new StringCollection() { "Release", "Debug" };
+            _SelectedConfiguration = "Debug";
             SelectedSolutionIndex = -1;
+        }
+        [OnDeserializing]
+        private void OnDeserializing(StreamingContext c)
+        {
+            OnCreated();
         }
         public IEnumerable<SolutionObjectView> SelectedSolutionViews
         {
@@ -152,7 +160,7 @@ namespace SolutionBuilder
             foreach (SolutionObject solution in Model.Scope2SolutionObjects[Header])
             {
                 SolutionObject tmp = solution;
-                SolutionObjectView solutionView = new SolutionObjectView(ref tmp, SelectedPlatform);
+                SolutionObjectView solutionView = new SolutionObjectView(ref tmp, SelectedConfiguration);
                 if (CheckedSolutions != null && CheckedSolutions.Contains(tmp.Name))
                     solutionView.Checked = true;
                 solutionView.PropertyChanged += new PropertyChangedEventHandler(SolutionView_PropertyChanged);
@@ -189,7 +197,7 @@ namespace SolutionBuilder
                     return;
                 if (solView.SolutionObject != null)
                 {
-                    solView.SolutionObject.Options[SelectedPlatform] = solView.Options;
+                    solView.SolutionObject.Options[SelectedConfiguration] = solView.Options;
                 }
             }
             if (e.PropertyName == "Checked")
@@ -225,7 +233,7 @@ namespace SolutionBuilder
                 _Model.Scope2SolutionObjects[Header] = new ObservableCollection<SolutionObject>();
             }
             _Model.Scope2SolutionObjects[Header].Add(solution);
-            SolutionObjectView solutionView = new SolutionObjectView(ref solution, SelectedPlatform);
+            SolutionObjectView solutionView = new SolutionObjectView(ref solution, SelectedConfiguration);
             solutionView.PropertyChanged += new PropertyChangedEventHandler(SolutionView_PropertyChanged);
             ExplicitAddInProgress = true;
             Solutions.Add(solutionView);

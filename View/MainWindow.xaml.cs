@@ -206,8 +206,10 @@ namespace SolutionBuilder.View
             {
                 string source = _ViewModel.DistributionSourceMap[distribution.Source];
                 target = target.Replace(@"{Platform}", distribution.Platform);
+                target = target.Replace(@"{Configuration}", distribution.Configuration);
                 target = target.Replace(@"{Name}", distribution.Folder);
                 source = source.Replace(@"{Platform}", distribution.Platform);
+                source = source.Replace(@"{Configuration}", distribution.Configuration);
                 Distributor distributeExecution = new Distributor()
                 {
                     copyExe = copyExe.ToString(),

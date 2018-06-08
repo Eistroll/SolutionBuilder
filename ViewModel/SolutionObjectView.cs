@@ -46,10 +46,10 @@ namespace SolutionBuilder
         [IgnoreDataMemberAttribute]
         public bool IsSelected { get; set; }
         public String BuildLog { get; set; }
-        public SolutionObjectView(ref SolutionObject SolutionObject, String selectedPlatform)
+        public SolutionObjectView(ref SolutionObject SolutionObject, String selectedConfiguration)
         {
             _SolutionObject = SolutionObject;
-            Options = _SolutionObject.Options[selectedPlatform];
+            Options = _SolutionObject.Options[selectedConfiguration];
         }
         public override int GetHashCode()
         {

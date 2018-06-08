@@ -30,6 +30,12 @@ namespace SolutionBuilder.ViewModel
             get { return _Platform; }
             set { if (_Platform != value) { _Platform = value; NotifyPropertyChanged("Platform"); } }
         }
+        private string _Configuration;
+        public string Configuration
+        {
+            get { return _Configuration; }
+            set { if (_Configuration != value) { _Configuration = value; NotifyPropertyChanged("Configuration"); } }
+        }
         private string _Executable;
         public string Executable
         {

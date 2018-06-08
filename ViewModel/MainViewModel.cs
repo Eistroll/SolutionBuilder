@@ -20,6 +20,7 @@ namespace SolutionBuilder
     {
         public BindingList<DistributionItem> DistributionList { get; set; }
         public StringCollection Platforms { get; set; }
+        public StringCollection Configurations { get; set; }
         private int _SelectedSettingIndex = -1;
         public int SelectedSettingIndex
         {
@@ -115,7 +116,8 @@ namespace SolutionBuilder
         public MainViewModel()
         {
             DistributionList = new BindingList<DistributionItem>();
-            Platforms = new StringCollection() { "Release", "Debug" };
+            Configurations = new StringCollection() { "Release", "Debug" };
+            Platforms = new StringCollection() { "x86", "x64" };
             Executables = new ObservableCollection<string>();
             DistributionSourceMap = new Dictionary<string, string>();
             DistributionTargetMap = new Dictionary<string, string>();

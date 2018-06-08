@@ -56,7 +56,7 @@ namespace Test_SolutionBuilder
             MainViewModel loadedModel = MainViewModel.Load();
             Assert.AreEqual(1, loadedModel.Tabs.Count);
             var loadedTab = loadedModel.Tabs[0];
-            CollectionAssert.AreEqual(tab.Platforms, loadedTab.Platforms);
+            CollectionAssert.AreEqual(tab.Configurations, loadedTab.Configurations);
             Assert.AreEqual(tab.SelectedPath, loadedTab.SelectedPath);
             Assert.IsFalse(tab.Solutions[0].Checked);
             Assert.IsTrue(tab.Solutions[1].Checked);

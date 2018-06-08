@@ -118,9 +118,9 @@
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
                                         <StackPanel Orientation="Horizontal" Grid.Column="0">
-                                            <ComboBox x:Name="cbPlatform" 
-                                                  ItemsSource="{Binding Platforms}" 
-                                                  SelectedItem="{Binding SelectedPlatform}" 
+                                            <ComboBox x:Name="cbConfiguration" 
+                                                  ItemsSource="{Binding Configurations}" 
+                                                  SelectedItem="{Binding SelectedConfiguration}" 
                                                   HorizontalAlignment="Left" 
                                                   VerticalAlignment="Center" 
                                                   Width="120" 
@@ -324,6 +324,25 @@
                                                             <MenuItem Header="Apply to all" 
                                                                   Command="{Binding ApplyToAllCmd}" 
                                                                   CommandParameter="Platform"/>
+                                                        </ContextMenu>
+                                                    </ComboBox.ContextMenu>
+                                                </ComboBox>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="Configuration" Width="100">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <ComboBox ItemsSource="{Binding DataContext.Configurations, ElementName=wndMain}" 
+                                                      SelectedItem="{Binding Configuration}" 
+                                                      Height="20" 
+                                                      Width="Auto" 
+                                                      Margin="-5,0">
+                                                    <ComboBox.ContextMenu>
+                                                        <ContextMenu>
+                                                            <MenuItem Header="Apply to all" 
+                                                                  Command="{Binding ApplyToAllCmd}" 
+                                                                  CommandParameter="Configuration"/>
                                                         </ContextMenu>
                                                     </ComboBox.ContextMenu>
                                                 </ComboBox>
