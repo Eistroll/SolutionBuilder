@@ -12,7 +12,7 @@ using System.Windows.Media.Animation;
 
 namespace SolutionBuilder
 {
-    public class Executor
+    public class Executor : IDisposable
     {
         CancellationTokenSource cancelTokenSource;
         CancellationToken token = CancellationToken.None;
@@ -37,6 +37,11 @@ namespace SolutionBuilder
             cancelTokenSource.Dispose();
             cancelTokenSource = new CancellationTokenSource();
             token = cancelTokenSource.Token;
+        }
+
+        public void Dispose()
+        {
+            ((IDisposable)cancelTokenSource).Dispose();
         }
     }
 }

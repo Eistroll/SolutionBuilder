@@ -220,6 +220,11 @@ namespace SolutionBuilder
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
+        private ICommand _BuildCmd;
+        public ICommand BuildCmd
+        {
+            get { return _BuildCmd ?? (_BuildCmd = new CommandHandler(param => BuildCheckedSolutions())); }
+        }
         private ICommand _AddSolutionCmd;
         public ICommand AddSolutionCmd
         {
@@ -274,19 +279,6 @@ namespace SolutionBuilder
         public bool BuildSolution_CanExecute(object parameter)
         {
             return SelectedSolutionIndex != -1;
-        }
-        private ICommand _CancelBuildCmd;
-        public ICommand CancelBuildCmd
-        {
-            get { return _CancelBuildCmd ?? (_CancelBuildCmd = new CommandHandler(param => CancelBuild())); }
-        }
-        public void CancelBuild()
-        {
-            View.MainWindow mainWindow = (View.MainWindow)System.Windows.Application.Current.MainWindow;
-            if (mainWindow != null)
-            {
-                mainWindow.executor.Cancel();
-            }
         }
         public void UpdateProgress(int min, int max, int current, string text, bool failure)
         {

@@ -9,7 +9,7 @@ using System.ComponentModel;
 
 namespace SolutionBuilder.ViewModel
 {
-    public class DistributionItem : INotifyPropertyChanged
+    public class DistributionItem : INotifyPropertyChanged, ICloneable
     {
         public bool Checked { get; set; }
         private string _Source;
@@ -66,6 +66,10 @@ namespace SolutionBuilder.ViewModel
             set { _ApplyToAllProperty = value; NotifyPropertyChanged("ApplyToAllProperty"); }
         }
 
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged(string name)
         {

@@ -178,6 +178,10 @@ namespace SolutionBuilder.View
                 tab.BuildCheckedSolutions();
             }
         }
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            executor.Cancel();
+        }
         private void RefreshLog_Click(object sender, RoutedEventArgs e)
         {
             RefreshLog();
@@ -217,16 +221,14 @@ namespace SolutionBuilder.View
                     target = target,
                     AddToLog = AddToLog
                 };
-                executor.Execute(() =>
-                {
-                    distributeExecution.Copy();
-                });
+                distributeExecution.Copy();
             }
             if (distribution.Start)
             {
                 if (task != null)
                     Task.WaitAll(task);
                 target = target.Replace(@"{Platform}", distribution.Platform);
+                target = target.Replace(@"{Configuration}", distribution.Configuration);
                 target = target.Replace(@"{Name}", distribution.Folder);
                 string exe = distribution.Executable;
                 if (exe.Count() == 0)
@@ -247,24 +249,11 @@ namespace SolutionBuilder.View
                     process.Start();
                     distribution.Proc = process;
                 });
-                //try
-                //{
-                //    task.Wait();
-                //}
-                //catch (AggregateException e)
-                //{
-                //    foreach (var v in e.InnerExceptions)
-                //        Console.WriteLine(e.Message + " " + v.Message);
-                //}
-                //finally
-                //{
-                //    executor.cancelTokenSource.Dispose()
-                //}
             }
             return true;
         }
 
-        private void ExecuteAll_Click(object sender, RoutedEventArgs e)
+        private void CopySelected_Click(object sender, RoutedEventArgs e)
         {
             ClearLog();
             FileInfo copyExe = new FileInfo(_ViewModel.GetSetting(Setting.Executables.CopyExe.ToString()));
@@ -276,10 +265,33 @@ namespace SolutionBuilder.View
             foreach (var distribution in _ViewModel.DistributionList)
             {
                 if(distribution.Checked)
+                {
+                    var copyOnlyDist = (DistributionItem)distribution.Clone();
+                    copyOnlyDist.Start = false;
                     ExecuteDistribution(distribution, executor, copyExe);
+                }
             }
         }
-        private void KillAll_Click(object sender, RoutedEventArgs e)
+        private void StartSelected_Click(object sender, RoutedEventArgs e)
+        {
+            ClearLog();
+            FileInfo copyExe = new FileInfo(_ViewModel.GetSetting(Setting.Executables.CopyExe.ToString()));
+            if (!copyExe.Exists)
+            {
+                AddToLog("Executable for copying is not defined!");
+                return;
+            }
+            foreach (var distribution in _ViewModel.DistributionList)
+            {
+                if (distribution.Checked)
+                {
+                    var executeOnlyDist = (DistributionItem)distribution.Clone();
+                    executeOnlyDist.Copy = false;
+                    ExecuteDistribution(executeOnlyDist, executor, copyExe);
+                }
+            }
+        }
+        private void KillSelected_Click(object sender, RoutedEventArgs e)
         {
             foreach (var distribution in _ViewModel.DistributionList)
             {
@@ -304,6 +316,50 @@ namespace SolutionBuilder.View
                 return;
             }
             ExecuteDistribution(distribution, executor, copyExe);
+        }
+        private void StartDistribution_Click(object sender, RoutedEventArgs e)
+        {
+            Button executeButton = (Button)sender;
+            DistributionItem distribution = executeButton.DataContext as DistributionItem;
+            ClearLog();
+            var nameExe = _ViewModel.GetSetting(Setting.Executables.CopyExe.ToString());
+            if (nameExe.Length == 0)
+            {
+                AddToLog("Executable for copying is not defined!");
+                return;
+            }
+            FileInfo copyExe = new FileInfo(nameExe);
+            if (!copyExe.Exists)
+            {
+                AddToLog("Executable for copying does not exists!");
+                return;
+            }
+            var startOnlyDist = (DistributionItem)distribution.Clone();
+            startOnlyDist.Copy = false;
+            startOnlyDist.Start = true;
+            ExecuteDistribution(startOnlyDist, executor, copyExe);
+        }
+        private void CopyDistribution_Click(object sender, RoutedEventArgs e)
+        {
+            Button executeButton = (Button)sender;
+            DistributionItem distribution = executeButton.DataContext as DistributionItem;
+            ClearLog();
+            var nameExe = _ViewModel.GetSetting(Setting.Executables.CopyExe.ToString());
+            if (nameExe.Length == 0)
+            {
+                AddToLog("Executable for copying is not defined!");
+                return;
+            }
+            FileInfo copyExe = new FileInfo(nameExe);
+            if (!copyExe.Exists)
+            {
+                AddToLog("Executable for copying does not exists!");
+                return;
+            }
+            var copyOnlyDist = (DistributionItem)distribution.Clone();
+            copyOnlyDist.Copy = true;
+            copyOnlyDist.Start = false;
+            ExecuteDistribution(copyOnlyDist, executor, copyExe);
         }
         private void KillDistribution_Click(object sender, RoutedEventArgs e)
         {
