@@ -367,7 +367,8 @@ namespace SolutionBuilder.View
         {
             Button openButton = (Button)sender;
             SolutionObjectView solutionObject = openButton.DataContext as SolutionObjectView;
-            var dialog = new StringQueryDialog("Enter Postbuild command:") { Owner = this };
+            var dialog = new StringQueryDialog("Enter command:", "Postbuild step") { Owner = this };
+            dialog.SizeToContent = SizeToContent.Width;
             dialog.QueryString = solutionObject.PostBuildStep;
             if (dialog.ShowDialog() == true)
             {

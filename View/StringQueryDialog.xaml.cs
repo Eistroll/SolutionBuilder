@@ -22,10 +22,10 @@ namespace SolutionBuilder.View
         public String QueryString { get { return QueryStringBox.Text; } set { QueryStringBox.Text = value; } }
         public String Text { get; set; }
         public String DialogTitle { get; set; }
-        public StringQueryDialog(String text)
+        public StringQueryDialog(String text, String title = "StringQueryDialog")
         {
             InitializeComponent();
-            DialogTitle = "StringQueryDialog";
+            DialogTitle = title;
             TextBlock.Text = text;
             DataContext = this;
         }

@@ -15,6 +15,7 @@
         x:Name="wndMain">
     <Window.Resources>
         <converters:StateToImageSourceConverter x:Key="StateConverter"/>
+        <converters:ContentToImageSourceConverter x:Key="ContentConverter"/>
         <converters:BoolToVisibilityConverter x:Key="VisibilityConverter"/>
         <Storyboard x:Key="hideMe">
             <DoubleAnimation Storyboard.TargetProperty="Opacity" Duration="0:0:2" To="0.0"/>
@@ -39,7 +40,7 @@
                          Overlay="{Binding ProgressBuildState, Converter={StaticResource StateConverter}}">
         </TaskbarItemInfo>
     </Window.TaskbarItemInfo>
-   <DockPanel LastChildFill="True">
+    <DockPanel LastChildFill="True">
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBar.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -237,10 +238,16 @@
                                                             </DataTemplate>
                                                         </GridViewColumn.CellTemplate>
                                                     </GridViewColumn>
-                                                    <GridViewColumn Header="PostBuild" Width="100">
+                                                    <GridViewColumn Header="PostBuild" Width="auto">
                                                         <GridViewColumn.CellTemplate>
                                                             <DataTemplate>
-                                                                <Button Click="OpenPostBuildStep_Click" Margin="2,0" Width="80" Height="20" Content="Edit"/>
+                                                                <!--<Image Source="{Binding PostBuildStep, Converter={StaticResource ContentConverter}}" />-->
+                                                                <Button Click="OpenPostBuildStep_Click" Margin="2,2" Width="20" Height="20">
+                                                                        <Image Source="{Binding PostBuildStep, Converter={StaticResource ContentConverter}}" 
+                                                               Height="16" 
+                                                               Width="16" 
+                                                               Margin="-5,0"/>
+                                                                </Button>
                                                             </DataTemplate>
                                                         </GridViewColumn.CellTemplate>
                                                     </GridViewColumn>
