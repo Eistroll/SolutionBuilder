@@ -194,9 +194,9 @@ namespace SolutionBuilder.View
                 _ViewModel.UpdateLog(tab.Solutions[tab.SelectedSolutionIndex]);
             }
         }
-        private bool ExecuteDistribution(DistributionItem distribution, Executor executor, FileInfo copyExe)
+        private bool ExecuteDistribution(DistributionItem distribution, bool Copy, bool Start, Executor executor, FileInfo copyExe)
         {
-            if (!distribution.Copy && !distribution.Start)
+            if (!Copy && !Start)
                 return false;
 
             Task task = null;
@@ -206,7 +206,7 @@ namespace SolutionBuilder.View
                 AddToLog($"No folder defined for DistributionTarget {distribution.Folder}\n");
                 return false;
             }
-            if (distribution.Copy)
+            if (Copy)
             {
                 string source = _ViewModel.DistributionSourceMap[distribution.Source];
                 target = target.Replace(@"{Platform}", distribution.Platform);
@@ -221,9 +221,10 @@ namespace SolutionBuilder.View
                     target = target,
                     AddToLog = AddToLog
                 };
+                AddToLog($"Start: Copy\n{source} -> {target}" + Environment.NewLine);
                 distributeExecution.Copy();
             }
-            if (distribution.Start)
+            if (Start)
             {
                 if (task != null)
                     Task.WaitAll(task);
@@ -266,9 +267,7 @@ namespace SolutionBuilder.View
             {
                 if(distribution.Checked)
                 {
-                    var copyOnlyDist = (DistributionItem)distribution.Clone();
-                    copyOnlyDist.Start = false;
-                    ExecuteDistribution(distribution, executor, copyExe);
+                    ExecuteDistribution(distribution, true, false, executor, copyExe);
                 }
             }
         }
@@ -285,9 +284,7 @@ namespace SolutionBuilder.View
             {
                 if (distribution.Checked)
                 {
-                    var executeOnlyDist = (DistributionItem)distribution.Clone();
-                    executeOnlyDist.Copy = false;
-                    ExecuteDistribution(executeOnlyDist, executor, copyExe);
+                    ExecuteDistribution(distribution, false, true, executor, copyExe);
                 }
             }
         }
@@ -295,7 +292,10 @@ namespace SolutionBuilder.View
         {
             foreach (var distribution in _ViewModel.DistributionList)
             {
-                distribution.Proc?.Kill();
+                if (distribution.Proc != null && !distribution.Proc.HasExited)
+                {
+                    distribution.Proc.Kill();
+                }
             }
         }
         private void ExecuteDistribution_Click(object sender, RoutedEventArgs e)
@@ -315,7 +315,7 @@ namespace SolutionBuilder.View
                 AddToLog("Executable for copying does not exists!");
                 return;
             }
-            ExecuteDistribution(distribution, executor, copyExe);
+            ExecuteDistribution(distribution, distribution.Copy, distribution.Start, executor, copyExe);
         }
         private void StartDistribution_Click(object sender, RoutedEventArgs e)
         {
@@ -334,10 +334,7 @@ namespace SolutionBuilder.View
                 AddToLog("Executable for copying does not exists!");
                 return;
             }
-            var startOnlyDist = (DistributionItem)distribution.Clone();
-            startOnlyDist.Copy = false;
-            startOnlyDist.Start = true;
-            ExecuteDistribution(startOnlyDist, executor, copyExe);
+            ExecuteDistribution(distribution, false, true, executor, copyExe);
         }
         private void CopyDistribution_Click(object sender, RoutedEventArgs e)
         {
@@ -356,16 +353,26 @@ namespace SolutionBuilder.View
                 AddToLog("Executable for copying does not exists!");
                 return;
             }
-            var copyOnlyDist = (DistributionItem)distribution.Clone();
-            copyOnlyDist.Copy = true;
-            copyOnlyDist.Start = false;
-            ExecuteDistribution(copyOnlyDist, executor, copyExe);
+            ExecuteDistribution(distribution, true, false, executor, copyExe);
         }
         private void KillDistribution_Click(object sender, RoutedEventArgs e)
         {
             Button killButton = (Button)sender;
             DistributionItem distribution = killButton.DataContext as DistributionItem;
-            distribution.Proc?.Kill();
+            if(distribution.Proc != null && !distribution.Proc.HasExited)
+                distribution.Proc.Kill();
+        }
+
+        private void OpenPostBuildStep_Click(object sender, RoutedEventArgs e)
+        {
+            Button openButton = (Button)sender;
+            SolutionObjectView solutionObject = openButton.DataContext as SolutionObjectView;
+            var dialog = new StringQueryDialog("Enter Postbuild command:") { Owner = this };
+            dialog.QueryString = solutionObject.PostBuildStep;
+            if (dialog.ShowDialog() == true)
+            {
+                solutionObject.PostBuildStep = dialog.QueryString;
+            }
         }
     }
 }

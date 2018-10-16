@@ -76,9 +76,34 @@ namespace SolutionBuilder
                 buildFailure = true;
                 solution.BuildState = View.State.Failure;
             }
-
+            
             solution.SuccessFlag = exitCode == 0 ? true : false;
+            if( solution.SuccessFlag)
+                PerformPostbuildStep(solution);
+
             return buildFailure;
+        }
+        private int PerformPostbuildStep( SolutionObjectView solution )
+        {
+            if (solution.PostBuildStep == null)
+                return -1;
+            System.Diagnostics.Process process = new System.Diagnostics.Process();
+            System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo()
+            { WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden, RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true };
+            startInfo.FileName = "cmd.exe";
+            startInfo.WorkingDirectory = BaseDir;
+            string command = solution.PostBuildStep;
+            command = command.Replace(@"{Name}", solution.Name);
+
+            startInfo.Arguments = @"/c " + command;
+            process.StartInfo = startInfo;
+            bool Success = process.Start();
+            process.BeginOutputReadLine();
+            process.WaitForExit();
+            string strLog = "PostBuild: " + command + " finished with " + process.ExitCode;
+            solution.BuildLog += strLog;
+            AddToLog?.Invoke(strLog + Environment.NewLine);
+            return process.ExitCode;
         }
     }
 }

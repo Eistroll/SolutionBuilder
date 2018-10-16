@@ -12,7 +12,8 @@ namespace SolutionBuilder
         public String Name { get; set; }
         [DataMember]
         public Dictionary<string, string> Options = new Dictionary<string, string>();
-
+        [DataMember]
+        public String PostBuildStep { get; set; }
         // Constructor
         public SolutionObject()
         {

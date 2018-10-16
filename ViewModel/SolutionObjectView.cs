@@ -24,6 +24,7 @@ namespace SolutionBuilder
             get { return _Options; }
             set { if (_Options != value) { _Options = value; NotifyPropertyChanged("Options"); } }
         }
+        public string PostBuildStep { get { return _SolutionObject?.PostBuildStep; } set { _SolutionObject.PostBuildStep = value; } }
         private bool _Checked = false;
         public bool Checked
         {

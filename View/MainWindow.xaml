@@ -39,7 +39,7 @@
                          Overlay="{Binding ProgressBuildState, Converter={StaticResource StateConverter}}">
         </TaskbarItemInfo>
     </Window.TaskbarItemInfo>
-    <DockPanel LastChildFill="True">
+   <DockPanel LastChildFill="True">
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBar.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -92,7 +92,7 @@
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <StackPanel Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="Right">
                             <Button x:Name="btBuild" 
@@ -234,6 +234,13 @@
                                                         <GridViewColumn.CellTemplate>
                                                             <DataTemplate>
                                                                 <TextBox Text="{Binding Options}" Width="Auto" Margin="-5,0"/>
+                                                            </DataTemplate>
+                                                        </GridViewColumn.CellTemplate>
+                                                    </GridViewColumn>
+                                                    <GridViewColumn Header="PostBuild" Width="100">
+                                                        <GridViewColumn.CellTemplate>
+                                                            <DataTemplate>
+                                                                <Button Click="OpenPostBuildStep_Click" Margin="2,0" Width="80" Height="20" Content="Edit"/>
                                                             </DataTemplate>
                                                         </GridViewColumn.CellTemplate>
                                                     </GridViewColumn>
