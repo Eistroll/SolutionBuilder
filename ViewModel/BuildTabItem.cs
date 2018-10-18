@@ -200,6 +200,16 @@ namespace SolutionBuilder
                     solView.SolutionObject.Options[SelectedConfiguration] = solView.Options;
                 }
             }
+            if (e.PropertyName == "PostBuildStep")
+            {
+                SolutionObjectView solView = (SolutionObjectView)sender;
+                if (solView == null)
+                    return;
+                if (solView.SolutionObject != null)
+                {
+                    solView.SolutionObject.PostBuildStep = solView.PostBuildStep;
+                }
+            }
             if (e.PropertyName == "Checked")
             {
                 SolutionObjectView solutionView = (SolutionObjectView)sender;

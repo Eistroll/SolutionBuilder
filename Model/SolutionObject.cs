@@ -30,6 +30,7 @@ namespace SolutionBuilder
             if (toCompareWith == null)
                 return false;
             return this.Name == toCompareWith.Name &&
+                this.PostBuildStep == toCompareWith.PostBuildStep && 
                 this.Options.OrderBy(kvp=>kvp.Key).SequenceEqual(toCompareWith.Options.OrderBy(kvp=>kvp.Key));
         }
 

@@ -75,7 +75,7 @@ namespace SolutionBuilder.View
             }
             else
             {
-                textBoxLog.Text += text;
+                _ViewModel.Log += text;
                 textBoxLog.ScrollToEnd();
             }
         }
@@ -214,6 +214,8 @@ namespace SolutionBuilder.View
                 target = target.Replace(@"{Name}", distribution.Folder);
                 source = source.Replace(@"{Platform}", distribution.Platform);
                 source = source.Replace(@"{Configuration}", distribution.Configuration);
+                AddToLog($"Copy\n{source} -> {target}" + Environment.NewLine);
+                InvalidateVisual();
                 Distributor distributeExecution = new Distributor()
                 {
                     copyExe = copyExe.ToString(),
@@ -221,8 +223,10 @@ namespace SolutionBuilder.View
                     target = target,
                     AddToLog = AddToLog
                 };
-                AddToLog($"Start: Copy\n{source} -> {target}" + Environment.NewLine);
-                distributeExecution.Copy();
+                task = executor.Execute(action =>
+                {
+                    distributeExecution.Copy(action);
+                });
             }
             if (Start)
             {
@@ -243,13 +247,14 @@ namespace SolutionBuilder.View
                     AddToLog($"Executable for starting does not exist: {exePath.ToString()}");
                     return false;
                 }
+                AddToLog($"Execute {exePath}" + Environment.NewLine);
                 task = Task.Factory.StartNew(() =>
-                {
-                    System.Diagnostics.Process process = new System.Diagnostics.Process();
-                    process.StartInfo.FileName = exePath.ToString();
-                    process.Start();
-                    distribution.Proc = process;
-                });
+                 {
+                     System.Diagnostics.Process process = new System.Diagnostics.Process();
+                     process.StartInfo.FileName = exePath.ToString();
+                     process.Start();
+                     distribution.Proc = process;
+                 });
             }
             return true;
         }
@@ -292,10 +297,7 @@ namespace SolutionBuilder.View
         {
             foreach (var distribution in _ViewModel.DistributionList)
             {
-                if (distribution.Proc != null && !distribution.Proc.HasExited)
-                {
-                    distribution.Proc.Kill();
-                }
+                KillProcss(distribution);
             }
         }
         private void ExecuteDistribution_Click(object sender, RoutedEventArgs e)
@@ -355,12 +357,25 @@ namespace SolutionBuilder.View
             }
             ExecuteDistribution(distribution, true, false, executor, copyExe);
         }
+
+        private void KillProcss(DistributionItem distribution)
+        {
+            if (distribution.Proc != null && !distribution.Proc.HasExited)
+            {
+                AddToLog($"Kill process {distribution.Proc.ProcessName} ({distribution.Proc.Id})");
+                distribution.Proc.Kill();
+            }
+            else
+            {
+                AddToLog("Process already has exited!");
+            }
+        }
+
         private void KillDistribution_Click(object sender, RoutedEventArgs e)
         {
             Button killButton = (Button)sender;
             DistributionItem distribution = killButton.DataContext as DistributionItem;
-            if(distribution.Proc != null && !distribution.Proc.HasExited)
-                distribution.Proc.Kill();
+            KillProcss(distribution);
         }
 
         private void OpenPostBuildStep_Click(object sender, RoutedEventArgs e)

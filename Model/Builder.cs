@@ -85,7 +85,7 @@ namespace SolutionBuilder
         }
         private int PerformPostbuildStep( SolutionObjectView solution )
         {
-            if (solution.PostBuildStep == null)
+            if (solution.PostBuildStep == null || solution.PostBuildStep.Length == 0)
                 return -1;
             System.Diagnostics.Process process = new System.Diagnostics.Process();
             System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo()

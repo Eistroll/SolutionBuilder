@@ -20,7 +20,7 @@ namespace SolutionBuilder.Converters
         }
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            if (value == null)
+            if (value == null || ((string)value).Length == 0)
                 return GetImageSourceFromResource("Images/cmd_text_new_20.png");
             else
                 return GetImageSourceFromResource("Images/img_pen_16.png");

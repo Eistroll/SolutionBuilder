@@ -334,7 +334,7 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Header="Folder" Width="200">
+                                    <GridViewColumn Header="Folder" Width="auto">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <ComboBox ItemsSource="{Binding DataContext.DistributionTargetMap, ElementName=wndMain }" 
@@ -347,7 +347,7 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Header="Platform" Width="100">
+                                    <GridViewColumn Header="Platform" Width="auto">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <ComboBox ItemsSource="{Binding DataContext.Platforms, ElementName=wndMain}" 

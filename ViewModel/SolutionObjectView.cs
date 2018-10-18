@@ -24,7 +24,12 @@ namespace SolutionBuilder
             get { return _Options; }
             set { if (_Options != value) { _Options = value; NotifyPropertyChanged("Options"); } }
         }
-        public string PostBuildStep { get { return _SolutionObject?.PostBuildStep; } set { _SolutionObject.PostBuildStep = value; } }
+        private string _PostBuildStep;
+        public string PostBuildStep
+        {
+            get { return _PostBuildStep; }
+            set { if (_PostBuildStep != value) { _PostBuildStep = value; NotifyPropertyChanged("PostBuildStep"); } }
+        }
         private bool _Checked = false;
         public bool Checked
         {
@@ -51,6 +56,7 @@ namespace SolutionBuilder
         {
             _SolutionObject = SolutionObject;
             Options = _SolutionObject.Options[selectedConfiguration];
+            PostBuildStep = _SolutionObject.PostBuildStep;
         }
         public override int GetHashCode()
         {
@@ -62,6 +68,7 @@ namespace SolutionBuilder
             if (toCompareWith == null)
                 return false;
             return this.Name == toCompareWith.Name &&
+                this.PostBuildStep == toCompareWith.PostBuildStep &&
                 this._Options == toCompareWith._Options &&
                 this.Checked == toCompareWith.Checked;
         }

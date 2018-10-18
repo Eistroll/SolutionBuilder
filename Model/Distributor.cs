@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SolutionBuilder
@@ -15,7 +16,7 @@ namespace SolutionBuilder
         string options = "/MIR";
         public Action<string> AddToLog;
 
-        public void Copy()
+        public void Copy(CancellationToken token)
         {
             try
             {
