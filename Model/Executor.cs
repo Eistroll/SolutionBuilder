@@ -23,6 +23,10 @@ namespace SolutionBuilder
             cancelTokenSource = new CancellationTokenSource();
             token = cancelTokenSource.Token;
         }
+        ~Executor()
+        {
+            Dispose(false);
+        }
         public Task Execute(Action action)
         {
             return Task.Run(() => action());
@@ -41,7 +45,16 @@ namespace SolutionBuilder
 
         public void Dispose()
         {
-            ((IDisposable)cancelTokenSource).Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        // The bulk of the clean-up code is implemented in Dispose(bool)
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                ((IDisposable)cancelTokenSource).Dispose();
+            }
         }
     }
 }

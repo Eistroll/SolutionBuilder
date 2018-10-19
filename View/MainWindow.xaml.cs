@@ -23,7 +23,7 @@ namespace SolutionBuilder.View
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, IDisposable
     {
         private Model _Model = new Model();
         private MainViewModel _ViewModel = new MainViewModel();
@@ -383,12 +383,28 @@ namespace SolutionBuilder.View
             Button openButton = (Button)sender;
             SolutionObjectView solutionObject = openButton.DataContext as SolutionObjectView;
             var dialog = new StringQueryDialog("Enter command:", "Postbuild step") { Owner = this };
-            dialog.SizeToContent = SizeToContent.Width;
+            dialog.Width = Width*0.8;
             dialog.QueryString = solutionObject.PostBuildStep;
             if (dialog.ShowDialog() == true)
             {
                 solutionObject.PostBuildStep = dialog.QueryString;
             }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // dispose managed resources
+                executor.Dispose();
+            }
+            // free native resources
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

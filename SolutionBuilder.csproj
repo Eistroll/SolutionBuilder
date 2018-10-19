@@ -201,6 +201,13 @@
     <Resource Include="Images\cmd_text_new_20.png" />
     <Resource Include="Images\img_pen_16.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\img_error_20.png" />
+    <Resource Include="Images\img_play_20.png" />
+    <Resource Include="Images\cmd_int_record_copy.png" />
+    <Resource Include="Images\img_batch_20.png" />
+    <Content Include="Images\si-glyph-document-edit.svg" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

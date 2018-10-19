@@ -30,11 +30,17 @@ namespace SolutionBuilder
             get { return _PostBuildStep; }
             set { if (_PostBuildStep != value) { _PostBuildStep = value; NotifyPropertyChanged("PostBuildStep"); } }
         }
+        public string _TimeChecked;
+        public string TimeChecked
+        {
+            get { return _TimeChecked; }
+            set { if (_TimeChecked != value) { _TimeChecked = value; NotifyPropertyChanged("TimeChecked"); } }
+        }
         private bool _Checked = false;
         public bool Checked
         {
             get { return _Checked; }
-            set { if (_Checked != value) { _Checked = value; NotifyPropertyChanged("Checked"); } }
+            set { if (_Checked != value) { _Checked = value; if (_Checked) TimeChecked = DateTime.Now.ToLongTimeString(); NotifyPropertyChanged("Checked"); } }
         }
         private View.State _BuildState;
         public View.State BuildState

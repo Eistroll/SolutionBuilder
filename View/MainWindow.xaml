@@ -98,6 +98,7 @@
                         <StackPanel Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="Right">
                             <Button x:Name="btBuild" 
                             Content="Build all" 
+                            ToolTip="Build all checked Build Tabs"
                             VerticalAlignment="Center" 
                             Width="75" 
                             Click="BuildAll_Click" 
@@ -109,6 +110,7 @@
                             </Button>
                             <Button x:Name="btCancel" 
                                 Content="Cancel" 
+                                ToolTip="Cancel current build step as soon as possible"
                                 Click="Cancel_Click" 
                                 VerticalAlignment="Center" 
                                 Width="75" 
@@ -159,6 +161,7 @@
                                             <StackPanel Orientation="Horizontal" Grid.Column="2">
                                                 <Button x:Name="btAdd" 
                                                     Content="Add" 
+                                                    ToolTip="Add new column to the list"
                                                     HorizontalAlignment="Right" 
                                                     VerticalAlignment="Center" 
                                                     Width="75" 
@@ -166,6 +169,7 @@
                                                     Margin="0,0,5,0"/>
                                                 <Button x:Name="btBuild" 
                                                     Content="Build" 
+                                                    ToolTip="Build selected solutions of current Tab"
                                                     VerticalAlignment="Center" 
                                                     Width="75" 
                                                     HorizontalAlignment="Right" 
@@ -242,8 +246,12 @@
                                                         <GridViewColumn.CellTemplate>
                                                             <DataTemplate>
                                                                 <!--<Image Source="{Binding PostBuildStep, Converter={StaticResource ContentConverter}}" />-->
-                                                                <Button Click="OpenPostBuildStep_Click" Margin="2,2" Width="20" Height="20">
-                                                                        <Image Source="{Binding PostBuildStep, Converter={StaticResource ContentConverter}}" 
+                                                                <Button Click="OpenPostBuildStep_Click" 
+                                                                        ToolTip="Create or edit post build command"
+                                                                        Margin="2,2" 
+                                                                        Width="20" 
+                                                                        Height="20">
+                                                                    <Image Source="{Binding PostBuildStep, Converter={StaticResource ContentConverter}}" 
                                                                Height="16" 
                                                                Width="16" 
                                                                Margin="-5,0"/>
@@ -257,7 +265,11 @@
                                                                 <Image Source="{Binding BuildState, Converter={StaticResource StateConverter}}" 
                                                                Height="20" 
                                                                Width="20" 
-                                                               Margin="-5,0"/>
+                                                               Margin="-5,0">
+                                                                    <Image.ToolTip>
+                                                                        <TextBlock Text="{Binding TimeChecked, StringFormat='{}Finished at {0}'}"/>
+                                                                    </Image.ToolTip>
+                                                                </Image>
                                                             </DataTemplate>
                                                         </GridViewColumn.CellTemplate>
                                                     </GridViewColumn>
@@ -286,9 +298,21 @@
                             <StackPanel Grid.Column="0" Orientation="Horizontal">
                             </StackPanel>
                             <StackPanel Grid.Column="2" Orientation="Horizontal">
-                                <Button Width="80" Margin="5" Click="CopySelected_Click">Copy selected</Button>
-                                <Button Width="80" Margin="5" Click="StartSelected_Click">Start selected</Button>
-                                <Button Width="80" Margin="5" Click="KillSelected_Click">Kill selected</Button>
+                                <Button Width="80" 
+                                        Margin="5" 
+                                        Content="Copy selected"
+                                        ToolTip="Copy selected sources to target folder"
+                                        Click="CopySelected_Click"/>
+                                <Button Width="80" 
+                                        Margin="5" 
+                                        Content="Start selected"
+                                        ToolTip="Start selected executables"
+                                        Click="StartSelected_Click"/>
+                                <Button Width="80" 
+                                        Margin="5" 
+                                        Content="Kill selected"
+                                        ToolTip="Kill selected executables"
+                                        Click="KillSelected_Click"/>
                             </StackPanel>
                         </Grid>
                         <ListView Grid.Row="1" 
@@ -308,7 +332,7 @@
                                     <GridViewColumn Header="" Width="30">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
-                                                <CheckBox IsChecked="{Binding Checked}"></CheckBox>
+                                                <CheckBox IsChecked="{Binding Checked}"/>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
@@ -404,6 +428,19 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
+                                    <GridViewColumn Header="Batch" Width="Auto">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Button Click="ExecuteDistribution_Click" 
+                                                            Margin="2,0" 
+                                                            ToolTip="Execute checked actions">
+                                                        <Image Source="pack://application:,,,/Images/img_batch_20.png" Width="16" Height="16"/>
+                                                    </Button>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
                                     <GridViewColumn Header="Copy" Width="50">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
@@ -434,14 +471,25 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Header="Actions" Width="150">
+                                    <GridViewColumn Header="Actions" Width="Auto">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal">
-                                                    <Button Click="ExecuteDistribution_Click" Margin="2,0">Execute</Button>
-                                                    <Button Click="CopyDistribution_Click" Margin="2,0">Copy</Button>
-                                                    <Button Click="StartDistribution_Click" Margin="2,0">Start</Button>
-                                                    <Button Click="KillDistribution_Click" Margin="2,0">Kill</Button>
+                                                    <Button Click="CopyDistribution_Click" 
+                                                            Margin="2,0" 
+                                                            ToolTip="Copy">
+                                                        <Image Source="pack://application:,,,/Images/cmd_int_record_copy.png" Width="16" Height="16"/>
+                                                    </Button>
+                                                    <Button Click="StartDistribution_Click" 
+                                                            Margin="2,0" 
+                                                            ToolTip="Start application">
+                                                        <Image Source="pack://application:,,,/Images/img_play_20.png" Width="16" Height="16"/>
+                                                    </Button>
+                                                    <Button Click="KillDistribution_Click" 
+                                                            Margin="2,0" 
+                                                            ToolTip="Kill application">
+                                                        <Image Source="pack://application:,,,/Images/img_error_20.png" Width="16" Height="16"/>
+                                                    </Button>
                                                 </StackPanel>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>

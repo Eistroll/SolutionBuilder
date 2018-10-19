@@ -347,6 +347,7 @@ namespace SolutionBuilder
             View.MainWindow mainWindow = (View.MainWindow)System.Windows.Application.Current.MainWindow;
             if (mainWindow == null)
                 return;
+            mainWindow.ClearLog();
             BuildState = View.State.None;
             ProgressVisible = true;
             ObservableCollection<SolutionObjectView> solutionsToBuild = new ObservableCollection<SolutionObjectView>();
