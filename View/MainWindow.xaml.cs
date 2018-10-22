@@ -362,12 +362,12 @@ namespace SolutionBuilder.View
         {
             if (distribution.Proc != null && !distribution.Proc.HasExited)
             {
-                AddToLog($"Kill process {distribution.Proc.ProcessName} ({distribution.Proc.Id})");
+                AddToLog($"Kill process {distribution.Proc.ProcessName} ({distribution.Proc.Id})" + Environment.NewLine);
                 distribution.Proc.Kill();
             }
             else
             {
-                AddToLog("Process already has exited!");
+                AddToLog("Process already has exited!" + Environment.NewLine);
             }
         }
 
