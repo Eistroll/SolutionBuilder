@@ -90,6 +90,9 @@
     <Compile Include="Settings.cs" />
     <Compile Include="ViewModel\DistributionItem.cs" />
     <Compile Include="ViewModel\BuildTabItem.cs" />
+    <Compile Include="View\BuildTabSettings.xaml.cs">
+      <DependentUpon>BuildTabSettings.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\ComboBoxQueryDialog.xaml.cs">
       <DependentUpon>ComboBoxQueryDialog.xaml</DependentUpon>
     </Compile>
@@ -103,6 +106,10 @@
       <DependentUpon>StringQueryDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\UserPreferences.cs" />
+    <Page Include="View\BuildTabSettings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\ComboBoxQueryDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -167,6 +174,7 @@
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </None>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
@@ -206,7 +214,7 @@
     <Resource Include="Images\img_play_20.png" />
     <Resource Include="Images\cmd_int_record_copy.png" />
     <Resource Include="Images\img_batch_20.png" />
-    <Content Include="Images\si-glyph-document-edit.svg" />
+    <Resource Include="Images\img_gear_20.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

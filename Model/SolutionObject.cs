@@ -8,15 +8,21 @@ namespace SolutionBuilder
     [DataContract]
     public class SolutionObject : ICloneable
     {
+        public enum Version { Initial }
+        [DataMember]
+        private String ContractVersion;
         [DataMember]
         public String Name { get; set; }
         [DataMember]
         public Dictionary<string, string> Options = new Dictionary<string, string>();
         [DataMember]
+        public Dictionary<string, string> PostBuildSteps = new Dictionary<string, string>();
+        [DataMember]
         public String PostBuildStep { get; set; }
         // Constructor
         public SolutionObject()
         {
+            ContractVersion = Version.Initial.ToString();
             Options["Release"] = "/p:Configuration=Release";
             Options["Debug"] = "/p:Configuration=Debug";
         }
@@ -30,13 +36,24 @@ namespace SolutionBuilder
             if (toCompareWith == null)
                 return false;
             return this.Name == toCompareWith.Name &&
-                this.PostBuildStep == toCompareWith.PostBuildStep && 
-                this.Options.OrderBy(kvp=>kvp.Key).SequenceEqual(toCompareWith.Options.OrderBy(kvp=>kvp.Key));
+                this.PostBuildStep == toCompareWith.PostBuildStep &&
+                this.PostBuildSteps.OrderBy(kvp => kvp.Key).SequenceEqual(toCompareWith.PostBuildSteps.OrderBy(kvp => kvp.Key)) &&
+                this.Options.OrderBy(kvp => kvp.Key).SequenceEqual(toCompareWith.Options.OrderBy(kvp => kvp.Key));
         }
 
         public object Clone()
         {
             return MemberwiseClone();
+        }
+        [OnDeserialized()]
+        private void OnDeserializedMethod(StreamingContext context)
+        {
+            if (ContractVersion!=Version.Initial.ToString() && PostBuildSteps == null)
+            {
+                PostBuildSteps = new Dictionary<string, string>();
+                PostBuildSteps["Release"] = PostBuildStep;
+                PostBuildSteps["Debug"] = PostBuildStep;
+            }
         }
     }
 }

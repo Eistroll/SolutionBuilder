@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SolutionBuilder.View;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -18,10 +19,31 @@ namespace SolutionBuilder
     [DataContract]
     public class BuildTabItem : INotifyPropertyChanged
     {
-        [DataMember]
-        public string Header { get; set; }
+        [DataMember(Name = "Header")]
+        private string _TabName { get; set; }
+        public string TabName
+        {
+            get { return _TabName; }
+            set
+            {
+                if (_TabName != value)
+                {
+                    string oldTabName = _TabName;
+                    _TabName = value;
+                    if (_Model != null && _Model.Scope2SolutionObjects.ContainsKey(oldTabName))
+                    {
+                        var oldData = _Model.Scope2SolutionObjects[oldTabName];
+                        _Model.Scope2SolutionObjects.Remove(oldTabName);
+                        _Model.Scope2SolutionObjects[_TabName] = oldData;
+                    }
+                    NotifyPropertyChanged("TabName");
+                }
+            }
+        }
         [DataMember]
         public String SelectedPath { get; set; }
+        [DataMember]
+        public String BaseDir { get; set; }
         [DataMember]
         public String BaseOptions { get; set; }
         [DataMember]
@@ -36,7 +58,8 @@ namespace SolutionBuilder
                 _SelectedConfiguration = value;
                 for (int i = 0; i < Solutions.Count; ++i)
                 {
-                    Solutions[i].Options = _Model.Scope2SolutionObjects[Header][i].Options[_SelectedConfiguration];
+                    Solutions[i].Options = _Model.Scope2SolutionObjects[TabName][i].Options[_SelectedConfiguration];
+                    Solutions[i].PostBuildStep = _Model.Scope2SolutionObjects[TabName][i].PostBuildSteps[_SelectedConfiguration];
                 }
             }
         }
@@ -130,7 +153,6 @@ namespace SolutionBuilder
         public void UpdateAvailableSolutions()
         {
             AllSolutionsInBaseDir.Clear();
-            String BaseDir = _ViewModel.GetSetting("BaseDir", Header);
             if (BaseDir.Length == 0)
                 return;
             System.IO.DirectoryInfo BaseDirInfo = new System.IO.DirectoryInfo(BaseDir);
@@ -155,9 +177,9 @@ namespace SolutionBuilder
         private void UpdateFromModel(ref Model Model)
         {
             Solutions.Clear();
-            if (Model.Scope2SolutionObjects.Count == 0 || !Model.Scope2SolutionObjects.ContainsKey(Header))
+            if (Model.Scope2SolutionObjects.Count == 0 || !Model.Scope2SolutionObjects.ContainsKey(TabName))
                 return;
-            foreach (SolutionObject solution in Model.Scope2SolutionObjects[Header])
+            foreach (SolutionObject solution in Model.Scope2SolutionObjects[TabName])
             {
                 SolutionObject tmp = solution;
                 SolutionObjectView solutionView = new SolutionObjectView(ref tmp, SelectedConfiguration);
@@ -167,7 +189,7 @@ namespace SolutionBuilder
                 Solutions.Add(solutionView);
             }
             Solutions.CollectionChanged += new NotifyCollectionChangedEventHandler(Solutions_CollectionChanged);
-       }
+        }
         private void Solutions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (ExplicitAddInProgress || ExplicitRemoveInProgress)
@@ -177,14 +199,14 @@ namespace SolutionBuilder
                 int index = e.NewStartingIndex;
                 foreach (SolutionObjectView solution in e.NewItems)
                 {
-                    _Model.Scope2SolutionObjects[Header].Insert(index++, solution.SolutionObject);
+                    _Model.Scope2SolutionObjects[TabName].Insert(index++, solution.SolutionObject);
                 }
             }
             if (e.Action == NotifyCollectionChangedAction.Remove)
             {
                 foreach (SolutionObjectView solution in e.OldItems)
                 {
-                    _Model.Scope2SolutionObjects[Header].Remove(solution.SolutionObject);
+                    _Model.Scope2SolutionObjects[TabName].Remove(solution.SolutionObject);
                 }
             }
         }
@@ -207,7 +229,7 @@ namespace SolutionBuilder
                     return;
                 if (solView.SolutionObject != null)
                 {
-                    solView.SolutionObject.PostBuildStep = solView.PostBuildStep;
+                    solView.SolutionObject.PostBuildSteps[SelectedConfiguration] = solView.PostBuildStep;
                 }
             }
             if (e.PropertyName == "Checked")
@@ -230,6 +252,11 @@ namespace SolutionBuilder
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
+        private ICommand _OpenSettingsCmd;
+        public ICommand OpenSettingsCmd
+        {
+            get { return _OpenSettingsCmd ?? (_OpenSettingsCmd = new CommandHandler(param => OpenSettings())); }
+        }
         private ICommand _BuildCmd;
         public ICommand BuildCmd
         {
@@ -243,11 +270,11 @@ namespace SolutionBuilder
         public void AddSolution()
         {
             SolutionObject solution = new SolutionObject();
-            if (!_Model.Scope2SolutionObjects.ContainsKey(Header))
+            if (!_Model.Scope2SolutionObjects.ContainsKey(TabName))
             {
-                _Model.Scope2SolutionObjects[Header] = new ObservableCollection<SolutionObject>();
+                _Model.Scope2SolutionObjects[TabName] = new ObservableCollection<SolutionObject>();
             }
-            _Model.Scope2SolutionObjects[Header].Add(solution);
+            _Model.Scope2SolutionObjects[TabName].Add(solution);
             SolutionObjectView solutionView = new SolutionObjectView(ref solution, SelectedConfiguration);
             solutionView.PropertyChanged += new PropertyChangedEventHandler(SolutionView_PropertyChanged);
             ExplicitAddInProgress = true;
@@ -270,7 +297,7 @@ namespace SolutionBuilder
             {
                 if (solutionView != null)
                 {
-                    _Model.Scope2SolutionObjects[Header].Remove(solutionView.SolutionObject);
+                    _Model.Scope2SolutionObjects[TabName].Remove(solutionView.SolutionObject);
                     indexListToRemove.Add(Solutions.IndexOf(solutionView));
                 }
             }
@@ -297,12 +324,12 @@ namespace SolutionBuilder
             ProgressCurrent = current;
             _ViewModel.ProgressValue = (double)current / (max - min);
             _ViewModel.ProgressDesc = text;
-            if ( current == min && !failure )
+            if (current == min && !failure)
             {
                 _ViewModel.ProgressBuildState = View.State.None;
                 _ViewModel.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
             }
-            if ( failure && _ViewModel.ProgressState != System.Windows.Shell.TaskbarItemProgressState.Error)
+            if (failure && _ViewModel.ProgressState != System.Windows.Shell.TaskbarItemProgressState.Error)
             {
                 _ViewModel.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Error;
             }
@@ -327,7 +354,7 @@ namespace SolutionBuilder
                 solution.BuildState = View.State.None;
                 Builder buildExecution = new Builder()
                 {
-                    BaseDir = _ViewModel.GetSetting("BaseDir", Header),
+                    BaseDir = BaseDir,
                     BaseOptions = BaseOptions,
                     BuildExe = new FileInfo(_ViewModel.GetSetting(Setting.Executables.BuildExe.ToString())),
                     solutions = new ObservableCollection<SolutionObjectView>() { solution },
@@ -335,12 +362,17 @@ namespace SolutionBuilder
                     UpdateProgress = UpdateProgress
                 };
                 _ViewModel.ProgressType = "Building single solution";
-                var task = mainWindow.executor.Execute( action =>
-                {
-                    buildExecution.Build(action);
-                });
+                var task = mainWindow.executor.Execute(action =>
+               {
+                   buildExecution.Build(action);
+               });
                 //_ViewModel.ProgressType = "";
             }
+        }
+        private void OpenSettings()
+        {
+            System.Windows.Window settings = new BuildTabSettings() { DataContext = this };
+            settings.ShowDialog();
         }
         public void BuildCheckedSolutions()
         {
@@ -361,7 +393,7 @@ namespace SolutionBuilder
             }
             Builder buildExecution = new Builder()
             {
-                BaseDir = _ViewModel.GetSetting("BaseDir", Header),
+                BaseDir = BaseDir,
                 BaseOptions = BaseOptions,
                 BuildExe = new FileInfo(_ViewModel.GetSetting(Setting.Executables.BuildExe.ToString())),
                 solutions = solutionsToBuild,
@@ -386,7 +418,7 @@ namespace SolutionBuilder
         public void OpenSolution(object parameter)
         {
             SolutionObjectView solution = Solutions[SelectedSolutionIndex];
-            StringBuilder path = new StringBuilder(_ViewModel.GetSetting("BaseDir", Header));
+            StringBuilder path = new StringBuilder(BaseDir);
             path.Append("\\" + solution.Name);
             Process.Start(path.ToString());
         }
@@ -403,13 +435,13 @@ namespace SolutionBuilder
         {
             StringCollection tabNames = new StringCollection();
             foreach (var tab in _ViewModel.Tabs)
-                if (tab.Header != Header)
-                    tabNames.Add(tab.Header);
+                if (tab.TabName != TabName)
+                    tabNames.Add(tab.TabName);
             var dialog = new View.ComboBoxQueryDialog() { Owner = Application.Current.MainWindow, DialogTitle = "Copy solutions to...", ComboBoxLabel = "Build tab", Entries = tabNames, SelectedEntry = tabNames[0] };
             if (dialog.ShowDialog() == true)
             {
                 String tabName = dialog.SelectedEntry;
-                BuildTabItem tab = _ViewModel.Tabs.First(x => x.Header == tabName);
+                BuildTabItem tab = _ViewModel.Tabs.First(x => x.TabName == tabName);
                 foreach (var solutionView in SelectedSolutionViews)
                 {
                     if (solutionView != null)

@@ -35,7 +35,6 @@ namespace SolutionBuilder
         public ObservableCollection<BuildTabItem> Tabs { get; set; }
         public int SelectedTabIndex { get; set; }
 
-
         [IgnoreDataMemberAttribute]
         public ObservableCollection<string> AllSolutionsForSelectedTab
         {
@@ -342,7 +341,7 @@ namespace SolutionBuilder
             Setting setting = (Setting)sender;
             foreach (var Tab in Tabs)
             {
-                if (Tab.Header == setting.Scope)
+                if (Tab.TabName == setting.Scope)
                 {
                     Tab.UpdateAvailableSolutions();
                     NotifyPropertyChanged("AllSolutionsForSelectedTab");
@@ -377,7 +376,7 @@ namespace SolutionBuilder
             scopes.Add(Setting.Scopes.DistributionTarget.ToString());
             scopes.Add(Setting.Scopes.DistributionExe.ToString());
             foreach (var tab in Tabs)
-                scopes.Add(tab.Header);
+                scopes.Add(tab.TabName);
             var dialog = new SettingCreationDialog() { Owner = Application.Current.MainWindow, Scopes = scopes }; // TODO #GUI access SettingsDialog
             if (dialog.ShowDialog() == true)
             {
@@ -398,6 +397,18 @@ namespace SolutionBuilder
         public void RemoveSetting(object parameter)
         {
             SettingsList.RemoveAt(SelectedSettingIndex);
+        }
+        [OnDeserialized()]
+        private void OnDeserializedMethod(StreamingContext context)
+        {
+            foreach (var tab in Tabs)
+            {
+                if (tab.BaseDir == null)
+                {
+                    tab.BaseDir = GetSetting("BaseDir", tab.TabName);
+                    SettingsList.Remove(new Setting() { Scope=tab.TabName, Key="BaseDir" });
+                }
+            }
         }
     }
 }

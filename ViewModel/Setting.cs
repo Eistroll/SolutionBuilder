@@ -23,5 +23,23 @@ namespace SolutionBuilder
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
+        public override bool Equals(object obj)
+        {
+            if (obj == null) return false;
+            Setting objAsPart = obj as Setting;
+            if (objAsPart == null) return false;
+            else return Equals(objAsPart);
+        }
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+        public bool Equals(Setting other)
+        {
+            if (other == null) return false;
+            if (this.Scope == other.Scope && this.Key == other.Key)
+                return true;
+            return false;
+        }
     }
 }

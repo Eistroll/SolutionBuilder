@@ -58,11 +58,12 @@ namespace SolutionBuilder
         [IgnoreDataMemberAttribute]
         public bool IsSelected { get; set; }
         public String BuildLog { get; set; }
+
         public SolutionObjectView(ref SolutionObject SolutionObject, String selectedConfiguration)
         {
             _SolutionObject = SolutionObject;
             Options = _SolutionObject.Options[selectedConfiguration];
-            PostBuildStep = _SolutionObject.PostBuildStep;
+            PostBuildStep = _SolutionObject.PostBuildSteps?[selectedConfiguration];
         }
         public override int GetHashCode()
         {

@@ -129,8 +129,8 @@
                             <TabControl.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{Binding Header}" Margin="0,0,2,0" />
-                                        <CheckBox IsChecked="{Binding DoBuild}" Margin="0,0,2,0"/>
+                                        <TextBlock Text="{Binding TabName}" Margin="0,0,2,0" />
+                                        <CheckBox IsChecked="{Binding DoBuild}" Margin="0,0,2,0" IsThreeState="False"/>
                                         <Image Source="{Binding BuildState, Converter={StaticResource StateConverter}}" Height="16" Margin="2"/>
                                     </StackPanel>
                                 </DataTemplate>
@@ -150,13 +150,13 @@
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
                                             <StackPanel Orientation="Horizontal" Grid.Column="0">
-                                                <ComboBox x:Name="cbConfiguration" 
-                                                  ItemsSource="{Binding Configurations}" 
-                                                  SelectedItem="{Binding SelectedConfiguration}" 
-                                                  HorizontalAlignment="Left" 
-                                                  VerticalAlignment="Center" 
-                                                  Width="120" 
-                                                  Height="22"/>
+                                                <Button Command="{Binding OpenSettingsCmd}" 
+                                                    ToolTip="Tab settings"
+                                                    Margin="2,2" 
+                                                    Width="20" 
+                                                    Height="20">
+                                                    <Image Source="pack://application:,,,/Images/img_gear_20.png" Width="16" Height="16"/>
+                                                </Button>
                                             </StackPanel>
                                             <StackPanel Orientation="Horizontal" Grid.Column="2">
                                                 <Button x:Name="btAdd" 
@@ -180,14 +180,24 @@
                                         </Grid>
                                         <Grid Grid.Row="1" Margin="5,5,5,0">
                                             <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="auto"/>
                                                 <ColumnDefinition Width="100"/>
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
-                                            <Label x:Name="lbBaseOptions" Grid.Column="0">Options:</Label>
+                                            <ComboBox x:Name="cbConfiguration" 
+                                                  Grid.Column="0"
+                                                  ItemsSource="{Binding Configurations}" 
+                                                  SelectedItem="{Binding SelectedConfiguration}" 
+                                                  HorizontalAlignment="Left" 
+                                                  VerticalAlignment="Center" 
+                                                  Width="120" 
+                                                  Height="22"/>
+                                            <Label x:Name="lbBaseOptions" 
+                                                   Grid.Column="1">Options:</Label>
                                             <TextBox x:Name="tbBaseOptions" 
-                                             Grid.Column="1" 
-                                             Text="{Binding BaseOptions}" 
-                                             VerticalAlignment="Center"/>
+                                                Grid.Column="2" 
+                                                Text="{Binding BaseOptions}" 
+                                                VerticalAlignment="Center"/>
                                         </Grid>
                                         <ListView Grid.Row="2"
                                           Name="lvSolutions" 
@@ -245,7 +255,6 @@
                                                     <GridViewColumn Header="PostBuild" Width="auto">
                                                         <GridViewColumn.CellTemplate>
                                                             <DataTemplate>
-                                                                <!--<Image Source="{Binding PostBuildStep, Converter={StaticResource ContentConverter}}" />-->
                                                                 <Button Click="OpenPostBuildStep_Click" 
                                                                         ToolTip="Create or edit post build command"
                                                                         Margin="2,2" 

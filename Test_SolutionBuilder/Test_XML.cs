@@ -46,7 +46,7 @@ namespace Test_SolutionBuilder
                 Options = new Dictionary<string, string> { { "Release", "/p:Configuration=\"Unicode Release\"" }, { "Debug", "/p:Configuration=\"Unicode Debug\"" } }
             });
             MainViewModel viewModel = new MainViewModel();
-            viewModel.Tabs.Add(new BuildTabItem() { Header = "test" });
+            viewModel.Tabs.Add(new BuildTabItem() { TabName = "test" });
             viewModel.BindToModel(ref model);
             var tab = viewModel.Tabs[0];
             tab.Solutions[1].Checked = true;

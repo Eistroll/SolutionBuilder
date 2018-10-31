@@ -85,7 +85,7 @@ namespace SolutionBuilder.View
             int index = tab.SelectedSolutionIndex;
             if (index >= 0 && index < tab.Solutions.Count)
             {
-                var solutions = _Model.Scope2SolutionObjects[tab.Header];
+                var solutions = _Model.Scope2SolutionObjects[tab.TabName];
                 solutions.RemoveAt(index);
                 tab.Solutions.RemoveAt(index);
             }
@@ -133,8 +133,7 @@ namespace SolutionBuilder.View
                 String tabName = dialog.Entries.FirstOrDefault(x => x.Key == "Name").Value;
                 if (tabName == null && tabName.Length <= 0)
                     return;
-                _ViewModel.SettingsList.Add(new Setting() { Scope = tabName, Key = "BaseDir", Value = dialog.Entries.FirstOrDefault(x => x.Key == "Base dir").Value });
-                BuildTabItem tab = new BuildTabItem() { Header = tabName };
+                BuildTabItem tab = new BuildTabItem() { TabName = tabName };
                 tab.BindToModel(ref _Model, ref _ViewModel);
                 _ViewModel.Tabs.Add(tab);
             }
@@ -146,11 +145,10 @@ namespace SolutionBuilder.View
             {
                 String tabName = dialog.QueryString;
                 BuildTabItem originalTab = tabs.SelectedItem as BuildTabItem;
-                String originalBaseDir = _ViewModel.GetSetting("BaseDir", originalTab.Header);
-                String newBaseDir = originalBaseDir.Replace(originalTab.Header, tabName);
-                _ViewModel.SettingsList.Add(new Setting() { Scope = tabName, Key = "BaseDir", Value = newBaseDir });
-                BuildTabItem tab = new BuildTabItem() { Header = tabName };
-                var clonedList = _Model.Scope2SolutionObjects[originalTab.Header].Select(obj => (SolutionObject)obj.Clone()).ToList();
+                String originalBaseDir = originalTab.BaseDir;
+                String newBaseDir = originalBaseDir.Replace(originalTab.TabName, tabName);
+                BuildTabItem tab = new BuildTabItem() { TabName = tabName, BaseDir = newBaseDir, BaseOptions = originalTab.BaseOptions };
+                var clonedList = _Model.Scope2SolutionObjects[originalTab.TabName].Select(obj => (SolutionObject)obj.Clone()).ToList();
                 _Model.Scope2SolutionObjects[tabName] = new System.Collections.ObjectModel.ObservableCollection<SolutionObject>(clonedList);
                 tab.BindToModel(ref _Model, ref _ViewModel);
                 _ViewModel.Tabs.Add(tab);
