@@ -262,6 +262,11 @@ namespace SolutionBuilder
         {
             get { return _BuildCmd ?? (_BuildCmd = new CommandHandler(param => BuildCheckedSolutions())); }
         }
+        private ICommand _CancelCmd;
+        public ICommand CancelCmd
+        {
+            get { return _CancelCmd ?? (_CancelCmd = new CommandHandler(param => CancelBuild())); }
+        }
         private ICommand _AddSolutionCmd;
         public ICommand AddSolutionCmd
         {
@@ -364,15 +369,25 @@ namespace SolutionBuilder
                 _ViewModel.ProgressType = "Building single solution";
                 var task = mainWindow.executor.Execute(action =>
                {
-                   buildExecution.Build(action);
+                   buildExecution.Build(action, ref mainWindow.executor.CurrentProcessId);
                });
                 //_ViewModel.ProgressType = "";
             }
         }
         private void OpenSettings()
         {
-            System.Windows.Window settings = new BuildTabSettings() { DataContext = this };
+            View.MainWindow mainWindow = (View.MainWindow)System.Windows.Application.Current.MainWindow;
+            if (mainWindow == null)
+                return;
+            System.Windows.Window settings = new BuildTabSettings() { DataContext = this, Owner = mainWindow };
             settings.ShowDialog();
+        }
+        public void CancelBuild()
+        {
+            View.MainWindow mainWindow = (View.MainWindow)System.Windows.Application.Current.MainWindow;
+            if (mainWindow == null)
+                return;
+            mainWindow.executor.Cancel();
         }
         public void BuildCheckedSolutions()
         {
@@ -403,7 +418,7 @@ namespace SolutionBuilder
             _ViewModel.ProgressType = "Building checked solutions";
             var task = mainWindow.executor.Execute(action =>
             {
-                buildExecution.Build(action);
+                buildExecution.Build(action, ref mainWindow.executor.CurrentProcessId);
             });
         }
         private CommandHandler _OpenSolutionCmd;

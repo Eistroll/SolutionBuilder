@@ -19,7 +19,7 @@ namespace SolutionBuilder
         public ObservableCollection<SolutionObjectView> solutions;
         public Action<string> AddToLog;
         public Action<int, int, int, string, bool> UpdateProgress;
-        public bool Build(CancellationToken token)
+        public bool Build(CancellationToken token, ref int currentProcessId)
         {
             bool atLeastOneBuildFailed = false;
             if (solutions.Count == 0)
@@ -29,6 +29,11 @@ namespace SolutionBuilder
             int count = 0;
             foreach (SolutionObjectView solution in solutions)
             {
+                string solutionPath = BaseDir + "\\" + solution.Name;
+                UpdateProgress?.Invoke(0, solutions.Count, count, solutionPath, atLeastOneBuildFailed);
+                bool failure = BuildSolution(BuildExe, solutionPath, BaseOptions, solution, ref currentProcessId);
+                atLeastOneBuildFailed = atLeastOneBuildFailed || failure;
+                AddToLog?.Invoke(solutionPath + (failure ? " failed" : " successful") + Environment.NewLine);
                 if (token.IsCancellationRequested == true)
                 {
                     AddToLog?.Invoke("Build has been canceled.");
@@ -36,12 +41,6 @@ namespace SolutionBuilder
                     //token.ThrowIfCancellationRequested();
                     return false;
                 }
-                string solutionPath = BaseDir + "\\" + solution.Name;
-                UpdateProgress?.Invoke(0, solutions.Count, count, solutionPath, atLeastOneBuildFailed);
-                bool failure = BuildSolution(BuildExe, solutionPath, BaseOptions, solution);
-                atLeastOneBuildFailed = atLeastOneBuildFailed || failure;
-                AddToLog?.Invoke(solutionPath + (failure ? " failed" : " successful") + Environment.NewLine);
-                UpdateProgress?.Invoke(0, solutions.Count, ++count, solutionPath, atLeastOneBuildFailed);
             }
             return atLeastOneBuildFailed;
         }
@@ -50,7 +49,7 @@ namespace SolutionBuilder
             string line = e.Data + Environment.NewLine;
             solution.BuildLog += line;
         }
-        private bool BuildSolution(FileInfo buildExe, string solutionPath, string baseOptions, SolutionObjectView solution)
+        private bool BuildSolution(FileInfo buildExe, string solutionPath, string baseOptions, SolutionObjectView solution, ref int currentProcessId)
         {
             bool buildFailure = true;
             solution.BuildLog = "";
@@ -63,6 +62,7 @@ namespace SolutionBuilder
             // Set event handler
             process.OutputDataReceived += (s, eventargs) => BuildOutputHandler(s, eventargs, solution);
             bool Success = process.Start();
+            currentProcessId = process.Id;
             process.BeginOutputReadLine();
             process.WaitForExit();
             int exitCode = process.ExitCode;
@@ -79,11 +79,11 @@ namespace SolutionBuilder
             
             solution.SuccessFlag = exitCode == 0 ? true : false;
             if( solution.SuccessFlag)
-                PerformPostbuildStep(solution);
+                PerformPostbuildStep(solution, ref currentProcessId);
 
             return buildFailure;
         }
-        private int PerformPostbuildStep( SolutionObjectView solution )
+        private int PerformPostbuildStep( SolutionObjectView solution, ref int currentProcessId )
         {
             if (solution.PostBuildStep == null || solution.PostBuildStep.Length == 0)
                 return -1;
@@ -98,6 +98,7 @@ namespace SolutionBuilder
             startInfo.Arguments = @"/c " + command;
             process.StartInfo = startInfo;
             bool Success = process.Start();
+            currentProcessId = process.Id;
             process.BeginOutputReadLine();
             process.WaitForExit();
             string strLog = "PostBuild: " + command + " finished with " + process.ExitCode;

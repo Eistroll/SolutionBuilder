@@ -176,6 +176,15 @@
                                                     Command="{Binding BuildCmd}" 
                                                     Height="20" 
                                                     Margin="5,0,0,0"/>
+                                                <Button x:Name="btCancel" 
+                                                    Content="Cancel" 
+                                                    ToolTip="Cancel current build of solution"
+                                                    VerticalAlignment="Center" 
+                                                    Width="75" 
+                                                    HorizontalAlignment="Right" 
+                                                    Command="{Binding CancelCmd}" 
+                                                    Height="20" 
+                                                    Margin="5,0,0,0"/>
                                             </StackPanel>
                                         </Grid>
                                         <Grid Grid.Row="1" Margin="5,5,5,0">

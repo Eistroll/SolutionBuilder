@@ -16,6 +16,7 @@ namespace SolutionBuilder
     {
         CancellationTokenSource cancelTokenSource;
         CancellationToken token = CancellationToken.None;
+        public int CurrentProcessId = 0;
         private MainViewModel _ViewModel;
         public Executor(MainViewModel viewModel)
         {
@@ -27,10 +28,6 @@ namespace SolutionBuilder
         {
             Dispose(false);
         }
-        public Task Execute(Action action)
-        {
-            return Task.Run(() => action());
-        }
         public Task Execute( Action<CancellationToken> action )
         {
             return Task.Run(() => action(token), token);
@@ -41,6 +38,19 @@ namespace SolutionBuilder
             cancelTokenSource.Dispose();
             cancelTokenSource = new CancellationTokenSource();
             token = cancelTokenSource.Token;
+            if( CurrentProcessId > 0)
+            {
+                Process[] process = Process.GetProcesses();
+                foreach (Process prs in process)
+                {
+                    if (prs.Id == CurrentProcessId)
+                    {
+                        prs.Kill();
+                        break;
+                    }
+                }
+            }
+
         }
 
         public void Dispose()
