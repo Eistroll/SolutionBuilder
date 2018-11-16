@@ -316,23 +316,24 @@ namespace SolutionBuilder
         private CommandHandler _BuildSolutionCmd;
         public CommandHandler BuildSolutionCmd
         {
-            get { return _BuildSolutionCmd ?? (_BuildSolutionCmd = new CommandHandler(param => BuildSolution(param), param => RemoveSolution_CanExecute(param))); }
+            get { return _BuildSolutionCmd ?? (_BuildSolutionCmd = new CommandHandler(param => BuildSelectedSolutions(param), param => RemoveSolution_CanExecute(param))); }
         }
         public bool BuildSolution_CanExecute(object parameter)
         {
             return SelectedSolutionIndex != -1;
         }
-        public void UpdateProgress(int min, int max, int current, string text, bool failure)
+        public void DoUpdateProgress(int min, int max, int current, string text, bool failure)
         {
             ProgressMin = min;
             ProgressMax = max;
             ProgressCurrent = current;
-            _ViewModel.ProgressValue = (double)current / (max - min);
+            double progress = current == 0 ? 0.001 : (double)current / (max - min);
+            _ViewModel.ProgressValue = Math.Min(1.0, progress);
             _ViewModel.ProgressDesc = text;
             if (current == min && !failure)
             {
                 _ViewModel.ProgressBuildState = View.State.None;
-                _ViewModel.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
+                _ViewModel.ProgressState = (min + 1 == max) ? System.Windows.Shell.TaskbarItemProgressState.Indeterminate : System.Windows.Shell.TaskbarItemProgressState.Normal;
             }
             if (failure && _ViewModel.ProgressState != System.Windows.Shell.TaskbarItemProgressState.Error)
             {
@@ -344,35 +345,17 @@ namespace SolutionBuilder
             {
                 ProgressVisible = false;
                 _ViewModel.ProgressBuildState = View.State.Success;
+                _ViewModel.ProgressState = System.Windows.Shell.TaskbarItemProgressState.None;
                 _ViewModel.ProgressType = "";
                 _ViewModel.ProgressDesc = "";
             }
         }
-        public void BuildSolution(object parameter)
+        public void BuildSelectedSolutions(object parameter)
         {
-            SolutionObjectView solution = Solutions[SelectedSolutionIndex];
-            View.MainWindow mainWindow = (View.MainWindow)System.Windows.Application.Current.MainWindow;
-            if (mainWindow != null)
-            {
-                mainWindow.ClearLog();
-                //(mainWindow.FindResource("showMe") as Storyboard).Begin(mainWindow.);
-                solution.BuildState = View.State.None;
-                Builder buildExecution = new Builder()
-                {
-                    BaseDir = BaseDir,
-                    BaseOptions = BaseOptions,
-                    BuildExe = new FileInfo(_ViewModel.GetSetting(Setting.Executables.BuildExe.ToString())),
-                    solutions = new ObservableCollection<SolutionObjectView>() { solution },
-                    AddToLog = mainWindow.AddToLog,
-                    UpdateProgress = UpdateProgress
-                };
-                _ViewModel.ProgressType = "Building single solution";
-                var task = mainWindow.executor.Execute(action =>
-               {
-                   buildExecution.Build(action, ref mainWindow.executor.CurrentProcessId);
-               });
-                //_ViewModel.ProgressType = "";
-            }
+            Collection<SolutionObjectView> solutions = new Collection<SolutionObjectView>();
+            foreach (var solutionView in SelectedSolutionViews)
+                solutions.Add(solutionView);
+            BuildSolutions(solutions, "Building selected solutions");
         }
         private void OpenSettings()
         {
@@ -389,7 +372,7 @@ namespace SolutionBuilder
                 return;
             mainWindow.executor.Cancel();
         }
-        public void BuildCheckedSolutions()
+        public void BuildSolutions(ICollection<SolutionObjectView> solutionsToBuild, string progressText )
         {
             View.MainWindow mainWindow = (View.MainWindow)System.Windows.Application.Current.MainWindow;
             if (mainWindow == null)
@@ -397,7 +380,24 @@ namespace SolutionBuilder
             mainWindow.ClearLog();
             BuildState = View.State.None;
             ProgressVisible = true;
-            ObservableCollection<SolutionObjectView> solutionsToBuild = new ObservableCollection<SolutionObjectView>();
+            Builder buildExecution = new Builder()
+            {
+                BaseDir = BaseDir,
+                BaseOptions = BaseOptions,
+                BuildExe = new FileInfo(_ViewModel.GetSetting(Setting.Executables.BuildExe.ToString())),
+                solutions = solutionsToBuild,
+                AddToLog = mainWindow.AddToLog,
+                UpdateProgress = DoUpdateProgress
+            };
+            _ViewModel.ProgressType = progressText;
+            var task = mainWindow.executor.Execute(action =>
+            {
+                buildExecution.Build(action, ref mainWindow.executor.CurrentProcessId);
+            });
+        }
+        public void BuildCheckedSolutions()
+        {
+            ICollection<SolutionObjectView> solutionsToBuild = new Collection<SolutionObjectView>();
             foreach (SolutionObjectView solution in Solutions)
             {
                 solution.BuildState = View.State.None;
@@ -406,20 +406,7 @@ namespace SolutionBuilder
                     solutionsToBuild.Add(solution);
                 }
             }
-            Builder buildExecution = new Builder()
-            {
-                BaseDir = BaseDir,
-                BaseOptions = BaseOptions,
-                BuildExe = new FileInfo(_ViewModel.GetSetting(Setting.Executables.BuildExe.ToString())),
-                solutions = solutionsToBuild,
-                AddToLog = mainWindow.AddToLog,
-                UpdateProgress = UpdateProgress
-            };
-            _ViewModel.ProgressType = "Building checked solutions";
-            var task = mainWindow.executor.Execute(action =>
-            {
-                buildExecution.Build(action, ref mainWindow.executor.CurrentProcessId);
-            });
+            BuildSolutions(solutionsToBuild, "Building checked solutions");
         }
         private CommandHandler _OpenSolutionCmd;
         public CommandHandler OpenSolutionCmd

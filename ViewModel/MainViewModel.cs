@@ -57,7 +57,7 @@ namespace SolutionBuilder
         public TaskbarItemProgressState ProgressState
         {
             get { return _ProgressState; }
-            set { if (value != _ProgressState) { _ProgressState = value; NotifyPropertyChanged("ProgressState"); } }
+            set { if (value != _ProgressState) { _ProgressState = value; NotifyPropertyChanged("ProgressState");  NotifyPropertyChanged("ProgressIsIndeterminate");} }
         }
         private String _ProgressType;
         [IgnoreDataMemberAttribute]
@@ -79,6 +79,11 @@ namespace SolutionBuilder
         {
             get { return _ProgressValue; }
             set { if (value != _ProgressValue) { _ProgressValue = value; NotifyPropertyChanged("ProgressValue"); } }
+        }
+        [IgnoreDataMemberAttribute]
+        public bool ProgressIsIndeterminate
+        {
+            get { return _ProgressState == System.Windows.Shell.TaskbarItemProgressState.Indeterminate; }
         }
         private View.State _ProgressBuildState;
         [IgnoreDataMemberAttribute]

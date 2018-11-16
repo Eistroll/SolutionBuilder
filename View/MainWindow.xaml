@@ -8,7 +8,7 @@
         xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
         xmlns:local="clr-namespace:SolutionBuilder.View"
         mc:Ignorable="d"
-        Title="MainWindow" 
+        Title="Solution Builder and Distributor" 
         Height="550" Width="750" 
         Loaded="Window_Loaded" 
         Closing="Window_Closing" 
@@ -17,6 +17,7 @@
         <converters:StateToImageSourceConverter x:Key="StateConverter"/>
         <converters:ContentToImageSourceConverter x:Key="ContentConverter"/>
         <converters:BoolToVisibilityConverter x:Key="VisibilityConverter"/>
+        <converters:TailOfFilePathConverter x:Key="TailPathConverter"/>
         <Storyboard x:Key="hideMe">
             <DoubleAnimation Storyboard.TargetProperty="Opacity" Duration="0:0:2" To="0.0"/>
             <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
@@ -64,7 +65,7 @@
             </StatusBarItem>
             <Separator Grid.Column="3" />
             <StatusBarItem Grid.Column="4">
-                <ProgressBar Minimum="0" Maximum="1" Value="{Binding ProgressValue}" Width="150" Height="16"/>
+                <ProgressBar Minimum="0" Maximum="1" Value="{Binding ProgressValue}" IsIndeterminate="{Binding ProgressIsIndeterminate}" Width="150" Height="16"/>
             </StatusBarItem>
         </StatusBar>
         <Grid DockPanel.Dock="Top">
@@ -129,9 +130,63 @@
                             <TabControl.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{Binding TabName}" Margin="0,0,2,0" />
-                                        <CheckBox IsChecked="{Binding DoBuild}" Margin="0,0,2,0" IsThreeState="False"/>
-                                        <Image Source="{Binding BuildState, Converter={StaticResource StateConverter}}" Height="16" Margin="2"/>
+                                        <StackPanel.Resources>
+                                            <Style x:Key="FadeOutButton" TargetType="{x:Type Button}">
+                                                <Style.Triggers>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding RelativeSource={RelativeSource self}, Path=IsMouseOver}" Value="True" />
+                                                            <Condition Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabItem}}, Path=IsSelected}" Value="False"/>
+                                                        </MultiDataTrigger.Conditions>
+                                                        <MultiDataTrigger.EnterActions>
+                                                            <BeginStoryboard>
+                                                                <Storyboard>
+                                                                    <DoubleAnimation Duration="0:0:0.2" To="1" Storyboard.TargetProperty="Opacity"/>
+                                                                </Storyboard>
+                                                            </BeginStoryboard>
+                                                        </MultiDataTrigger.EnterActions>
+                                                        <MultiDataTrigger.ExitActions>
+                                                            <BeginStoryboard>
+                                                                <Storyboard>
+                                                                    <DoubleAnimation Duration="0:0:0.2" To="0" Storyboard.TargetProperty="Opacity"/>
+                                                                </Storyboard>
+                                                            </BeginStoryboard>
+                                                        </MultiDataTrigger.ExitActions>
+                                                    </MultiDataTrigger>
+                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabItem}}, Path=IsSelected}" Value="True">
+                                                        <DataTrigger.EnterActions>
+                                                            <BeginStoryboard>
+                                                                <Storyboard>
+                                                                    <DoubleAnimation Duration="0:0:0.2" To="1" Storyboard.TargetProperty="Opacity"/>
+                                                                </Storyboard>
+                                                            </BeginStoryboard>
+                                                        </DataTrigger.EnterActions>
+                                                        <DataTrigger.ExitActions>
+                                                            <BeginStoryboard>
+                                                                <Storyboard>
+                                                                    <DoubleAnimation Duration="0:0:0.2" To="0.0" Storyboard.TargetProperty="Opacity"/>
+                                                                </Storyboard>
+                                                            </BeginStoryboard>
+                                                        </DataTrigger.ExitActions>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </StackPanel.Resources>
+                                        <TextBlock Text="{Binding TabName}" Margin="2,2"/>
+                                        <CheckBox IsChecked="{Binding DoBuild}" Margin="4,2" IsThreeState="False"/>
+                                        <Image Source="{Binding BuildState, Converter={StaticResource StateConverter}}" Margin="2,2" Height="16"/>
+                                        <Button Click="CloseTab_Click" 
+                                                    ToolTip="Remove Tab"
+                                                    Margin="0,2" 
+                                                    Width="14" 
+                                                    Height="14"
+                                                    Style="{StaticResource FadeOutButton}"
+                                                    Opacity="0.0">
+                                            <Button.Triggers>
+                                                <EventTrigger RoutedEvent="Button.Click"/>
+                                            </Button.Triggers>
+                                            <Image Source="pack://application:,,,/Images/img_delete_16.png"/>
+                                        </Button>
                                     </StackPanel>
                                 </DataTemplate>
                             </TabControl.ItemTemplate>
@@ -308,13 +363,6 @@
                             <RowDefinition Height="Auto"></RowDefinition>
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0" Orientation="Horizontal">
-                            </StackPanel>
                             <StackPanel Grid.Column="2" Orientation="Horizontal">
                                 <Button Width="80" 
                                         Margin="5" 
@@ -347,21 +395,88 @@
                             </ListView.Resources>
                             <ListView.View>
                                 <GridView>
-                                    <GridViewColumn Header="" Width="30">
+                                    <GridViewColumn Width="30">
+                                        <GridViewColumn.Header>
+                                            <Image Source="pack://application:,,,/Images/img_check_16.png" Width="16" Height="16"/>
+                                        </GridViewColumn.Header>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <CheckBox IsChecked="{Binding Checked}"/>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Header="Source" Width="100">
+                                    <GridViewColumn Header="Actions" Width="Auto">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Button Click="CopyDistribution_Click" 
+                                                            Margin="0,0,2,0" 
+                                                            ToolTip="Copy">
+                                                        <Image Source="pack://application:,,,/Images/cmd_int_record_copy.png" Width="16" Height="16"/>
+                                                    </Button>
+                                                    <Button Click="StartDistribution_Click" 
+                                                            Margin="2,0" 
+                                                            ToolTip="Start application">
+                                                        <Image Source="pack://application:,,,/Images/img_play_20.png" Width="16" Height="16"/>
+                                                    </Button>
+                                                    <Button Click="KillDistribution_Click" 
+                                                            Margin="2,0" 
+                                                            ToolTip="Kill application">
+                                                        <Image Source="pack://application:,,,/Images/img_error_20.png" Width="16" Height="16"/>
+                                                    </Button>
+                                                    <Button Click="ExecuteDistribution_Click" 
+                                                            Margin="8,0,0,0" 
+                                                            ToolTip="Execute checked actions">
+                                                        <Image Source="pack://application:,,,/Images/img_batch_20.png" Width="16" Height="16"/>
+                                                    </Button>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn>
+                                        <GridViewColumn.Header>
+                                            <Image Source="pack://application:,,,/Images/cmd_int_record_copy.png" Width="16" Height="16"/>
+                                        </GridViewColumn.Header>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <CheckBox IsChecked="{Binding Copy}">
+                                                    <CheckBox.ContextMenu>
+                                                        <ContextMenu>
+                                                            <MenuItem Header="Apply to all" 
+                                                                  Command="{Binding ApplyToAllCmd}" 
+                                                                  CommandParameter="Copy"/>
+                                                        </ContextMenu>
+                                                    </CheckBox.ContextMenu>
+                                                </CheckBox>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn>
+                                        <GridViewColumn.Header>
+                                            <Image Source="pack://application:,,,/Images/img_play_20.png" Width="16" Height="16"/>
+                                        </GridViewColumn.Header>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <CheckBox IsChecked="{Binding Start}">
+                                                    <CheckBox.ContextMenu>
+                                                        <ContextMenu>
+                                                            <MenuItem Header="Apply to all" 
+                                                                  Command="{Binding ApplyToAllCmd}" 
+                                                                  CommandParameter="Start"/>
+                                                        </ContextMenu>
+                                                    </CheckBox.ContextMenu>
+                                                </CheckBox>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="Source" Width="Auto">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <ComboBox ItemsSource="{Binding DataContext.DistributionSourceMap, ElementName=wndMain }" 
                                                       DisplayMemberPath="Key" 
                                                       SelectedValuePath="Key" 
                                                       SelectedValue="{Binding Source}" 
-                                                      Width="Auto" 
+                                                      Width="80" 
                                                       Height="20" 
                                                       Margin="-5,0"
                                                       Tag="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
@@ -408,7 +523,7 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Header="Configuration" Width="100">
+                                    <GridViewColumn Header="Configuration" Width="Auto">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <ComboBox ItemsSource="{Binding DataContext.Configurations, ElementName=wndMain}" 
@@ -446,69 +561,24 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Header="Batch" Width="Auto">
+                                    <GridViewColumn Header="Executable Options" Width="150">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <Button Click="ExecuteDistribution_Click" 
-                                                            Margin="2,0" 
-                                                            ToolTip="Execute checked actions">
-                                                        <Image Source="pack://application:,,,/Images/img_batch_20.png" Width="16" Height="16"/>
-                                                    </Button>
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </GridViewColumn.CellTemplate>
-                                    </GridViewColumn>
-                                    <GridViewColumn Header="Copy" Width="50">
-                                        <GridViewColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <CheckBox IsChecked="{Binding Copy}">
-                                                    <CheckBox.ContextMenu>
+                                                <ComboBox ItemsSource="{Binding ExecArguments}" 
+                                                      SelectedItem="{Binding SelectedExecArgument}" 
+                                                      IsEditable="True"
+                                                      Text="{Binding NewExecArgument, UpdateSourceTrigger=LostFocus, Mode=OneWayToSource}"
+                                                      Height="20" 
+                                                      Width="Auto" 
+                                                      Margin="-5,0">
+                                                    <ComboBox.ContextMenu>
                                                         <ContextMenu>
                                                             <MenuItem Header="Apply to all" 
                                                                   Command="{Binding ApplyToAllCmd}" 
-                                                                  CommandParameter="Copy"/>
+                                                                  CommandParameter="Executable"/>
                                                         </ContextMenu>
-                                                    </CheckBox.ContextMenu>
-                                                </CheckBox>
-                                            </DataTemplate>
-                                        </GridViewColumn.CellTemplate>
-                                    </GridViewColumn>
-                                    <GridViewColumn Header="Start" Width="50">
-                                        <GridViewColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <CheckBox IsChecked="{Binding Start}">
-                                                    <CheckBox.ContextMenu>
-                                                        <ContextMenu>
-                                                            <MenuItem Header="Apply to all" 
-                                                                  Command="{Binding ApplyToAllCmd}" 
-                                                                  CommandParameter="Start"/>
-                                                        </ContextMenu>
-                                                    </CheckBox.ContextMenu>
-                                                </CheckBox>
-                                            </DataTemplate>
-                                        </GridViewColumn.CellTemplate>
-                                    </GridViewColumn>
-                                    <GridViewColumn Header="Actions" Width="Auto">
-                                        <GridViewColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <Button Click="CopyDistribution_Click" 
-                                                            Margin="2,0" 
-                                                            ToolTip="Copy">
-                                                        <Image Source="pack://application:,,,/Images/cmd_int_record_copy.png" Width="16" Height="16"/>
-                                                    </Button>
-                                                    <Button Click="StartDistribution_Click" 
-                                                            Margin="2,0" 
-                                                            ToolTip="Start application">
-                                                        <Image Source="pack://application:,,,/Images/img_play_20.png" Width="16" Height="16"/>
-                                                    </Button>
-                                                    <Button Click="KillDistribution_Click" 
-                                                            Margin="2,0" 
-                                                            ToolTip="Kill application">
-                                                        <Image Source="pack://application:,,,/Images/img_error_20.png" Width="16" Height="16"/>
-                                                    </Button>
-                                                </StackPanel>
+                                                    </ComboBox.ContextMenu>
+                                                </ComboBox>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>

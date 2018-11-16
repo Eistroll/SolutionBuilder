@@ -79,6 +79,16 @@ namespace SolutionBuilder.View
                 textBoxLog.ScrollToEnd();
             }
         }
+        private void CloseTab_Click(object sender, RoutedEventArgs e)
+        {
+            BuildTabItem selectedTab = tabs.SelectedItem as BuildTabItem;
+            var tabName = selectedTab?.TabName;
+            MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("Are you sure?", @"Delete Tab {tabName} Confirmation", System.Windows.MessageBoxButton.YesNo);
+            if (messageBoxResult == MessageBoxResult.Yes)
+            {
+                _ViewModel.Tabs.Remove(selectedTab);
+            }
+        }
         private void RemoveSolution_OnClick(object sender, RoutedEventArgs e)
         {
             BuildTabItem tab = (BuildTabItem)tabs.SelectedContent;
@@ -245,11 +255,12 @@ namespace SolutionBuilder.View
                     AddToLog($"Executable for starting does not exist: {exePath.ToString()}");
                     return false;
                 }
-                AddToLog($"Execute {exePath}" + Environment.NewLine);
+                AddToLog($"Execute {exePath} {distribution.SelectedExecArgument}" + Environment.NewLine);
                 task = Task.Factory.StartNew(() =>
                  {
                      System.Diagnostics.Process process = new System.Diagnostics.Process();
                      process.StartInfo.FileName = exePath.ToString();
+                     process.StartInfo.Arguments = distribution.SelectedExecArgument;
                      process.Start();
                      distribution.Proc = process;
                  });

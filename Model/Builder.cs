@@ -16,7 +16,7 @@ namespace SolutionBuilder
         public string BaseDir;
         public string BaseOptions;
         public FileInfo BuildExe;
-        public ObservableCollection<SolutionObjectView> solutions;
+        public ICollection<SolutionObjectView> solutions;
         public Action<string> AddToLog;
         public Action<int, int, int, string, bool> UpdateProgress;
         public bool Build(CancellationToken token, ref int currentProcessId)
@@ -25,23 +25,27 @@ namespace SolutionBuilder
             if (solutions.Count == 0)
                 return false;
             //(FindResource("showMe") as Storyboard).Begin();
-            UpdateProgress?.Invoke(0, solutions.Count, 0, "", atLeastOneBuildFailed);
             int count = 0;
+            // Initially update with real solution count to handle single solution progress
+            UpdateProgress?.Invoke(0, solutions.Count, 0, "", atLeastOneBuildFailed);
+            int doubleSolutionCount = solutions.Count * 2;
             foreach (SolutionObjectView solution in solutions)
             {
                 string solutionPath = BaseDir + "\\" + solution.Name;
-                UpdateProgress?.Invoke(0, solutions.Count, count, solutionPath, atLeastOneBuildFailed);
+                UpdateProgress?.Invoke(0, doubleSolutionCount, ++count, solutionPath, atLeastOneBuildFailed);
                 bool failure = BuildSolution(BuildExe, solutionPath, BaseOptions, solution, ref currentProcessId);
                 atLeastOneBuildFailed = atLeastOneBuildFailed || failure;
+                UpdateProgress?.Invoke(0, doubleSolutionCount, ++count, solutionPath, atLeastOneBuildFailed);
                 AddToLog?.Invoke(solutionPath + (failure ? " failed" : " successful") + Environment.NewLine);
                 if (token.IsCancellationRequested == true)
                 {
                     AddToLog?.Invoke("Build has been canceled.");
-                    UpdateProgress?.Invoke(0, solutions.Count, solutions.Count, "Build has been canceled.", atLeastOneBuildFailed);
+                    UpdateProgress?.Invoke(0, solutions.Count+1, solutions.Count+1, "Build has been canceled.", atLeastOneBuildFailed);
                     //token.ThrowIfCancellationRequested();
                     return false;
                 }
             }
+            UpdateProgress?.Invoke(0, solutions.Count, solutions.Count, "", atLeastOneBuildFailed);
             return atLeastOneBuildFailed;
         }
         private void BuildOutputHandler(object sender, DataReceivedEventArgs e, SolutionObjectView solution)

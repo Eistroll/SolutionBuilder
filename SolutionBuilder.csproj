@@ -84,6 +84,7 @@
     <Compile Include="Converters\ContentToImageSourceConverter.cs" />
     <Compile Include="Converters\StateToImageSourceConverter.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
+    <Compile Include="Converters\TailOfFilePathConverter.cs" />
     <Compile Include="Model\Distributor.cs" />
     <Compile Include="Model\Executor.cs" />
     <Compile Include="Model\Builder.cs" />

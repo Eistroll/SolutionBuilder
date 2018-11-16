@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
+using System.Collections.ObjectModel;
 
 namespace SolutionBuilder.ViewModel
 {
@@ -54,6 +55,33 @@ namespace SolutionBuilder.ViewModel
             get { return _Start; }
             set { if (_Start != value) { _Start = value; NotifyPropertyChanged("Start"); } }
         }
+        public ObservableCollection<string> ExecArguments { get; set; }
+        private string _SelectedExecArgument;
+        public string SelectedExecArgument
+        {
+            get { return _SelectedExecArgument; }
+            set
+            {
+                _SelectedExecArgument = value;
+                NotifyPropertyChanged("SelectedExecArgument");
+            }
+        }
+        [IgnoreDataMemberAttribute]
+        public string NewExecArgument
+        {
+            set
+            {
+                if (SelectedExecArgument != null)
+                {
+                    return;
+                }
+                if (!string.IsNullOrEmpty(value))
+                {
+                    ExecArguments?.Add(value);
+                    SelectedExecArgument = value;
+                }
+            }
+        }
         [IgnoreDataMemberAttribute]
         public int PID { get; set; }
         [IgnoreDataMemberAttribute]
@@ -65,7 +93,10 @@ namespace SolutionBuilder.ViewModel
             get { return _ApplyToAllProperty; }
             set { _ApplyToAllProperty = value; NotifyPropertyChanged("ApplyToAllProperty"); }
         }
-
+        public DistributionItem()
+        {
+            ExecArguments = new ObservableCollection<string>();
+        }
         public object Clone()
         {
             return this.MemberwiseClone();
