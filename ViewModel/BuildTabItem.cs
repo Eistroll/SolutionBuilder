@@ -345,7 +345,7 @@ namespace SolutionBuilder
             {
                 ProgressVisible = false;
                 _ViewModel.ProgressBuildState = View.State.Success;
-                _ViewModel.ProgressState = System.Windows.Shell.TaskbarItemProgressState.None;
+                _ViewModel.ProgressState = failure ? System.Windows.Shell.TaskbarItemProgressState.Error : System.Windows.Shell.TaskbarItemProgressState.None;
                 _ViewModel.ProgressType = "";
                 _ViewModel.ProgressDesc = "";
             }

@@ -19,6 +19,7 @@ namespace SolutionBuilder
     public class MainViewModel : INotifyPropertyChanged
     {
         public BindingList<DistributionItem> DistributionList { get; set; }
+        public int SelectedDistributionIndex { get; set; }
         public StringCollection Platforms { get; set; }
         public StringCollection Configurations { get; set; }
         private int _SelectedSettingIndex = -1;

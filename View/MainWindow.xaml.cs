@@ -11,6 +11,7 @@ using System.Windows.Input;
 using SolutionBuilder.ViewModel;
 using System.Threading;
 using System.Collections.ObjectModel;
+using System.Windows.Media;
 
 namespace SolutionBuilder.View
 {

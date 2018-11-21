@@ -132,6 +132,19 @@ namespace SolutionBuilder.ViewModel
         {
             public string Property;
         }
+        private CommandHandler _RemoveExecTargetCmd;
+        public CommandHandler RemoveExecTargetCmd
+        {
+            get { return _RemoveExecTargetCmd ?? (_RemoveExecTargetCmd = new CommandHandler(param => OnRemoveExecTarget(param), param => RemoveExecTarget_CanExecute(param))); }
+        }
+        public bool RemoveExecTarget_CanExecute(object parameter)
+        {
+            return true;
+        }
+        protected virtual void OnRemoveExecTarget(object parameter)
+        {
+            ExecArguments.Remove(SelectedExecArgument);
+        }
         public object this[string propertyName]
         {
             get { return this.GetType().GetProperty(propertyName).GetValue(this, null); }

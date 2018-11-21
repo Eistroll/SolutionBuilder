@@ -384,6 +384,7 @@
                         <ListView Grid.Row="1" 
                               Name="lvDistribution" 
                               ItemsSource="{Binding DistributionList}" 
+                              SelectedIndex="{Binding SelectedDistributionIndex}"
                               Margin="5" 
                               HorizontalContentAlignment="Stretch"
                               dd:DragDrop.IsDragSource="True" 
@@ -469,14 +470,14 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Header="Source" Width="Auto">
+                                    <GridViewColumn Header="Source" Width="100">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <ComboBox ItemsSource="{Binding DataContext.DistributionSourceMap, ElementName=wndMain }" 
                                                       DisplayMemberPath="Key" 
                                                       SelectedValuePath="Key" 
                                                       SelectedValue="{Binding Source}" 
-                                                      Width="80" 
+                                                      Width="Auto" 
                                                       Height="20" 
                                                       Margin="-5,0"
                                                       Tag="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
@@ -566,6 +567,7 @@
                                             <DataTemplate>
                                                 <ComboBox ItemsSource="{Binding ExecArguments}" 
                                                       SelectedItem="{Binding SelectedExecArgument}" 
+                                                      Name="ComboBox_ExecArguments"
                                                       IsEditable="True"
                                                       Text="{Binding NewExecArgument, UpdateSourceTrigger=LostFocus, Mode=OneWayToSource}"
                                                       Height="20" 
@@ -576,6 +578,8 @@
                                                             <MenuItem Header="Apply to all" 
                                                                   Command="{Binding ApplyToAllCmd}" 
                                                                   CommandParameter="Executable"/>
+                                                            <MenuItem Header="Delete entry" 
+                                                                  Command="{Binding RemoveExecTargetCmd}"/>
                                                         </ContextMenu>
                                                     </ComboBox.ContextMenu>
                                                 </ComboBox>
