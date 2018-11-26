@@ -307,7 +307,20 @@ namespace SolutionBuilder.View
         {
             foreach (var distribution in _ViewModel.DistributionList)
             {
-                KillProcss(distribution);
+                if(distribution.Checked)
+                    KillProcss(distribution);
+            }
+        }
+        private void NewDistribution_Click(object sender, RoutedEventArgs e)
+        {
+            _ViewModel.DistributionList.AddNew();
+        }
+        private void DeleteDistributions_Click(object sender, RoutedEventArgs e)
+        {
+            for( int i= _ViewModel.DistributionList.Count; i >0; --i)
+            {
+                if (_ViewModel.DistributionList.ElementAt(i - 1).IsSelected)
+                    _ViewModel.DistributionList.RemoveAt(i - 1);
             }
         }
         private void ExecuteDistribution_Click(object sender, RoutedEventArgs e)
@@ -415,6 +428,15 @@ namespace SolutionBuilder.View
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        private void ComboBox_ExecArguments_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            var combobox = sender as ComboBox;
+            if(combobox != null && combobox.IsDropDownOpen)
+            {
+                e.Handled = true;
+            }
         }
     }
 }

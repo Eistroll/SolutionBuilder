@@ -363,7 +363,7 @@
                             <RowDefinition Height="Auto"></RowDefinition>
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
-                            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                            <StackPanel Grid.Column="0" Orientation="Horizontal">
                                 <Button Width="80" 
                                         Margin="5" 
                                         Content="Copy selected"
@@ -380,6 +380,20 @@
                                         ToolTip="Kill selected executables"
                                         Click="KillSelected_Click"/>
                             </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Width="Auto" 
+                                        Margin="5" 
+                                        ToolTip="Create new distribution row"
+                                        Click="NewDistribution_Click">
+                                    <Image Source="pack://application:,,,/Images/img_add_16.png" Width="16" Height="16"/>
+                                </Button>
+                                <Button Width="Auto" 
+                                        Margin="5" 
+                                        ToolTip="Delete selected distributions"
+                                        Click="DeleteDistributions_Click">
+                                    <Image Source="pack://application:,,,/Images/img_delete_16.png" Width="16" Height="16"/>
+                                </Button>
+                            </StackPanel>
                         </Grid>
                         <ListView Grid.Row="1" 
                               Name="lvDistribution" 
@@ -394,6 +408,11 @@
                                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                                 </Style>
                             </ListView.Resources>
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="{x:Type ListViewItem}">
+                                    <Setter Property="IsSelected" Value="{Binding Mode=TwoWay, Path=IsSelected}"/>
+                                </Style>
+                            </ListView.ItemContainerStyle>
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Width="30">
@@ -572,7 +591,8 @@
                                                       Text="{Binding NewExecArgument, UpdateSourceTrigger=LostFocus, Mode=OneWayToSource}"
                                                       Height="20" 
                                                       Width="Auto" 
-                                                      Margin="-5,0">
+                                                      Margin="-5,0"
+                                                      ContextMenuOpening="ComboBox_ExecArguments_ContextMenuOpening">
                                                     <ComboBox.ContextMenu>
                                                         <ContextMenu>
                                                             <MenuItem Header="Apply to all" 

@@ -12,6 +12,8 @@ namespace SolutionBuilder.ViewModel
 {
     public class DistributionItem : INotifyPropertyChanged, ICloneable
     {
+        [IgnoreDataMemberAttribute]
+        public bool IsSelected { get; set; }
         public bool Checked { get; set; }
         private string _Source;
         public string Source
@@ -144,6 +146,8 @@ namespace SolutionBuilder.ViewModel
         protected virtual void OnRemoveExecTarget(object parameter)
         {
             ExecArguments.Remove(SelectedExecArgument);
+            if (ExecArguments.Count > 0)
+                SelectedExecArgument = ExecArguments.ElementAt(0);
         }
         public object this[string propertyName]
         {

@@ -14,7 +14,7 @@
         </Grid.RowDefinitions>
         <ListView Grid.Row="0" 
                   x:Name="lvSettings" 
-                  ItemsSource="{Binding SettingsList}" 
+                  ItemsSource="{Binding DynamoList}" 
                   HorizontalContentAlignment="Stretch" 
                   SelectedIndex="{Binding SelectedSettingIndex}">
             <ListView.Resources>
