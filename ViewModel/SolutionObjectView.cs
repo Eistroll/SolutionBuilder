@@ -63,7 +63,9 @@ namespace SolutionBuilder
         {
             _SolutionObject = SolutionObject;
             Options = _SolutionObject.Options[selectedConfiguration];
-            PostBuildStep = _SolutionObject.PostBuildSteps?[selectedConfiguration];
+            _SolutionObject.PostBuildSteps.TryGetValue(selectedConfiguration, out var postBuildStep);
+            if (!string.IsNullOrEmpty(postBuildStep))
+                PostBuildStep = postBuildStep;
         }
         public override int GetHashCode()
         {
