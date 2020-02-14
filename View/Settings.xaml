@@ -13,8 +13,8 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <ListView Grid.Row="0" 
-                  x:Name="lvSettings" 
-                  ItemsSource="{Binding DynamoList}" 
+                  x:Name="lvSettings"
+                  ItemsSource="{Binding SettingsList}" 
                   HorizontalContentAlignment="Stretch" 
                   SelectedIndex="{Binding SelectedSettingIndex}">
             <ListView.Resources>
@@ -30,7 +30,7 @@
             </ListView.ContextMenu>
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Scope" Width="150" DisplayMemberBinding="{Binding Scope}"/>
+                    <!--<GridViewColumn Header="Scope" Width="150" DisplayMemberBinding="{Binding Scope}"/>-->
                     <GridViewColumn Header="Key" Width="150" DisplayMemberBinding="{Binding Key}"/>
                     <GridViewColumn Header="Value" Width="Auto">
                         <GridViewColumn.CellTemplate>
@@ -41,6 +41,17 @@
                     </GridViewColumn>
                 </GridView>
             </ListView.View>
+            <ListView.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock FontWeight="Bold"
+                                       FontSize="14"
+                                       Text="{Binding Name}" />
+                        </DataTemplate>
+                    </GroupStyle.HeaderTemplate>
+                </GroupStyle>
+            </ListView.GroupStyle>
         </ListView>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button IsDefault="True" Content="Ok" Click="OkButton_Click" Width="50" Margin="5"/>

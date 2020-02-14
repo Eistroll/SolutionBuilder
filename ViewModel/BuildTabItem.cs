@@ -45,6 +45,8 @@ namespace SolutionBuilder
         [DataMember]
         public String BaseDir { get; set; }
         [DataMember]
+        public String BuildExe { get; set; }
+        [DataMember]
         public String BaseOptions { get; set; }
         [DataMember]
         public StringCollection CheckedSolutions { get; set; }
@@ -384,7 +386,7 @@ namespace SolutionBuilder
             {
                 BaseDir = BaseDir,
                 BaseOptions = BaseOptions,
-                BuildExe = new FileInfo(_ViewModel.GetSetting(Setting.Executables.BuildExe.ToString())),
+                BuildExe = new FileInfo(BuildExe ?? _ViewModel.GetSetting(Setting.Executables.BuildExe.ToString())),
                 solutions = solutionsToBuild,
                 AddToLog = mainWindow.AddToLog,
                 UpdateProgress = DoUpdateProgress

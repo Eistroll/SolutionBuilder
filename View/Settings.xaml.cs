@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,9 +23,15 @@ namespace SolutionBuilder.View
         public Settings()
         {
             InitializeComponent();
+            this.Loaded += Window_Loaded;
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(lvSettings.ItemsSource);
+            PropertyGroupDescription groupDescription = new PropertyGroupDescription(nameof(Setting.Scope));
+            view?.GroupDescriptions.Add(groupDescription);
+            view?.SortDescriptions.Add(new SortDescription {PropertyName = nameof(Setting.Scope), Direction = ListSortDirection.Ascending});
+            view?.SortDescriptions.Add(new SortDescription {PropertyName = nameof(Setting.Key), Direction = ListSortDirection.Ascending});
         }
         private void NewDistributionSource_Click(object sender, RoutedEventArgs e)
         {
