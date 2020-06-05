@@ -34,7 +34,7 @@
                  HorizontalAlignment="Stretch"
                  Height="23"
                  TextWrapping="Wrap"
-                 Text="{Binding TabName}" />
+                 Text="{Binding TabName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <Label Grid.Column="0"
                Grid.Row="1"
                Content="Base dir"
@@ -44,7 +44,7 @@
                  HorizontalAlignment="Stretch"
                  Height="23"
                  TextWrapping="Wrap"
-                 Text="{Binding BaseDir}"
+                 Text="{Binding BaseDir, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  VerticalAlignment="Center" />
         <Label Grid.Column="0"
                Grid.Row="2"
@@ -55,7 +55,7 @@
                  HorizontalAlignment="Stretch"
                  Height="23"
                  TextWrapping="Wrap"
-                 Text="{Binding BuildExe}"
+                 Text="{Binding BuildExe, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  VerticalAlignment="Center" />
     </Grid>
 </Window>

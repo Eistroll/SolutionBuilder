@@ -275,7 +275,7 @@ namespace SolutionBuilder
                         {
                             Executables.Add(item.Value);
                         }
-                        var distribution = DistributionList.First(x => x.Folder == item.Key);
+                        var distribution = DistributionList.FirstOrDefault(x => x.Folder == item.Key);
                         if ( distribution != null )
                         {
                             distribution.Executable = item.Value;

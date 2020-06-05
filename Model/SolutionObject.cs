@@ -11,12 +11,27 @@ namespace SolutionBuilder
         public enum Version { Initial }
         [DataMember]
         private String ContractVersion;
+
         [DataMember]
-        public String Name { get; set; }
+        public String Name
+        {
+            get => _Name;
+            set
+            {
+                if (value != null)
+                {
+                    _Name = value;
+                }
+            }
+        }
+
         [DataMember]
         public Dictionary<string, string> Options = new Dictionary<string, string>();
         [DataMember]
         public Dictionary<string, string> PostBuildSteps = new Dictionary<string, string>();
+
+        private string _Name;
+
         [DataMember]
         public String PostBuildStep { get; set; }
         // Constructor
@@ -48,7 +63,7 @@ namespace SolutionBuilder
         [OnDeserialized()]
         private void OnDeserializedMethod(StreamingContext context)
         {
-            if (ContractVersion!=Version.Initial.ToString() && PostBuildSteps == null)
+            if (ContractVersion != Version.Initial.ToString() && PostBuildSteps == null)
             {
                 PostBuildSteps = new Dictionary<string, string>();
                 PostBuildSteps["Release"] = PostBuildStep;

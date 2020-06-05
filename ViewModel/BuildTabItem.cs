@@ -42,8 +42,21 @@ namespace SolutionBuilder
         }
         [DataMember]
         public String SelectedPath { get; set; }
+
         [DataMember]
-        public String BaseDir { get; set; }
+        public String BaseDir
+        {
+            get => _BaseDir;
+            set
+            {
+                if (!value.Equals(_BaseDir))
+                {
+                    _BaseDir = value;
+                    UpdateAvailableSolutions();
+                }
+            }
+        }
+
         [DataMember]
         public String BuildExe { get; set; }
         [DataMember]
@@ -155,16 +168,21 @@ namespace SolutionBuilder
         public void UpdateAvailableSolutions()
         {
             AllSolutionsInBaseDir.Clear();
-            if (BaseDir.Length == 0)
+            if (string.IsNullOrEmpty(BaseDir))
                 return;
-            System.IO.DirectoryInfo BaseDirInfo = new System.IO.DirectoryInfo(BaseDir);
-            if (BaseDirInfo.Exists)
+            System.IO.DirectoryInfo baseDirInfo = new System.IO.DirectoryInfo(BaseDir);
+            if (baseDirInfo.Exists)
             {
                 var solutionPaths = Directory.GetFiles(BaseDir, @"*.sln", SearchOption.AllDirectories);
                 foreach (var path in solutionPaths)
                 {
                     String newPath = path.Replace(BaseDir, "");
                     AllSolutionsInBaseDir.Add(newPath);
+                }
+                // Trigger notification so that Combobox selects the stored solution
+                foreach (var solution in Solutions)
+                {
+                    solution.NotifyAllPropertiesChanged();
                 }
             }
         }
@@ -374,7 +392,7 @@ namespace SolutionBuilder
                 return;
             mainWindow.executor.Cancel();
         }
-        public void BuildSolutions(ICollection<SolutionObjectView> solutionsToBuild, string progressText )
+        public void BuildSolutions(ICollection<SolutionObjectView> solutionsToBuild, string progressText)
         {
             View.MainWindow mainWindow = (View.MainWindow)System.Windows.Application.Current.MainWindow;
             if (mainWindow == null)
@@ -386,7 +404,7 @@ namespace SolutionBuilder
             {
                 BaseDir = BaseDir,
                 BaseOptions = BaseOptions,
-                BuildExe = new FileInfo(BuildExe ?? _ViewModel.GetSetting(Setting.Executables.BuildExe.ToString())),
+                BuildExe = new FileInfo(string.IsNullOrEmpty(BuildExe) ? _ViewModel.GetSetting(Setting.Executables.BuildExe.ToString()) : BuildExe),
                 solutions = solutionsToBuild,
                 AddToLog = mainWindow.AddToLog,
                 UpdateProgress = DoUpdateProgress
@@ -427,6 +445,8 @@ namespace SolutionBuilder
             Process.Start(path.ToString());
         }
         private CommandHandler _CopySolutionsToCmd;
+        private string _BaseDir;
+
         public CommandHandler CopySolutionsToCmd
         {
             get { return _CopySolutionsToCmd ?? (_CopySolutionsToCmd = new CommandHandler(param => CopySolutionsTo(param), param => RemoveSolution_CanExecute(param))); }

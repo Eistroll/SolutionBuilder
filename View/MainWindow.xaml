@@ -328,7 +328,7 @@
                                                         <GridViewColumn.CellTemplate>
                                                             <DataTemplate>
                                                                 <ComboBox ItemsSource="{Binding DataContext.AllSolutionsForSelectedTab, ElementName=wndMain, UpdateSourceTrigger=PropertyChanged, Mode=OneWay }"
-                                                                          SelectedItem="{Binding Name}"
+                                                                          SelectedItem="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
                                                                           Width="Auto"
                                                                           Margin="-5,0" />
                                                             </DataTemplate>

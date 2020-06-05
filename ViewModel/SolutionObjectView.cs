@@ -88,6 +88,11 @@ namespace SolutionBuilder
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
+        public void NotifyAllPropertiesChanged()
+        {
+            NotifyPropertyChanged(nameof(Name));
+            NotifyPropertyChanged(nameof(Options));
+        }
         public object Clone()
         {
             return MemberwiseClone();
