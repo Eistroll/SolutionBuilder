@@ -24,7 +24,7 @@ namespace SolutionBuilder
                 System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo()
                 { WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden, RedirectStandardOutput = false, UseShellExecute = false, CreateNoWindow = true };
                 startInfo.FileName = @copyExe;
-                startInfo.Arguments = $"{source} {target} {options}";
+                startInfo.Arguments = $"\"{source}\" \"{target}\" \"{options}\"";
                 process.StartInfo = startInfo;
                 //process.OutputDataReceived += (s, eventargs) => BuildOutputHandler(s, eventargs, solution);
                 bool started = process.Start();

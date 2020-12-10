@@ -7,6 +7,7 @@
         xmlns:converters="clr-namespace:SolutionBuilder.Converters"
         xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
         xmlns:local="clr-namespace:SolutionBuilder.View"
+        xmlns:system="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="Solution Builder and Distributor"
         Height="550"
@@ -19,6 +20,7 @@
         <converters:ContentToImageSourceConverter x:Key="ContentConverter" />
         <converters:BoolToVisibilityConverter x:Key="VisibilityConverter" />
         <converters:TailOfFilePathConverter x:Key="TailPathConverter" />
+        <converters:SelectedDistributionItemsConverter x:Key="DistributionItemsConverter"/>
         <Storyboard x:Key="hideMe">
             <DoubleAnimation Storyboard.TargetProperty="Opacity"
                              Duration="0:0:2"
@@ -506,12 +508,22 @@
                                         </GridViewColumn.Header>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
-                                                <CheckBox IsChecked="{Binding Copy}">
+                                                <CheckBox IsChecked="{Binding Copy}"
+                                                          Tag="{Binding ElementName=lvDistribution}">
                                                     <CheckBox.ContextMenu>
                                                         <ContextMenu>
                                                             <MenuItem Header="Apply to all"
                                                                       Command="{Binding ApplyToAllCmd}"
                                                                       CommandParameter="Copy" />
+                                                            <MenuItem Header="Apply to selected"
+                                                                      Command="{Binding ApplyToSelectedCmd}">
+                                                                <MenuItem.CommandParameter>
+                                                                    <MultiBinding Converter="{StaticResource DistributionItemsConverter}">
+                                                                        <Binding Source="Copy"/>
+                                                                        <Binding Path="PlacementTarget.Tag" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=ContextMenu}"/>
+                                                                    </MultiBinding>
+                                                                </MenuItem.CommandParameter>
+                                                            </MenuItem>
                                                         </ContextMenu>
                                                     </CheckBox.ContextMenu>
                                                 </CheckBox>
@@ -532,6 +544,15 @@
                                                             <MenuItem Header="Apply to all"
                                                                       Command="{Binding ApplyToAllCmd}"
                                                                       CommandParameter="Start" />
+                                                            <MenuItem Header="Apply to selected"
+                                                                      Command="{Binding ApplyToSelectedCmd}">
+                                                                <MenuItem.CommandParameter>
+                                                                    <MultiBinding Converter="{StaticResource DistributionItemsConverter}">
+                                                                        <Binding Source="Start"/>
+                                                                        <Binding Path="PlacementTarget.Tag" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=ContextMenu}"/>
+                                                                    </MultiBinding>
+                                                                </MenuItem.CommandParameter>
+                                                            </MenuItem>
                                                         </ContextMenu>
                                                     </CheckBox.ContextMenu>
                                                 </CheckBox>
@@ -555,6 +576,15 @@
                                                             <MenuItem Header="Apply to all"
                                                                       Command="{Binding ApplyToAllCmd}"
                                                                       CommandParameter="Source" />
+                                                            <MenuItem Header="Apply to selected"
+                                                                      Command="{Binding ApplyToSelectedCmd}">
+                                                                <MenuItem.CommandParameter>
+                                                                    <MultiBinding Converter="{StaticResource DistributionItemsConverter}">
+                                                                        <Binding Source="Source"/>
+                                                                        <Binding Path="PlacementTarget.Tag" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=ContextMenu}"/>
+                                                                    </MultiBinding>
+                                                                </MenuItem.CommandParameter>
+                                                            </MenuItem>
                                                         </ContextMenu>
                                                     </ComboBox.ContextMenu>
                                                 </ComboBox>
@@ -589,6 +619,15 @@
                                                             <MenuItem Header="Apply to all"
                                                                       Command="{Binding ApplyToAllCmd}"
                                                                       CommandParameter="Platform" />
+                                                            <MenuItem Header="Apply to selected"
+                                                                      Command="{Binding ApplyToSelectedCmd}">
+                                                                <MenuItem.CommandParameter>
+                                                                    <MultiBinding Converter="{StaticResource DistributionItemsConverter}">
+                                                                        <Binding Source="Platform"/>
+                                                                        <Binding Path="PlacementTarget.Tag" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=ContextMenu}"/>
+                                                                    </MultiBinding>
+                                                                </MenuItem.CommandParameter>
+                                                            </MenuItem>
                                                         </ContextMenu>
                                                     </ComboBox.ContextMenu>
                                                 </ComboBox>
@@ -609,6 +648,15 @@
                                                             <MenuItem Header="Apply to all"
                                                                       Command="{Binding ApplyToAllCmd}"
                                                                       CommandParameter="Configuration" />
+                                                            <MenuItem Header="Apply to selected"
+                                                                      Command="{Binding ApplyToSelectedCmd}">
+                                                                <MenuItem.CommandParameter>
+                                                                    <MultiBinding Converter="{StaticResource DistributionItemsConverter}">
+                                                                        <Binding Source="Configuration"/>
+                                                                        <Binding Path="PlacementTarget.Tag" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=ContextMenu}"/>
+                                                                    </MultiBinding>
+                                                                </MenuItem.CommandParameter>
+                                                            </MenuItem>
                                                         </ContextMenu>
                                                     </ComboBox.ContextMenu>
                                                 </ComboBox>
@@ -659,6 +707,15 @@
                                                             <MenuItem Header="Apply to all"
                                                                       Command="{Binding ApplyToAllCmd}"
                                                                       CommandParameter="Executable" />
+                                                            <MenuItem Header="Apply to selected"
+                                                                      Command="{Binding ApplyToSelectedCmd}">
+                                                                <MenuItem.CommandParameter>
+                                                                    <MultiBinding Converter="{StaticResource DistributionItemsConverter}">
+                                                                        <Binding Source="Executable"/>
+                                                                        <Binding Path="PlacementTarget.Tag" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=ContextMenu}"/>
+                                                                    </MultiBinding>
+                                                                </MenuItem.CommandParameter>
+                                                            </MenuItem>
                                                             <MenuItem Header="Delete entry"
                                                                       Command="{Binding RemoveExecTargetCmd}" />
                                                         </ContextMenu>
@@ -681,9 +738,9 @@
                      Text="{Binding Log, UpdateSourceTrigger=PropertyChanged}"
                      VerticalAlignment="Stretch"
                      ScrollViewer.CanContentScroll="True"
-                     HorizontalScrollBarVisibility="Auto"
+                     HorizontalScrollBarVisibility="Disabled"
                      IsReadOnly="True"
-                     AcceptsReturn="True"
+                     TextWrapping="Wrap"
                      Margin="5"
                      VerticalScrollBarVisibility="Auto">
                 <TextBox.ContextMenu>

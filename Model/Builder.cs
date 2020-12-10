@@ -98,6 +98,7 @@ namespace SolutionBuilder
             startInfo.WorkingDirectory = BaseDir;
             string command = solution.PostBuildStep;
             command = command.Replace(@"{Name}", solution.Name);
+            command = command.Replace(@"{BaseDir}", BaseDir);
 
             startInfo.Arguments = @"/c " + command;
             process.StartInfo = startInfo;

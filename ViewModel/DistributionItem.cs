@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using SolutionBuilder.Converters;
 
 namespace SolutionBuilder.ViewModel
 {
@@ -88,13 +90,6 @@ namespace SolutionBuilder.ViewModel
         public int PID { get; set; }
         [IgnoreDataMemberAttribute]
         public Process Proc;
-        private string _ApplyToAllProperty;
-        [IgnoreDataMemberAttribute]
-        public string ApplyToAllProperty
-        {
-            get { return _ApplyToAllProperty; }
-            set { _ApplyToAllProperty = value; NotifyPropertyChanged("ApplyToAllProperty"); }
-        }
         public DistributionItem()
         {
             ExecArguments = new ObservableCollection<string>();
@@ -121,8 +116,7 @@ namespace SolutionBuilder.ViewModel
         {
             if (parameter == null)
                 return;
-            ApplyToAllProperty = parameter as string;
-            ApplyToAllEventArgs e = new ApplyToAllEventArgs() { Property = ApplyToAllProperty };
+            ApplyToAllEventArgs e = new ApplyToAllEventArgs() { PropertyName = parameter as string };
             EventHandler<ApplyToAllEventArgs> handler = ApplyToAll;
             if (handler != null)
             {
@@ -132,7 +126,30 @@ namespace SolutionBuilder.ViewModel
         public event EventHandler<ApplyToAllEventArgs> ApplyToAll;
         public class ApplyToAllEventArgs : EventArgs
         {
-            public string Property;
+            public string PropertyName;
+        }
+        private CommandHandler _ApplyToSelectedCmd;
+        public CommandHandler ApplyToSelectedCmd
+        {
+            get { return _ApplyToSelectedCmd ?? (_ApplyToSelectedCmd = new CommandHandler(param => OnApplyToSelected(param), param => ApplyToSelected_CanExecute(param))); }
+        }
+        public bool ApplyToSelected_CanExecute(object parameter)
+        {
+            return parameter != null;
+        }
+        protected virtual void OnApplyToSelected(object parameter)
+        {
+            if (parameter is SelectedDistributionItemsConverter.Selection selection)
+            {
+                ApplyToSelectedEventArgs e = new ApplyToSelectedEventArgs() { PropertyName = selection.Name, SelectedItems = selection.SelectedItems };
+                ApplyToSelected?.Invoke(this, e);
+            }
+        }
+        public event EventHandler<ApplyToSelectedEventArgs> ApplyToSelected;
+        public class ApplyToSelectedEventArgs : EventArgs
+        {
+            public string PropertyName;
+            public IList SelectedItems;
         }
         private CommandHandler _RemoveExecTargetCmd;
         public CommandHandler RemoveExecTargetCmd

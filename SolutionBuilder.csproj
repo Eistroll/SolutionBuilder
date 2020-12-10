@@ -82,6 +82,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters\ContentToImageSourceConverter.cs" />
+    <Compile Include="Converters\SelectedDistributionItemsConverter.cs" />
     <Compile Include="Converters\StateToImageSourceConverter.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Converters\TailOfFilePathConverter.cs" />
