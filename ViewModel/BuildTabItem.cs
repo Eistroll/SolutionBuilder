@@ -49,7 +49,7 @@ namespace SolutionBuilder
             get => _BaseDir;
             set
             {
-                if (!value.Equals(_BaseDir))
+                if (value != null && !value.Equals(_BaseDir))
                 {
                     _BaseDir = value;
                     UpdateAvailableSolutions();
@@ -58,6 +58,7 @@ namespace SolutionBuilder
         }
 
         [DataMember] public string BuildExe { get; set; }
+        [DataMember] public string PublishExe { get; set; }
 
         [DataMember] public string BaseOptions { get; set; }
 
@@ -370,6 +371,9 @@ namespace SolutionBuilder
                 BuildExe = new FileInfo(string.IsNullOrEmpty(BuildExe)
                     ? _ViewModel.GetSetting(Setting.Executables.BuildExe.ToString())
                     : BuildExe),
+                PublishExe = new FileInfo(string.IsNullOrEmpty(PublishExe)
+                    ? _ViewModel.GetSetting(Setting.Executables.CopyExe.ToString())
+                    : PublishExe),
                 solutions = solutionsToBuild,
                 AddToLog = mainWindow.AddToLog,
                 UpdateProgress = DoUpdateProgress

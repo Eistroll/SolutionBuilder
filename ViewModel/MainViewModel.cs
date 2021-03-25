@@ -413,7 +413,7 @@ namespace SolutionBuilder
 
         private void DistributionItem_ApplyToSelected(object sender, DistributionItem.ApplyToSelectedEventArgs e)
         {
-            if (sender is DistributionItem itemModified)
+            if (sender is DistributionItem itemModified && e.SelectedItems != null)
                 foreach (var item in e.SelectedItems)
                     if (item is DistributionItem distributionItem && distributionItem != itemModified)
                         distributionItem[e.PropertyName] = itemModified[e.PropertyName];
@@ -435,7 +435,6 @@ namespace SolutionBuilder
                     if (item.Scope == Setting.Scopes.DistributionTarget.ToString() && item.Key != null)
                     {
                         var distributionItem = new DistributionItem {Folder = item.Key};
-                        distributionItem.SetSelectionCountGetter(() => SelectedDistributionItems);
                         DistributionList.Add(distributionItem);
                         DistributionTargetMap[item.Key] = item.Value;
                         NotifyPropertyChanged("DistributionTargetMap");

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,33 @@ namespace SolutionBuilder
         public SolutionObject SolutionObject { get { return _SolutionObject; } }
         public string Name { get { return _SolutionObject?.Name; } set { _SolutionObject.Name = value; } }
 
+        public ObservableCollection<string> PublishToList { get; set; }
+        private string _SelectedPublishTo;
+        public string SelectedPublishTo
+        {
+	        get { return _SelectedPublishTo; }
+	        set
+	        {
+		        _SelectedPublishTo = value;
+		        NotifyPropertyChanged("SelectedPublishTo");
+	        }
+        }
+        [IgnoreDataMember]
+        public string NewPublishTo
+        {
+	        set
+	        {
+		        if (SelectedPublishTo != null)
+		        {
+			        return;
+		        }
+		        if (!string.IsNullOrEmpty(value))
+		        {
+			        PublishToList?.Add(value);
+			        SelectedPublishTo = value;
+		        }
+	        }
+        }
         private string _Options;
         public string Options
         {
@@ -55,14 +83,17 @@ namespace SolutionBuilder
             set { if (_SuccessFlag != value) { _SuccessFlag = value; NotifyPropertyChanged("SuccessFlag"); } }
         }
 
-        [IgnoreDataMemberAttribute]
+        [IgnoreDataMember]
         public bool IsSelected { get; set; }
         public String BuildLog { get; set; }
+        public string LastOutFolder { get; set; }
 
         public SolutionObjectView(ref SolutionObject SolutionObject, String selectedConfiguration)
         {
             _SolutionObject = SolutionObject;
             Options = _SolutionObject.Options[selectedConfiguration];
+            PublishToList = _SolutionObject.PublishToLists[selectedConfiguration];
+            SelectedPublishTo = _SolutionObject.PublishTos[selectedConfiguration];
             _SolutionObject.PostBuildSteps.TryGetValue(selectedConfiguration, out var postBuildStep);
             if (!string.IsNullOrEmpty(postBuildStep))
                 PostBuildStep = postBuildStep;

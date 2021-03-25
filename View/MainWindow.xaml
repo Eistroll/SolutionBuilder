@@ -363,8 +363,23 @@
                                                             </DataTemplate>
                                                         </GridViewColumn.CellTemplate>
                                                     </GridViewColumn>
+	                                                <GridViewColumn Header="Publish"
+	                                                                Width="300">
+		                                                <GridViewColumn.CellTemplate>
+			                                                <DataTemplate>
+				                                                <ComboBox ItemsSource="{Binding PublishToList}"
+				                                                          SelectedItem="{Binding SelectedPublishTo}"
+				                                                          Name="ComboBox_PublishTo"
+				                                                          IsEditable="True"
+				                                                          Text="{Binding NewPublishTo, UpdateSourceTrigger=LostFocus, Mode=OneWayToSource}"
+				                                                          ToolTip="{Binding SelectedPublishTo}"
+				                                                          Width="Auto"
+				                                                          Margin="-5,0" />
+			                                                </DataTemplate>
+		                                                </GridViewColumn.CellTemplate>
+	                                                </GridViewColumn>
                                                     <GridViewColumn Header="State"
-                                                                    Width="32">
+	                                                                Width="32">
                                                         <GridViewColumn.CellTemplate>
                                                             <DataTemplate>
                                                                 <Image Source="{Binding BuildState, Converter={StaticResource StateConverter}}"
@@ -692,6 +707,7 @@
                                                           Name="ComboBox_ExecArguments"
                                                           IsEditable="True"
                                                           Text="{Binding NewExecArgument, UpdateSourceTrigger=LostFocus, Mode=OneWayToSource}"
+                                                          ToolTip="{Binding SelectedExecArgument}"
                                                           Height="20"
                                                           Width="Auto"
                                                           Margin="-5,0"

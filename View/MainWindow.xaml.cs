@@ -256,7 +256,6 @@ namespace SolutionBuilder.View
                     AddToLog($"Executable for starting does not exist: {exePath.ToString()}");
                     return false;
                 }
-                AddToLog($"Execute {exePath} {distribution.SelectedExecArgument}" + Environment.NewLine);
                 task = Task.Factory.StartNew(() =>
                  {
                      System.Diagnostics.Process process = new System.Diagnostics.Process();
@@ -265,6 +264,7 @@ namespace SolutionBuilder.View
                      process.Start();
                      distribution.Proc = process;
                  });
+                AddToLog($"Execute {exePath} {distribution?.SelectedExecArgument} [{distribution?.Proc?.Id}]" + Environment.NewLine);
             }
             return true;
         }
@@ -308,7 +308,7 @@ namespace SolutionBuilder.View
             foreach (var distribution in _ViewModel.DistributionList)
             {
                 if(distribution.Checked)
-                    KillProcss(distribution);
+                    KillProcess(distribution);
             }
         }
         private void NewDistribution_Click(object sender, RoutedEventArgs e)
@@ -381,7 +381,7 @@ namespace SolutionBuilder.View
             ExecuteDistribution(distribution, true, false, executor, copyExe);
         }
 
-        private void KillProcss(DistributionItem distribution)
+        private void KillProcess(DistributionItem distribution)
         {
             if (distribution.Proc != null && !distribution.Proc.HasExited)
             {
@@ -398,7 +398,7 @@ namespace SolutionBuilder.View
         {
             Button killButton = (Button)sender;
             DistributionItem distribution = killButton.DataContext as DistributionItem;
-            KillProcss(distribution);
+            KillProcess(distribution);
         }
 
         private void OpenPostBuildStep_Click(object sender, RoutedEventArgs e)
